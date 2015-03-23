@@ -1,9 +1,12 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -35,5 +38,16 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void Login(View view){
+        EditText nickname = (EditText) findViewById(R.id.loginNickname);
+        EditText email = (EditText) findViewById(R.id.loginEmail);
+
+        Intent intent = new Intent();
+        intent.putExtra("nickname", nickname.getText());
+        intent.putExtra("email", email.getText());
+        startActivity(intent);
+        finish();
     }
 }
