@@ -4,5 +4,7 @@
     <string name="app_name">AirDesk</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_show_file">ShowFileActivity</string>
+    <string name="title_activity_edit_file">EditFileActivity</string>
 
 </resources>

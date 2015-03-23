@@ -16,6 +16,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ShowFileActivity"
+            android:label="@string/title_activity_show_file" >
+        </activity>
+        <activity
+            android:name=".EditFileActivity"
+            android:label="@string/title_activity_edit_file" >
+        </activity>
     </application>
 
 </manifest>
