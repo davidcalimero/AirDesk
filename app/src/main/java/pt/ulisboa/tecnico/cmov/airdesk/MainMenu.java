@@ -1,12 +1,14 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import com.example.android.common.view.SlidingTabLayout;
+import pt.ulisboa.tecnico.cmov.airdesk.slidingTab.SlidingTabLayout;
 
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspacePagerAdapter;
 
@@ -27,6 +29,11 @@ public class MainMenu extends ActionBarActivity {
 
         mSlidingTabLayout.setViewPager(mViewPager);
 
+        Intent intent = getIntent();
+        String nickname = intent.getStringExtra("nickname");
+        String email = intent.getStringExtra("email");
+
+        setTitle(nickname + " | " + email);
     }
 
 
@@ -53,5 +60,12 @@ public class MainMenu extends ActionBarActivity {
         // Aqui põe-se as opções da ActionBar! :D
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void openFile(View view){
+        Intent intent = new Intent(getApplicationContext(), ShowFileActivity.class);
+        intent.putExtra("title", "TitleTest");
+        intent.putExtra("text", "TextTest");
+        startActivity(intent);
     }
 }

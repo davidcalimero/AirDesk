@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.common.view;
+package pt.ulisboa.tecnico.cmov.airdesk.slidingTab;
 
 import android.R;
 import android.content.Context;
