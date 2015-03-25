@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,9 @@ public class MainMenu extends ActionBarActivity {
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
 
+    private String nickname;
+    private String email;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,9 +33,17 @@ public class MainMenu extends ActionBarActivity {
 
         mSlidingTabLayout.setViewPager(mViewPager);
 
-        Intent intent = getIntent();
-        String nickname = intent.getStringExtra("nickname");
-        String email = intent.getStringExtra("email");
+        Log.e("Teste", "onCreateNovo");
+
+        if(savedInstanceState != null){
+            nickname = savedInstanceState.getString("Name");
+            email = savedInstanceState.getString("Email");
+        }
+        else{
+            Intent intent = getIntent();
+            nickname = intent.getStringExtra("nickname");
+            email = intent.getStringExtra("email");
+        }
 
         setTitle(nickname + " | " + email);
     }
@@ -60,6 +72,14 @@ public class MainMenu extends ActionBarActivity {
         // Aqui põe-se as opções da ActionBar! :D
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.e("Teste", "onSaveInstanceState");
+        outState.putString("Name", nickname);
+        outState.putString("Email", email);
+        super.onSaveInstanceState(outState);
     }
 
     public void openFile(View view){
