@@ -45,7 +45,7 @@ public class MainMenu extends ActionBarActivity {
             nickname = savedInstanceState.getString(NICKNAME);
             email = savedInstanceState.getString(EMAIL);
         }
-
+        
         setTitle(nickname + " | " + email);
     }
 
