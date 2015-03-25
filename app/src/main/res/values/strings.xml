@@ -14,5 +14,6 @@
     <string name="edit">Edit</string>
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
+    <string name="app_logo">AppLogo</string>
 
 </resources>
