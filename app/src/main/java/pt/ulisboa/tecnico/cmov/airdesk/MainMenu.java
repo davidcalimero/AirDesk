@@ -15,8 +15,13 @@ import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspacePagerAdapter;
 
 public class MainMenu extends ActionBarActivity {
 
+    public static final String NICKNAME = "nickname";
+    public static final String EMAIL = "email";
+
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
+    private String nickname;
+    private String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,16 +31,30 @@ public class MainMenu extends ActionBarActivity {
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mViewPager.setAdapter(new WorkspacePagerAdapter(getSupportFragmentManager()));
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-
+        mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
 
-        Intent intent = getIntent();
-        String nickname = intent.getStringExtra("nickname");
-        String email = intent.getStringExtra("email");
+        if(savedInstanceState == null) {
+            //Default sate
+            Intent intent = getIntent();
+            nickname = intent.getStringExtra(NICKNAME);
+            email = intent.getStringExtra(EMAIL);
+        }
+        else{
+            //Saved state
+            nickname = savedInstanceState.getString(NICKNAME);
+            email = savedInstanceState.getString(EMAIL);
+        }
 
         setTitle(nickname + " | " + email);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(NICKNAME, nickname);
+        outState.putString(EMAIL, email);
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
