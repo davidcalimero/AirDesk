@@ -4,6 +4,7 @@
     <string name="app_name">AirDesk</string>
     <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>
+    <string name="action_logout">Logout</string>
     <string name="temp">Temp Text</string>
     <string name="nickname">Nickname</string>
     <string name="email">E-Mail</string>

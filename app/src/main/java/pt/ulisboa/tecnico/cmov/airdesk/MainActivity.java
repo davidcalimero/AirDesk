@@ -14,48 +14,52 @@ public class MainActivity extends ActionBarActivity {
     public static final String PREFERENCES = "loginPrefs";
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
+    public static final String LOGOUT = "logout";
 
     private SharedPreferences sharedPreferences;
-    private EditText nicknameView;
-    private EditText emailView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Initialize variables
+        String nickname;
+        String email;
+
+        //Get login data from shareddprefs
         sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        nicknameView = (EditText) findViewById(R.id.loginNickname);
-        emailView = (EditText) findViewById(R.id.loginEmail);
+        nickname = sharedPreferences.getString(NICKNAME, "");
+        email = sharedPreferences.getString(EMAIL, "");
 
-        //Initialize views with saved content
-        if (sharedPreferences.contains(NICKNAME)) {
-            nicknameView.setText(sharedPreferences.getString(NICKNAME, ""));
-
-        }
-        if (sharedPreferences.contains(EMAIL)) {
-            emailView.setText(sharedPreferences.getString(EMAIL, ""));
-
+        //Logout if applicable
+        if(getIntent().getBooleanExtra(LOGOUT, false)){
+            sharedPreferences.edit().clear().commit();
         }
 
-        if(!nicknameView.getText().toString().equals("") && !emailView.getText().toString().equals("")){
-            Login(null);
+        //If was not logout and have data to login autologin
+        if(!nickname.equals("") && !email.equals("") && !getIntent().getBooleanExtra(LOGOUT, false)){
+            sendLoginData(nickname, email);
         }
     }
 
 
-    public void Login(View view){
+    public void login(View view){
+        //Get data from views
+        EditText nicknameView = (EditText) findViewById(R.id.loginNickname);
+        EditText emailView = (EditText) findViewById(R.id.loginEmail);
         String nickname = nicknameView.getText().toString();
         String email = emailView.getText().toString();
 
         //Save views content
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
         editor.putString(NICKNAME, nickname);
         editor.putString(EMAIL, email);
         editor.commit();
 
+        sendLoginData(nickname, email);
+    }
+
+    private void sendLoginData(String nickname, String email){
         //Change activity
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);
         intent.putExtra(NICKNAME, nickname);

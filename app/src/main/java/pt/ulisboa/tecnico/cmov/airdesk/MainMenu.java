@@ -17,6 +17,7 @@ public class MainMenu extends ActionBarActivity {
 
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
+    public static final String LOGOUT = "logout";
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
@@ -70,15 +71,25 @@ public class MainMenu extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id){
+            case R.id.action_settings:
+                break;
+
+            case R.id.action_refresh:
+                break;
+
+            case R.id.action_logout:
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra(LOGOUT, true);
+                startActivity(intent);
+                finish();
+
+             default:
+                 return super.onOptionsItemSelected(item);
+
         }
 
-        /* TODO */
-        // Aqui põe-se as opções da ActionBar! :D
-
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     public void openFile(View view){
