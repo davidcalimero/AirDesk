@@ -9,20 +9,37 @@ import android.widget.EditText;
 
 public class EditFileActivity extends ActionBarActivity {
 
+    private String title;
+    private String text;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_file);
 
-        Intent intent = getIntent();
-        String title = intent.getStringExtra("title");
-        String text = intent.getStringExtra("text");
+        if(savedInstanceState == null) {
+            //Default sate
+            Intent intent = getIntent();
+            title = intent.getStringExtra(ShowFileActivity.TITLE);
+            text = intent.getStringExtra(ShowFileActivity.TEXT);
+        }
+        else{
+            //Saved state
+            title = savedInstanceState.getString(ShowFileActivity.TITLE);
+            text = savedInstanceState.getString(ShowFileActivity.TEXT);
+        }
 
         EditText editText = (EditText) findViewById(R.id.editText);
         editText.setText(text);
         setTitle(title);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(ShowFileActivity.TITLE, title);
+        outState.putString(ShowFileActivity.TEXT, text);
+        super.onSaveInstanceState(outState);
+    }
 
     public void doneButtonPressed(View view){
         /*

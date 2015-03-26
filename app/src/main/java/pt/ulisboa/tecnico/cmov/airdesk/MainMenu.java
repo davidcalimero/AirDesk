@@ -17,12 +17,13 @@ public class MainMenu extends ActionBarActivity {
 
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
-    public static final String LOGOUT = "logout";
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private String nickname;
     private String email;
+
+    //private ArrayList<CharSequence> tags = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,22 +81,37 @@ public class MainMenu extends ActionBarActivity {
 
             case R.id.action_logout:
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.putExtra(LOGOUT, true);
+                intent.putExtra(MainActivity.LOGOUT, true);
                 startActivity(intent);
                 finish();
 
              default:
                  return super.onOptionsItemSelected(item);
-
         }
 
         return true;
     }
 
+    /*@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) {
+            return;
+        }
+        tags = data.getCharSequenceArrayListExtra(TagsActivity.TAGS);
+    }*/
+
     public void openFile(View view){
-        Intent intent = new Intent(getApplicationContext(), ShowFileActivity.class);
-        intent.putExtra("title", "TitleTest");
-        intent.putExtra("text", "TextTest");
-        startActivity(intent);
+
+        /*Intent intent = new Intent(getApplicationContext(), ShowFileActivity.class);
+        intent.putExtra(ShowFileActivity.TITLE, "TitleTest");
+        intent.putExtra(ShowFileActivity.TEXT, "TextTest");
+        startActivity(intent);*/
+
+
+        /*Intent intent = new Intent(getApplicationContext(), TagsActivity.class);
+        intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, tags);
+        intent.putExtra(TagsActivity.TITLE, "TagsActivity");
+        startActivityForResult(intent, 1);*/
     }
 }

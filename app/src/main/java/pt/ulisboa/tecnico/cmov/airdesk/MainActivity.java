@@ -7,13 +7,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
 
     public static final String PREFERENCES = "loginPrefs";
-    public static final String NICKNAME = "nickname";
-    public static final String EMAIL = "email";
     public static final String LOGOUT = "logout";
 
     private SharedPreferences sharedPreferences;
@@ -31,8 +30,8 @@ public class MainActivity extends ActionBarActivity {
 
         //Get login data from shareddprefs
         sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        nickname = sharedPreferences.getString(NICKNAME, "");
-        email = sharedPreferences.getString(EMAIL, "");
+        nickname = sharedPreferences.getString(MainMenu.NICKNAME, "");
+        email = sharedPreferences.getString(MainMenu.EMAIL, "");
 
         //Logout if applicable
         if(getIntent().getBooleanExtra(LOGOUT, false)){
@@ -53,10 +52,16 @@ public class MainActivity extends ActionBarActivity {
         String nickname = nicknameView.getText().toString();
         String email = emailView.getText().toString();
 
+        //Invalid input verification
+        if(nickname.equals("") || email.equals("")){
+            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         //Save views content
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(NICKNAME, nickname);
-        editor.putString(EMAIL, email);
+        editor.putString(MainMenu.NICKNAME, nickname);
+        editor.putString(MainMenu.EMAIL, email);
         editor.commit();
 
         sendLoginData(nickname, email);
@@ -65,8 +70,8 @@ public class MainActivity extends ActionBarActivity {
     private void sendLoginData(String nickname, String email){
         //Change activity
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);
-        intent.putExtra(NICKNAME, nickname);
-        intent.putExtra(EMAIL, email);
+        intent.putExtra(MainMenu.NICKNAME, nickname);
+        intent.putExtra(MainMenu.EMAIL, email);
         startActivity(intent);
         finish();
     }
