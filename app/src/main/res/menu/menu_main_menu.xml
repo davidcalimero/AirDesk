@@ -17,6 +17,9 @@
                 android:title="@string/action_logout"
                 android:icon="@drawable/ic_action_logout"
                 app:showAsAction="always"/>
+            <item android:id="@+id/new_workspace"
+                android:title="@string/action_new_workspace"
+                app:showAsAction="always"/>
         </menu>
     </item>
 </menu>

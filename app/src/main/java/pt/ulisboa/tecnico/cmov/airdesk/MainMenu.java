@@ -23,7 +23,6 @@ public class MainMenu extends ActionBarActivity {
     private String nickname;
     private String email;
 
-    //private ArrayList<CharSequence> tags = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +71,8 @@ public class MainMenu extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        Intent intent;
+
         switch (id){
             case R.id.action_settings:
                 break;
@@ -80,10 +81,16 @@ public class MainMenu extends ActionBarActivity {
                 break;
 
             case R.id.action_logout:
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.putExtra(MainActivity.LOGOUT, true);
                 startActivity(intent);
                 finish();
+                break;
+
+            case R.id.new_workspace:
+                intent = new Intent(getApplicationContext(), NewWorkspaceActivity.class);
+                startActivity(intent);
+                break;
 
              default:
                  return super.onOptionsItemSelected(item);
@@ -92,14 +99,7 @@ public class MainMenu extends ActionBarActivity {
         return true;
     }
 
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) {
-            return;
-        }
-        tags = data.getCharSequenceArrayListExtra(TagsActivity.TAGS);
-    }*/
+
 
     public void openFile(View view){
 

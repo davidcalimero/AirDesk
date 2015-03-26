@@ -7,6 +7,8 @@
     <string name="action_logout">Logout</string>
     <string name="nickname">Nickname</string>
     <string name="email">E-Mail</string>
+    <string name="action_new_workspace">New Workspace</string>
+    <string name="workspace_name">Workspace Name</string>
     <string name="login">Login</string>
     <string name="file">File</string>
     <string name="edit">Edit</string>
@@ -15,5 +17,6 @@
     <string name="app_logo">App Logo</string>
     <string name="add">Add</string>
     <string name="invalid_input">Invalid Input</string>
+    <string name="title_activity_new_workspace">Create New Workspace</string>
 
 </resources>
