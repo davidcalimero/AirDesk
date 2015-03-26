@@ -28,7 +28,7 @@
         <activity
             android:name=".ShowFileActivity"
             android:parentActivityName=".MainMenu"
-            android:label="@string/temp"
+            android:label="@string/app_name"
             android:launchMode="singleTop" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -38,7 +38,7 @@
         <activity
             android:name=".EditFileActivity"
             android:parentActivityName=".ShowFileActivity"
-            android:label="@string/temp" >
+            android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ShowFileActivity"/>
