@@ -70,10 +70,19 @@ public class TagsActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
+        sendData();
+        super.onBackPressed();
+    }
+
+    public void done(View view){
+        sendData();
+        finish();
+    }
+
+    public void sendData(){
         Intent intent = new Intent();
         intent.putCharSequenceArrayListExtra(TAGS, tags);
         setResult(RESULT_OK, intent);
-        super.onBackPressed();
     }
 
     public void addTag(View view){

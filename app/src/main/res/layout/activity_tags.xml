@@ -11,27 +11,39 @@
     <ListView android:id="@+id/tagsView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_above="@+id/tagWriteView" />
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/addTag" />
 
     <EditText android:id="@+id/tagWriteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:inputType="text"
+        android:layout_above="@+id/tagsDone"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/addTag"
-        android:layout_toStartOf="@+id/addTag"
-        android:inputType="text"/>
+        android:layout_toStartOf="@+id/addTag" />
 
     <Button android:id="@+id/addTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add"
+        android:onClick="addTag"
+        android:layout_above="@+id/tagsDone"
+        android:layout_alignRight="@+id/tagsView"
+        android:layout_alignEnd="@+id/tagsView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/done"
+        android:id="@+id/tagsDone"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:onClick="addTag" />
+        android:layout_alignRight="@+id/addTag"
+        android:layout_alignEnd="@+id/addTag"
+        android:layout_toEndOf="@+id/tagWriteView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="done" />
 
 </RelativeLayout>
