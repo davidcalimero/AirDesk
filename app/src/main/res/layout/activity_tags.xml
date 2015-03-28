@@ -22,7 +22,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/addTag"
-        android:layout_toStartOf="@+id/addTag" />
+        android:layout_toStartOf="@+id/addTag"
+        android:hint="@string/enter_new_tag" />
 
     <Button android:id="@+id/addTag"
         android:layout_width="wrap_content"

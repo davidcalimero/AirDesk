@@ -6,7 +6,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import pt.ulisboa.tecnico.cmov.airdesk.slidingTab.SlidingTabLayout;
 
@@ -30,7 +29,7 @@ public class MainMenu extends ActionBarActivity {
         setContentView(R.layout.activity_main_menu);
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mViewPager.setAdapter(new WorkspacePagerAdapter(getSupportFragmentManager()));
+        mViewPager.setAdapter(new WorkspacePagerAdapter(getSupportFragmentManager(), getApplicationContext()));
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
@@ -47,7 +46,7 @@ public class MainMenu extends ActionBarActivity {
             email = savedInstanceState.getString(EMAIL);
         }
         
-        setTitle(nickname + " | " + email);
+        setTitle(nickname + ": " + email);
     }
 
     @Override
@@ -97,21 +96,5 @@ public class MainMenu extends ActionBarActivity {
         }
 
         return true;
-    }
-
-
-
-    public void openFile(View view){
-
-        /*Intent intent = new Intent(getApplicationContext(), ShowFileActivity.class);
-        intent.putExtra(ShowFileActivity.TITLE, "TitleTest");
-        intent.putExtra(ShowFileActivity.TEXT, "TextTest");
-        startActivity(intent);*/
-
-
-        /*Intent intent = new Intent(getApplicationContext(), TagsActivity.class);
-        intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, tags);
-        intent.putExtra(TagsActivity.TITLE, "TagsActivity");
-        startActivityForResult(intent, 1);*/
     }
 }

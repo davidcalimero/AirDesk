@@ -2,7 +2,9 @@ package pt.ulisboa.tecnico.cmov.airdesk.adapter;
 
 import pt.ulisboa.tecnico.cmov.airdesk.OwnedFragment;
 import pt.ulisboa.tecnico.cmov.airdesk.ForeignFragment;
+import pt.ulisboa.tecnico.cmov.airdesk.R;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,17 +12,26 @@ import android.util.Log;
 
 public class WorkspacePagerAdapter extends FragmentPagerAdapter {
 
-    private static final String[] names = {"Owned", "Foreign"};
     private static final int OWNED = 0;
     private static final int FOREIGN = 1;
 
-    public WorkspacePagerAdapter(FragmentManager fm){
+    private Context context;
+
+    public WorkspacePagerAdapter(FragmentManager fm, Context c){
         super(fm);
+        context = c;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return names[position];
+        switch(position){
+            case OWNED:
+                return context.getString(R.string.owned);
+            case FOREIGN:
+                return context.getString(R.string.foreign);
+            default:
+                return "";
+        }
     }
 
     @Override
@@ -37,8 +48,8 @@ public class WorkspacePagerAdapter extends FragmentPagerAdapter {
             case FOREIGN:
                 return new ForeignFragment();
             default:
-                Log.e("Testing", "Deu erro");
+                Log.e("WorkspacePagerAdapter", "Wrong ID");
+                return null;
         }
-        return null;
     }
 }

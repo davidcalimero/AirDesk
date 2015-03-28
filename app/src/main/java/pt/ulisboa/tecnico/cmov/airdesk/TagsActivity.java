@@ -97,7 +97,5 @@ public class TagsActivity extends ActionBarActivity {
         tagWriter.getText().clear();
         adapter.add(tag);
         tags.add(tag);
-
-
     }
 }

@@ -5,10 +5,11 @@
     <application
         android:name=".ApplicationContext"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:screenOrientation="portrait"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -18,11 +19,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainMenu"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
         </activity>
+
         <activity
             android:name=".ShowFileActivity"
             android:label="@string/app_name"
@@ -32,6 +35,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />
         </activity>
+
         <activity
             android:name=".EditFileActivity"
             android:label="@string/app_name"
@@ -40,14 +44,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ShowFileActivity" />
         </activity>
+
         <activity
             android:name=".TagsActivity"
             android:label="@string/app_name" >
         </activity>
+
         <activity
             android:name=".NewWorkspaceActivity"
-            android:label="@string/title_activity_new_workspace" >
+            android:label="@string/create_new_workspace"
+            android:parentActivityName=".MainMenu" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainMenu" />
         </activity>
+
     </application>
 
 </manifest>
