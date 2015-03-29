@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pt.ulisboa.tecnico.cmov.airdesk.ForeignFragment">
+
+    <item android:id="@+id/tag_subscriptions"
+        android:title="@string/subscriptions"
+        android:icon="@android:drawable/ic_menu_preferences"
+        app:showAsAction="always"/>
+
+</menu>

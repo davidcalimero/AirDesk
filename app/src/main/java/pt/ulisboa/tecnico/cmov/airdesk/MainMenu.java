@@ -4,8 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewConfiguration;
+
+import java.lang.reflect.Field;
+
 
 import pt.ulisboa.tecnico.cmov.airdesk.slidingTab.SlidingTabLayout;
 
@@ -17,8 +22,6 @@ public class MainMenu extends ActionBarActivity {
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
 
-    private SlidingTabLayout mSlidingTabLayout;
-    private ViewPager mViewPager;
     private String nickname;
     private String email;
 
@@ -28,9 +31,9 @@ public class MainMenu extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mViewPager.setAdapter(new WorkspacePagerAdapter(getSupportFragmentManager(), getApplicationContext()));
-        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        SlidingTabLayout mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
 
@@ -47,6 +50,20 @@ public class MainMenu extends ActionBarActivity {
         }
         
         setTitle(nickname + ": " + email);
+
+        //Force overflow menu on actionBar
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        }
+        catch (Exception e) {
+            Log.e("MainMenu", "Force action bar menu error");
+        }
     }
 
     @Override
@@ -70,25 +87,12 @@ public class MainMenu extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        Intent intent;
-
         switch (id){
-            case R.id.action_settings:
-                break;
-
-            case R.id.action_refresh:
-                break;
-
             case R.id.action_logout:
-                intent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.putExtra(MainActivity.LOGOUT, true);
                 startActivity(intent);
                 finish();
-                break;
-
-            case R.id.new_workspace:
-                intent = new Intent(getApplicationContext(), NewWorkspaceActivity.class);
-                startActivity(intent);
                 break;
 
              default:

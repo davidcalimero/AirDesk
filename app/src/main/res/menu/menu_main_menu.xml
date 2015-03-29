@@ -3,26 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.MainMenu">
 
-    <item android:id="@+id/action_refresh"
-        android:title="@string/refresh"
-        android:icon="@android:drawable/ic_popup_sync"
-        app:showAsAction="always"/>
-
-    <item android:id="@+id/action_settings"
-        android:title="@string/settings"
-        android:icon="@drawable/ic_action_overflow"
-        app:showAsAction="always">
-        <menu>
-            <item android:id="@+id/action_logout"
-                android:title="@string/logout"
-                android:icon="@drawable/ic_action_logout"
-                app:showAsAction="always"/>
-
-            <item android:id="@+id/new_workspace"
-                android:title="@string/new_workspace"
-                android:icon="@drawable/ic_action_new"
-                app:showAsAction="always"/>
-        </menu>
-    </item>
+    <item android:id="@+id/action_logout"
+        android:title="@string/logout"
+        app:showAsAction="never"/>
 
 </menu>

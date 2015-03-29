@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
         android:contentDescription="@string/file_icon"
-        android:src="@drawable/file"
+        android:src="@drawable/ic_file"
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"/>
 
     <TextView

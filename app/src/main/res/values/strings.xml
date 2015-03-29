@@ -10,6 +10,8 @@
     <string name="refresh">Refresh</string>
     <string name="logout">Logout</string>
     <string name="new_workspace">New Workspace</string>
+    <string name="subscriptions">Subscriptions</string>
+    <string name="delete">Delete</string>
 
     <!-- Hints -->
     <string name="nickname">Nickname</string>
