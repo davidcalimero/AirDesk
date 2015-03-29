@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.ForeignFragment">
 
-    <item android:id="@+id/tag_subscriptions"
+    <item android:id="@+id/action_subscriptions"
         android:title="@string/subscriptions"
         android:icon="@android:drawable/ic_menu_preferences"
         app:showAsAction="always"/>

@@ -39,7 +39,6 @@
     <!-- Toasts -->
     <string name="invalid_input">Invalid Input</string>
     <string name="enter_a_valid_name">Enter a valid name</string>
-
     <!-- Not Organized -->
 
 </resources>

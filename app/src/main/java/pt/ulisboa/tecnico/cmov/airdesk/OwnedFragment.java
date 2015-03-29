@@ -39,7 +39,7 @@ public class OwnedFragment extends Fragment {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.new_workspace:
+            case R.id.action_new_workspace:
                 Intent intent = new Intent(getActivity().getApplicationContext(), NewWorkspaceActivity.class);
                 startActivity(intent);
                 break;

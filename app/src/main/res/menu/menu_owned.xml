@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.OwnedFragment">
 
-    <item android:id="@+id/new_workspace"
+    <item android:id="@+id/action_new_workspace"
         android:title="@string/new_workspace"
         android:icon="@drawable/ic_action_new"
         app:showAsAction="always"/>

@@ -48,7 +48,7 @@ public class ForeignFragment extends Fragment {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.tag_subscriptions:
+            case R.id.action_subscriptions:
                 Intent intent = new Intent(getActivity().getApplicationContext(), TagsActivity.class);
                 intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, tags);
                 intent.putExtra(TagsActivity.TITLE, getString(R.string.subscriptions));
