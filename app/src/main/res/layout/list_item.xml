@@ -7,7 +7,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageView"
+        android:id="@+id/itemIcon"
         android:contentDescription="@string/file_icon"
         android:src="@drawable/ic_file"
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"/>
