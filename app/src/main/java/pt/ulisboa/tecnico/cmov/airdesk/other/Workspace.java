@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
 
+import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -33,19 +34,23 @@ public class Workspace {
     /* Privacy */
     private MODE _privacy = MODE.PRIVATE;
 
-    /* Quota */
-    private float _quota = 0;
+    /* Maximum Quota */
+    private long _maximumQuota = 0;
+
+    /* Actual Quota */
+    private long _quota = 0;
 
     /*********************************/
     /********** CONSTRUCTOR **********/
     /*********************************/
 
     /* Workspace */
-    public Workspace(String name, String owner, MODE privacy, float quota){
+    public Workspace(String name, String owner, MODE privacy, long quota){
         _name = name;
         _owner = owner;
         _privacy = privacy;
-        _quota = quota;
+        _maximumQuota = quota;
+        _quota = 0;
     }
 
     /*********************************/
@@ -81,16 +86,29 @@ public class Workspace {
         _privacy = privacy;
     }
 
-    /* Quota */
-    public float getQuota() {
+    /* Maximum Quota */
+    public long getMaximumQuota() {
+        return _maximumQuota;
+    }
+
+    public void setMaximumQuota(long quota){
+        _maximumQuota = quota;
+    }
+
+    /* Actual Quota */
+    public long getQuota(){
         return _quota;
     }
 
-    public void setQuota(float quota) {
-        // TODO - Possivelmente necessário completar esta informação
-        _quota = quota;
+    public void incrementQuota(long amount) {
+        _quota += amount;
     }
 
+    public void decrementQuota(long amount) {
+        _quota -= amount;
+    }
+
+    /* Equals */
     @Override
     public boolean equals(Object o) {
         if(o instanceof Workspace){
@@ -134,5 +152,46 @@ public class Workspace {
     public boolean removeTag(String tag){
         return _tags.remove(tag);
     }
+    //endregion
+
+    //region CENAS AINDA NÃO TESTADAS
+
+    /*********************************/
+    /******** FILE MANAGEMENT ********/
+    /*********************************/
+
+    public boolean addFile(Context context, String title, String content){
+        if(!verifySpace(content))
+            return false;
+        String path = getWorkspacePath(context);
+        if(!FileManager.createFile(path, title + ".txt"))
+            return false;
+        path += FileManager.LINE_SEP + title + ".txt";
+        if(!FileManager.writeFile(path, content))
+            return false;
+        incrementQuota(content.length());
+        return true;
+    }
+
+    public boolean removeFile(Context context, String filename){
+        String fileLocation = getWorkspacePath(context) + FileManager.LINE_SEP + filename + ".txt";
+        long amount = FileManager.getUsedSpace(fileLocation);
+        FileManager.deleteFile(fileLocation);
+        decrementQuota(amount);
+        return true;
+    }
+
+    /*********************************/
+    /************* UTILS *************/
+    /*********************************/
+
+    private String getWorkspacePath(Context context){
+        return context.getFilesDir().getAbsolutePath() + FileManager.LINE_SEP + _owner + FileManager.LINE_SEP + _name;
+    }
+
+    public boolean verifySpace(String content){
+        return !(content.length() + _quota > _maximumQuota);
+    }
+
     //endregion
 }

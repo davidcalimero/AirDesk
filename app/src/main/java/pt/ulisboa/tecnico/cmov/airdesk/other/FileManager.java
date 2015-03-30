@@ -17,7 +17,7 @@ public class FileManager {
 
     /* MACROS */
     // Line Separator
-    private static final String LINE_SEP = System.getProperty("line.separator");
+    public static final String LINE_SEP = System.getProperty("line.separator");
 
     /**
      * Create File Function.
