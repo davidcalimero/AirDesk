@@ -21,6 +21,9 @@ public class Workspace {
     /* Name of the workspace. */
     private String _name = "";
 
+    /* Workspace Owner */
+    private String _owner = "";
+
     /* User List */
     private ArrayList<String> _users = new ArrayList<>();
 
@@ -38,8 +41,9 @@ public class Workspace {
     /*********************************/
 
     /* Workspace */
-    public Workspace(String name, MODE privacy, float quota){
+    public Workspace(String name, String owner, MODE privacy, float quota){
         _name = name;
+        _owner = owner;
         _privacy = privacy;
         _quota = quota;
     }
@@ -51,6 +55,11 @@ public class Workspace {
     /* Name */
     public String getName() {
         return _name;
+    }
+
+    /* Owner */
+    public String getOwnerID(){
+        return _owner;
     }
 
     /* User List */
@@ -80,6 +89,16 @@ public class Workspace {
     public void setQuota(float quota) {
         // TODO - Possivelmente necessário completar esta informação
         _quota = quota;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof Workspace){
+            Workspace workspace = (Workspace) o;
+            if(this.getOwnerID().equals((workspace.getOwnerID())) && this.getName().equals(workspace.getName()))
+                return true;
+        }
+        return super.equals(o);
     }
 
     /*********************************/

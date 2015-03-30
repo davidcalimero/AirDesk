@@ -17,7 +17,10 @@ public class User {
     private String _nickname;
 
     /* Owned Workspace List */
-    private ArrayList<String> _workspaceList = new ArrayList<>();
+    private ArrayList<Workspace> _ownedWorkspaceList = new ArrayList<>();
+
+    /* Foreign Workspace List */
+    private ArrayList<Workspace> _foreignWorkspaceList = new ArrayList<>();
 
     /* Keywords List */
     private ArrayList<String> _keywordList = new ArrayList<>();
@@ -50,9 +53,14 @@ public class User {
         return _nickname;
     }
 
-    /* Client Workspace List */
-    public ArrayList<String> getWorkspaceList() {
-        return _workspaceList;
+    /* Client Owned Workspace List */
+    public ArrayList<Workspace> geOwnedWorkspaceList() {
+        return _ownedWorkspaceList;
+    }
+
+    /* Client Foreign Workspace List */
+    public ArrayList<Workspace> geForeignWorkspaceList() {
+        return _foreignWorkspaceList;
     }
 
     /* Client Keyword List */
@@ -80,15 +88,21 @@ public class User {
 
     /* Workspace List */
     //region DEPRECATED
-    public boolean removeWorkspace(String name){
-        return _workspaceList.remove(name);
+    public boolean removeWorkspace(Workspace workspace){
+        if(_ownedWorkspaceList.contains(workspace))
+            return _ownedWorkspaceList.remove(workspace);
+        else
+            return _foreignWorkspaceList.remove(workspace);
     }
 
-    public boolean addWorkspace(String name){
+    public boolean addWorkspace(Workspace workspace){
         try{
-            return _workspaceList.add(name);
+            if(workspace.getOwnerID().equals(getID()))
+                return _ownedWorkspaceList.add(workspace);
+            else
+                return _foreignWorkspaceList.add(workspace);
         } catch (Exception e){
-            Log.e("User", "Can't add keyword. Had " + e.toString());
+            Log.e("User", "Can't add workspace. Had " + e.toString());
             return false;
         }
     }
