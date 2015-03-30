@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:weightSum="1">
 
     <TextView
         android:id="@+id/groupHeader"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="25sp"
-        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft" />
+        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:layout_weight="0.95" />
+
+    <ImageView android:id="@+id/settingsIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_edit"
+        android:contentDescription="@string/edit_icon" />
 
 </LinearLayout>

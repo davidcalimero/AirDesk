@@ -22,6 +22,7 @@
     <!-- Descriptions -->
     <string name="app_logo">App Logo</string>
     <string name="file_icon">File icon</string>
+    <string name="edit_icon">edit icon</string>
 
     <!-- Buttons -->
     <string name="login">Login</string>
