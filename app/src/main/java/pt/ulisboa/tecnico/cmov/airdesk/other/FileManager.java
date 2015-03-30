@@ -144,4 +144,22 @@ public class FileManager {
             free = ((long)statFs.getAvailableBlocks() * (long)statFs.getBlockSize()) / 1048576;
         return free;
     }
+
+    /**
+     * Get Used Space Function.
+     * Returns space used by directory or file, in bytes.
+     * If it's a directory, it will sum the size of all children recursively.
+     */
+    public static long getUsedSpace(String path){
+        File file = new File(path);
+        if(file.isDirectory()){
+            File[] children = file.listFiles();
+            long totalSpace = 0;
+            for(File f : children)
+                totalSpace += getUsedSpace(f.getAbsolutePath());
+            return totalSpace;
+        }
+        else
+            return file.length();
+    }
 }
