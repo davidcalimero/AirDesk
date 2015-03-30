@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewConfiguration;
 
 import java.lang.reflect.Field;
@@ -21,6 +22,7 @@ public class MainMenu extends ActionBarActivity {
 
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
+    public static final String WORKSPACE = "workspace";
 
     private String nickname;
     private String email;
@@ -100,5 +102,13 @@ public class MainMenu extends ActionBarActivity {
         }
 
         return true;
+    }
+
+
+    public void onSettingsButtonPressed(View view){
+        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        byte[] byteArray = null; //chamar método;
+        intent.putExtra(MainMenu.WORKSPACE, byteArray);
+        startActivity(intent);
     }
 }
