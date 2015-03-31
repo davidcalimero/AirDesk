@@ -95,6 +95,7 @@ public class User implements Serializable{
                 return _ownedWorkspaceList.add(workspace);
             else
                 return _foreignWorkspaceList.add(workspace);
+
         } catch (Exception e){
             Log.e("User", "Can't add workspace. Had " + e.toString());
             return false;
@@ -119,6 +120,28 @@ public class User implements Serializable{
     }
 
     public void commit(Context context){
+        Log.e("User", "Size before: " + getOwnedWorkspaceList().size());
         FileManager.objectToFile(getID(), this, context);
+        Log.e("User", "Size after: " + getOwnedWorkspaceList().size());
+    }
+
+    /*********************************/
+    /***** WORKSPACE MANAGEMENT ******/
+    /*********************************/
+
+    public boolean hasWorkspace(String name){
+        for(Workspace w : getOwnedWorkspaceList()){
+            if(w.getName().equals(name))
+                return true;
+        }
+        return false;
+    }
+
+    public Workspace getWorkspaceByName(String name){
+        for(Workspace w : getOwnedWorkspaceList()){
+            if(w.getName().equals(name))
+                return w;
+        }
+        return null;
     }
 }
