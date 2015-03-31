@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -55,6 +56,7 @@ public class TagsActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putCharSequenceArrayList(TAGS, tags);
         outState.putString(TITLE, title);
+        Log.e("TagsActivity", "state saved: " + title);
         super.onSaveInstanceState(outState);
     }
 

@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,7 @@ public class EditFileActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(ShowFileActivity.TITLE, title);
         outState.putString(ShowFileActivity.TEXT, text);
+        Log.e("EditFileActivity", "state saved: " + title);
         super.onSaveInstanceState(outState);
     }
 
