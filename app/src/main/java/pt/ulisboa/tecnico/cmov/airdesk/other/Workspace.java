@@ -4,9 +4,10 @@ package pt.ulisboa.tecnico.cmov.airdesk.other;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Workspace {
+public class Workspace implements Serializable{
 
     /*********************************/
     /************ MACROS *************/
@@ -137,24 +138,6 @@ public class Workspace {
         }
     }
 
-    /* Public Profile */
-    //region DEPRECATED
-    // Seems like it's deprecated :P
-    public boolean addTag(String tag){
-        try{
-            return _tags.add(tag);
-        } catch (Exception e){
-            Log.e("User", "Can't add keyword. Had " + e.toString());
-            return false;
-        }
-    }
-
-    public boolean removeTag(String tag){
-        return _tags.remove(tag);
-    }
-    //endregion
-
-    //region CENAS AINDA NÃO TESTADAS
 
     /*********************************/
     /******** FILE MANAGEMENT ********/

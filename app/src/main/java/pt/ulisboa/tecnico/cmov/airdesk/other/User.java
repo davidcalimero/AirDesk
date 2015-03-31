@@ -1,10 +1,13 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
+import android.content.Context;
 import android.util.Log;
 
+import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class User {
+public class User implements Serializable{
 
     /*********************************/
     /*********** VARIABLES ***********/
@@ -23,13 +26,13 @@ public class User {
     private ArrayList<Workspace> _foreignWorkspaceList = new ArrayList<>();
 
     /* Keywords List */
-    private ArrayList<String> _keywordList = new ArrayList<>();
+    private ArrayList<CharSequence> _subscriptions = new ArrayList<>();
 
     /*********************************/
     /********** CONSTRUCTOR **********/
     /*********************************/
 
-    public User(String mail, String nick){
+    private User(String mail, String nick){
         _email = mail;
         _nickname = nick;
     }
@@ -54,37 +57,28 @@ public class User {
     }
 
     /* Client Owned Workspace List */
-    public ArrayList<Workspace> geOwnedWorkspaceList() {
+    public ArrayList<Workspace> getOwnedWorkspaceList() {
         return _ownedWorkspaceList;
     }
 
     /* Client Foreign Workspace List */
-    public ArrayList<Workspace> geForeignWorkspaceList() {
+    public ArrayList<Workspace> getForeignWorkspaceList() {
         return _foreignWorkspaceList;
     }
 
     /* Client Keyword List */
-    public ArrayList<String> getKeywordList() {
-        return _keywordList;
+    public ArrayList<CharSequence> getSubscriptions() {
+        return _subscriptions;
+    }
+
+    public void setSubscriptions(ArrayList<CharSequence> value) {
+        _subscriptions.clear();
+        _subscriptions = value;
     }
 
     /*********************************/
     /******** LIST MANAGEMENT ********/
     /*********************************/
-
-    /* Keyword List */
-    public boolean removeKeyword(String keyword){
-        return _keywordList.remove(keyword);
-    }
-
-    public boolean addKeyword(String keyword){
-        try{
-            return _keywordList.add(keyword);
-        } catch (Exception e){
-            Log.e("User", "Can't add keyword. Had " + e.toString());
-            return false;
-        }
-    }
 
     /* Workspace List */
     //region DEPRECATED
@@ -107,4 +101,24 @@ public class User {
         }
     }
     //endregion
+
+    /*********************************/
+    /******** USER MANAGEMENT ********/
+    /*********************************/
+
+    public static User LoadUser(String email, String nickName, Context context){
+        User user;
+        try {
+            user = (User) FileManager.fileToObject(email, context);
+            Log.e("User", "user loaded: " + user.getID());
+        } catch (FileNotFoundException e) {
+            user = new User(email, nickName);
+            Log.e("User", "user created: " + user.getID());
+        }
+        return user;
+    }
+
+    public void commit(Context context){
+        FileManager.objectToFile(getID(), this, context);
+    }
 }

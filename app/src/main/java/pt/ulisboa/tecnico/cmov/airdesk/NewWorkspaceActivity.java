@@ -3,21 +3,29 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import pt.ulisboa.tecnico.cmov.airdesk.other.User;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
+
 
 public class NewWorkspaceActivity extends ActionBarActivity {
 
+    public static final String WORKSPACE = "workspace";
+
+    private User user;
     private ArrayList<CharSequence> tags = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_workspace);
+        user = ((ApplicationContext) getApplicationContext()).getActiveUser();
     }
 
     public boolean isWorkspaceNameEmpty(){
@@ -31,9 +39,12 @@ public class NewWorkspaceActivity extends ActionBarActivity {
         else {
             EditText workspaceName = (EditText) findViewById(R.id.workspaceName);
             String name = workspaceName.getText().toString();
-            // criar workspace
+            // TODO falta privacidade e cota
+            user.addWorkspace(new Workspace(name, user.getID(), Workspace.MODE.PRIVATE, 0));
+            sendData(name);
+            finish();
+            Log.e("NewWorkspaceActivity", "workspace created: " + name);
         }
-
     }
 
     public void onAddTagButtonPressed (View view){
@@ -57,5 +68,11 @@ public class NewWorkspaceActivity extends ActionBarActivity {
             return;
         }
         tags = data.getCharSequenceArrayListExtra(TagsActivity.TAGS);
+    }
+
+    public void sendData(String name){
+        Intent intent = new Intent();
+        intent.putExtra(WORKSPACE, name);
+        setResult(RESULT_OK, intent);
     }
 }

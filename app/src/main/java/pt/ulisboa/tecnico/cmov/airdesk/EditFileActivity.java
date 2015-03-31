@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,18 +18,12 @@ public class EditFileActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_file);
 
-        if(savedInstanceState == null) {
-            //Default sate
-            Intent intent = getIntent();
-            title = intent.getStringExtra(ShowFileActivity.TITLE);
-            text = intent.getStringExtra(ShowFileActivity.TEXT);
-        }
-        else{
-            //Saved state
-            title = savedInstanceState.getString(ShowFileActivity.TITLE);
-            text = savedInstanceState.getString(ShowFileActivity.TEXT);
-        }
+        //Restore data
+        Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
+        title = bundle.getString(ShowFileActivity.TITLE);
+        text = bundle.getString(ShowFileActivity.TEXT);
 
+        //Init
         EditText editText = (EditText) findViewById(R.id.editText);
         editText.setText(text);
         setTitle(title);
@@ -45,7 +38,7 @@ public class EditFileActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_edit_file, menu);
+        getMenuInflater().inflate(R.menu.menu_file, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -66,7 +59,7 @@ public class EditFileActivity extends ActionBarActivity {
 
     public void doneButtonPressed(View view){
         /*
-        ** Falta guardar texto alterado
+        ** TODO Falta guardar texto alterado
         */
         //EditText editText = (EditText) findViewById(R.id.editText);
         //String text = editText.getText().toString();

@@ -13,6 +13,7 @@ import android.view.ViewConfiguration;
 import java.lang.reflect.Field;
 
 
+import pt.ulisboa.tecnico.cmov.airdesk.other.User;
 import pt.ulisboa.tecnico.cmov.airdesk.slidingTab.SlidingTabLayout;
 
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspacePagerAdapter;
@@ -22,11 +23,9 @@ public class MainMenu extends ActionBarActivity {
 
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
-    public static final String WORKSPACE = "workspace";
+    //public static final String WORKSPACE = "workspace";
 
-    private String nickname;
-    private String email;
-
+    private ApplicationContext appState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,39 +38,37 @@ public class MainMenu extends ActionBarActivity {
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
 
-        if(savedInstanceState == null) {
-            //Default sate
-            Intent intent = getIntent();
-            nickname = intent.getStringExtra(NICKNAME);
-            email = intent.getStringExtra(EMAIL);
-        }
-        else{
-            //Saved state
-            nickname = savedInstanceState.getString(NICKNAME);
-            email = savedInstanceState.getString(EMAIL);
-        }
-        
+        appState = (ApplicationContext) getApplicationContext();
+
+        //Restore data
+        Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
+        String nickname = bundle.getString(NICKNAME);
+        String email = bundle.getString(EMAIL);
+
+        //Load current user
+        User user = User.LoadUser(email, nickname, getApplicationContext());
+        appState.setActiveUser(user);
         setTitle(nickname + ": " + email);
 
         //Force overflow menu on actionBar
-        try {
-            ViewConfiguration config = ViewConfiguration.get(this);
-            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+        forceMenuOverflow();
+    }
 
-            if (menuKeyField != null) {
-                menuKeyField.setAccessible(true);
-                menuKeyField.setBoolean(config, false);
-            }
+    @Override
+    protected void onStop() {
+        if(appState.hasActiveUser()) {
+            appState.getActiveUser().commit(getApplicationContext());
+            Log.e("MainMenu", "user committed:" + appState.getActiveUser().getID());
         }
-        catch (Exception e) {
-            Log.e("MainMenu", "Force action bar menu error");
-        }
+        super.onStop();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(NICKNAME, nickname);
-        outState.putString(EMAIL, email);
+        User user = appState.getActiveUser();
+        outState.putString(NICKNAME, user.getNickname());
+        outState.putString(EMAIL, user.getEmail());
+        Log.e("MainMenu", "state saved: " + user.getID());
         super.onSaveInstanceState(outState);
     }
 
@@ -84,17 +81,11 @@ public class MainMenu extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         switch (id){
             case R.id.action_logout:
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.putExtra(MainActivity.LOGOUT, true);
-                startActivity(intent);
-                finish();
+                logout();
                 break;
 
              default:
@@ -104,11 +95,33 @@ public class MainMenu extends ActionBarActivity {
         return true;
     }
 
-
     public void onSettingsButtonPressed(View view){
-        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        /*Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
         byte[] byteArray = null; //chamar método;
-        intent.putExtra(MainMenu.WORKSPACE, byteArray);
+        intent.putExtra(WORKSPACE, byteArray);
+        startActivity(intent);*/
+    }
+
+    private void logout(){
+        Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
+        intent.putExtra(LogInActivity.LOGOUT, true);
         startActivity(intent);
+        finish();
+    }
+
+    //Force overflow menu on actionBar
+    private void forceMenuOverflow(){
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        }
+        catch (Exception e) {
+            Log.e("MainMenu", "Force action bar menu error");
+        }
     }
 }

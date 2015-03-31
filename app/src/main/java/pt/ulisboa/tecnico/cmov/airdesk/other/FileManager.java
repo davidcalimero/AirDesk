@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
@@ -10,6 +11,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -130,6 +133,63 @@ public class FileManager {
             file.delete();
         }
     }
+
+    public static Object fileToObject(String fileName, Context context) throws FileNotFoundException {
+        FileInputStream fis = context.openFileInput(fileName);
+        ObjectInputStream is = null;
+        Object object = null;
+        try {
+            is = new ObjectInputStream(fis);
+            object = is.readObject();
+        } catch (Exception e) {
+            Log.e("FileManager", "Error loading object from file");
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException ex) {
+                Log.e("FileManager", "Error cloasing IS");
+            }
+            try {
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException ex) {
+                Log.e("FileManager", "Error cloasing FIS");
+            }
+        }
+
+        return object;
+    }
+
+    public static void objectToFile(String fileName, Object object, Context context){
+        FileOutputStream fos = null;
+        ObjectOutputStream os = null;
+        try {
+            fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+            os = new ObjectOutputStream(fos);
+            os.writeObject(object);
+        } catch (IOException e) {
+            Log.e("FileManager", "Error saving object into file");
+        } finally {
+            try {
+                if (os != null) {
+                    os.close();
+                }
+            } catch (IOException ex) {
+                Log.e("FileManager", "Error cloasing OS");
+            }
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException ex) {
+                Log.e("FileManager", "Error cloasing FOS");
+            }
+        }
+    }
+
 
     /**
      * Get Free Space Function.

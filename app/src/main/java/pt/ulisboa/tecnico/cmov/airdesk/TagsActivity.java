@@ -28,16 +28,10 @@ public class TagsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tags);
 
-        if (savedInstanceState == null) {
-            //Default sate
-            Intent intent = getIntent();
-            tags = intent.getCharSequenceArrayListExtra(TAGS);
-            title = intent.getStringExtra(TITLE);
-        } else {
-            //Saved state
-            tags = savedInstanceState.getCharSequenceArrayList(TAGS);
-            title = savedInstanceState.getString(TITLE);
-        }
+        //Restore data
+        Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
+        tags = bundle.getCharSequenceArrayList(TAGS);
+        title = bundle.getString(TITLE);
 
         tagWriter = (EditText) findViewById(R.id.tagWriteView);
 
@@ -53,11 +47,7 @@ public class TagsActivity extends ActionBarActivity {
             }
         });
 
-        //ListView population
-        for(CharSequence tag : tags){
-            adapter.add(tag.toString());
-        }
-
+        populateListView();
         setTitle(title);
     }
 
@@ -97,5 +87,12 @@ public class TagsActivity extends ActionBarActivity {
         tagWriter.getText().clear();
         adapter.add(tag);
         tags.add(tag);
+    }
+
+    //ListView population
+    private void populateListView(){
+        for(CharSequence tag : tags){
+            adapter.add(tag.toString());
+        }
     }
 }

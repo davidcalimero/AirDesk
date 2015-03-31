@@ -1,19 +1,8 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
-import android.content.Context;
-import android.util.Log;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-
 public class Utils {
 
-    public static byte[] objectoToByteArray(Object object){
+    /*public static byte[] objectoToByteArray(Object object){
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
         byte[] bytes = null;
@@ -57,5 +46,5 @@ public class Utils {
             } catch (IOException ex) {}
         }
         return object;
-    }
+    }*/
 }

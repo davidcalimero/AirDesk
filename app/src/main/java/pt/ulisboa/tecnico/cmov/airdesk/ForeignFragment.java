@@ -11,13 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
-import java.util.ArrayList;
-
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
+import pt.ulisboa.tecnico.cmov.airdesk.other.User;
 
 public class ForeignFragment extends Fragment {
 
-    private ArrayList<CharSequence> tags = new ArrayList<>();
+    private User user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,10 +28,7 @@ public class ForeignFragment extends Fragment {
         expandableListView.setAdapter(adapter);
 
         setHasOptionsMenu(true);
-
-        adapter.createGroup("Teste1");
-        adapter.createGroup("Teste2");
-        adapter.addChild("Teste2", "HelloHorld!");
+        user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
 
         return view;
     }
@@ -50,7 +46,7 @@ public class ForeignFragment extends Fragment {
         switch (id) {
             case R.id.action_subscriptions:
                 Intent intent = new Intent(getActivity().getApplicationContext(), TagsActivity.class);
-                intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, tags);
+                intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, user.getSubscriptions());
                 intent.putExtra(TagsActivity.TITLE, getString(R.string.subscriptions));
                 startActivityForResult(intent, 1);
                 break;
@@ -65,9 +61,8 @@ public class ForeignFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) {
+        if (data == null)
             return;
-        }
-        tags = data.getCharSequenceArrayListExtra(TagsActivity.TAGS);
+        user.setSubscriptions(data.getCharSequenceArrayListExtra(TagsActivity.TAGS));
     }
 }

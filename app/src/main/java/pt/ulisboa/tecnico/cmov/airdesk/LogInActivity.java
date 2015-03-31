@@ -5,12 +5,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 
-public class MainActivity extends ActionBarActivity {
+public class LogInActivity extends ActionBarActivity {
 
     public static final String PREFERENCES = "loginPrefs";
     public static final String LOGOUT = "logout";
@@ -34,16 +35,14 @@ public class MainActivity extends ActionBarActivity {
         email = sharedPreferences.getString(MainMenu.EMAIL, "");
 
         //Logout if applicable
-        if(getIntent().getBooleanExtra(LOGOUT, false)){
+        if(getIntent().getBooleanExtra(LOGOUT, false))
             sharedPreferences.edit().clear().commit();
-        }
 
         //If was not logout and have data to login autologin
         if(!nickname.equals("") && !email.equals("") && !getIntent().getBooleanExtra(LOGOUT, false)){
             sendLoginData(nickname, email);
         }
     }
-
 
     public void login(View view){
         //Get data from views
@@ -65,6 +64,7 @@ public class MainActivity extends ActionBarActivity {
         editor.commit();
 
         sendLoginData(nickname, email);
+        Log.e("LogInActivity", "Login: " + email);
     }
 
     private void sendLoginData(String nickname, String email){
