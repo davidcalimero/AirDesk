@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,9 +14,12 @@ import android.widget.ExpandableListView;
 
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
 public class ForeignFragment extends Fragment {
 
+    private  WorkspaceListAdapter adapter;
     private User user;
 
     @Override
@@ -24,12 +28,13 @@ public class ForeignFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_foreign, container, false);
 
         ExpandableListView expandableListView = (ExpandableListView) view.findViewById(R.id.foreignListView);
-        WorkspaceListAdapter adapter = new WorkspaceListAdapter(getActivity());
+        adapter = new WorkspaceListAdapter(getActivity(), R.layout.list_group_foreign, R.layout.list_item);
         expandableListView.setAdapter(adapter);
-
         setHasOptionsMenu(true);
+
         user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
 
+        populateListView();
         return view;
     }
 
@@ -60,9 +65,22 @@ public class ForeignFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (data == null)
             return;
         user.setSubscriptions(data.getCharSequenceArrayListExtra(TagsActivity.TAGS));
+        Log.e("ForeignFragment", "tags added");
+        ((MainMenu) getActivity()).refresh();
+    }
+
+    //Adds workspace views to the list view
+    private void populateListView(){
+        for(Workspace w : user.getOwnedWorkspaceList()){
+            if(w.getPrivacy() == Workspace.MODE.PUBLIC && Utils.hasSameElement(w.getPublicProfile(), user.getSubscriptions())) {
+                adapter.createGroup(w.getName());
+                Log.e("ForeignFragment", "workspace added: " + w.getName());
+            }
+            //TODO check for files
+        }
+        adapter.notifyDataSetChanged();
     }
 }

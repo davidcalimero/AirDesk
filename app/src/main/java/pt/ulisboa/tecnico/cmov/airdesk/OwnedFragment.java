@@ -12,20 +12,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import java.util.ArrayList;
+
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
-import pt.ulisboa.tecnico.cmov.airdesk.other.User;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
 public class OwnedFragment extends Fragment {
 
     private  WorkspaceListAdapter adapter;
 
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_owned, container, false);
 
         ExpandableListView expandableListView = (ExpandableListView) view.findViewById(R.id.ownedListView);
-        adapter = new WorkspaceListAdapter(getActivity());
+        adapter = new WorkspaceListAdapter(getActivity(), R.layout.list_group_owner, R.layout.list_item);
         expandableListView.setAdapter(adapter);
         setHasOptionsMenu(true);
 
@@ -56,27 +56,19 @@ public class OwnedFragment extends Fragment {
         return true;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            String name = data.getStringExtra(NewWorkspaceActivity.WORKSPACE);
-            if (name != null && !name.equals("")) {
-                adapter.createGroup(name);
-                adapter.notifyDataSetChanged();
-                Log.e("OwnedFragment", "workspace added: " + name);
-            }
-        }
-    }
-
     //Adds workspace views to the list view
     private void populateListView(){
-        User user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
-        for(Workspace w : user.getOwnedWorkspaceList()){
+        ArrayList<Workspace> workspaces = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser().getOwnedWorkspaceList();
+        for(Workspace w : workspaces){
             adapter.createGroup(w.getName());
             Log.e("OwnedFragment", "workspace added: " + w.getName());
             //TODO check for files
         }
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        ((MainMenu) getActivity()).refresh();
     }
 }

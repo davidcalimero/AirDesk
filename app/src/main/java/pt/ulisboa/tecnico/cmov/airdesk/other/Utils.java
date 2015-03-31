@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
+import java.util.List;
+
 public class Utils {
 
     /*public static byte[] objectoToByteArray(Object object){
@@ -47,4 +49,16 @@ public class Utils {
         }
         return object;
     }*/
+
+    //Returns true if list1 has at least one element contained in list2
+    public static boolean hasSameElement(List list1, List list2){
+        for(Object object1 : list1){
+            for(Object object2: list2){
+                if(object1.equals(object2)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

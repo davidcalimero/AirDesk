@@ -22,7 +22,8 @@
     <!-- Descriptions -->
     <string name="app_logo">App Logo</string>
     <string name="file_icon">File icon</string>
-    <string name="edit_icon">edit icon</string>
+    <string name="edit_icon">Edit icon</string>
+    <string name="add_file_icon">Add file icon</string>
 
     <!-- Buttons -->
     <string name="login">Login</string>
@@ -44,6 +45,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
     <!-- Not Organized -->
 
 </resources>

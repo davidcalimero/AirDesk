@@ -16,11 +16,15 @@ import pt.ulisboa.tecnico.cmov.airdesk.R;
 public class WorkspaceListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
+    private int group_xml;
+    private int item_xml;
     private ArrayList<String> groupHeaders = new ArrayList<>();
     private HashMap<String, ArrayList<String>> childHeaders = new HashMap<>(); //Format (groupTitle, childTitle)
 
-    public WorkspaceListAdapter(Context context) {
+    public WorkspaceListAdapter(Context context, int group_xml, int item_xml) {
         this.context = context;
+        this.group_xml = group_xml;
+        this.item_xml = item_xml;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_item, null);
+            convertView = inflater.inflate(item_xml, null);
         }
 
         TextView textView = (TextView) convertView.findViewById(R.id.itemHeader);
@@ -72,7 +76,7 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
         String groupTitle = (String) getGroup(groupPosition);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_group, null);
+            convertView = inflater.inflate(group_xml, null);
         }
 
         TextView textView = (TextView) convertView.findViewById(R.id.groupHeader);

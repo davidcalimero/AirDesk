@@ -11,13 +11,21 @@
         android:layout_height="wrap_content"
         android:textSize="25sp"
         android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
-        android:layout_weight="0.95" />
+        android:layout_weight="1.00" />
+
+    <ImageView android:id="@+id/addFileIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_new_dark"
+        android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
+        android:contentDescription="@string/add_file_icon" />
 
     <ImageView android:id="@+id/settingsIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_menu_edit"
         android:contentDescription="@string/edit_icon"
+        android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
         android:onClick="onSettingsButtonPressed"/>
 
 </LinearLayout>

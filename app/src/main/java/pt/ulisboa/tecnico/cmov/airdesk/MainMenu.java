@@ -26,6 +26,7 @@ public class MainMenu extends ActionBarActivity {
     //public static final String WORKSPACE = "workspace";
 
     private ApplicationContext appState;
+    private WorkspacePagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,8 @@ public class MainMenu extends ActionBarActivity {
         setContentView(R.layout.activity_main_menu);
 
         ViewPager mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mViewPager.setAdapter(new WorkspacePagerAdapter(getSupportFragmentManager(), getApplicationContext()));
+        adapter = new WorkspacePagerAdapter(getSupportFragmentManager(), getApplicationContext());
+        mViewPager.setAdapter(adapter);
         SlidingTabLayout mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
@@ -46,8 +48,7 @@ public class MainMenu extends ActionBarActivity {
         String email = bundle.getString(EMAIL);
 
         //Load current user
-        User user = User.LoadUser(email, nickname, getApplicationContext());
-        appState.setActiveUser(user);
+        appState.setActiveUser(User.LoadUser(email, nickname, getApplicationContext()));
         setTitle(nickname + ": " + email);
 
         //Force overflow menu on actionBar
@@ -55,12 +56,12 @@ public class MainMenu extends ActionBarActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         if(appState.hasActiveUser()) {
             appState.getActiveUser().commit(getApplicationContext());
             Log.e("MainMenu", "user committed:" + appState.getActiveUser().getID());
         }
-        super.onStop();
+        super.onPause();
     }
 
     @Override
@@ -68,7 +69,7 @@ public class MainMenu extends ActionBarActivity {
         User user = appState.getActiveUser();
         outState.putString(NICKNAME, user.getNickname());
         outState.putString(EMAIL, user.getEmail());
-        Log.e("MainMenu", "state saved: " + user.getID());
+
         super.onSaveInstanceState(outState);
     }
 
@@ -106,6 +107,7 @@ public class MainMenu extends ActionBarActivity {
         Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
         intent.putExtra(LogInActivity.LOGOUT, true);
         startActivity(intent);
+        Log.e("MainMenu", "Logout: " + appState.getActiveUser().getID());
         finish();
     }
 
@@ -123,5 +125,9 @@ public class MainMenu extends ActionBarActivity {
         catch (Exception e) {
             Log.e("MainMenu", "Force action bar menu error");
         }
+    }
+
+    public void refresh(){
+        adapter.notifyDataSetChanged();
     }
 }

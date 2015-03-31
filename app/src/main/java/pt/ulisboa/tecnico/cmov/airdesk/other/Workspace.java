@@ -30,7 +30,7 @@ public class Workspace implements Serializable{
     private ArrayList<String> _users = new ArrayList<>();
 
     /* Public Profile */
-    private ArrayList<String> _tags = new ArrayList<>();
+    private ArrayList<CharSequence> _tags = new ArrayList<>();
 
     /* Privacy */
     private MODE _privacy = MODE.PRIVATE;
@@ -74,8 +74,12 @@ public class Workspace implements Serializable{
     }
 
     /* Public Profile */
-    public ArrayList<String> getPublicProfile() {
+    public ArrayList<CharSequence> getPublicProfile() {
         return _tags;
+    }
+    public void setPublicProfile(ArrayList<CharSequence> tags) {
+        _tags.clear();
+        _tags = tags;
     }
 
     /* Privacy */
@@ -175,6 +179,4 @@ public class Workspace implements Serializable{
     public boolean verifySpace(String content){
         return !(content.length() + _quota > _maximumQuota);
     }
-
-    //endregion
 }
