@@ -48,7 +48,8 @@ public class MainMenu extends ActionBarActivity {
         String email = bundle.getString(EMAIL);
 
         //Load current user
-        appState.setActiveUser(User.LoadUser(email, nickname, getApplicationContext()));
+        if(!appState.hasActiveUser())
+            appState.setActiveUser(User.LoadUser(email, nickname, getApplicationContext()));
         setTitle(nickname + ": " + email);
 
         //Force overflow menu on actionBar
@@ -56,12 +57,12 @@ public class MainMenu extends ActionBarActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         if(appState.hasActiveUser()) {
             appState.getActiveUser().commit(getApplicationContext());
             Log.e("MainMenu", "user committed:" + appState.getActiveUser().getID());
         }
-        super.onPause();
+        super.onStop();
     }
 
     @Override
