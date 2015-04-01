@@ -52,12 +52,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />
         </activity>
-        <!--
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
-        -->
+        <activity
+            android:name=".PrivacyActivity"
+            android:label="@string/title_activity_workspace_privacy" >
+        </activity>
+        <activity
+            android:name=".QuotaActivity"
+            android:label="@string/title_activity_quota" >
+        </activity>
+
         <activity
             android:name=".CreateFileActivity"
             android:label="@string/create_new_file" >

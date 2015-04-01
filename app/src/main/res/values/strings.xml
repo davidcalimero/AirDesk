@@ -43,6 +43,25 @@
     <string name="invalid_input">Invalid Input</string>
     <string name="enter_a_valid_name">Enter a valid name</string>
     <string name="title_activity_settings">SettingsActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+
+    <!-- Settings -->
+    <string name="action_settings">Settings</string> <!--Provavelmente não será necessário -->
+    <string name="edit_people">Add/Remove People</string>
+    <string name="change_privacy">Change privacy</string>
+    <string name="change_quota">Change Quota</string>
+    <string name="public_privacy">Public</string>
+    <string name="private_privacy">Private</string>
+
+
     <!-- Not Organized -->
+    <string name="title_activity_workspace_privacy">WorkspacePrivacyActivity</string>
+    <string name="title_activity_quota">QuotaActivity</string>
+
+
+
+
+
 
 </resources>
