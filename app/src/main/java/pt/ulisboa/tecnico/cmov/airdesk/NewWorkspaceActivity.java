@@ -40,7 +40,6 @@ public class NewWorkspaceActivity extends ActionBarActivity {
             Workspace workspace = new Workspace(name, user.getID(), Workspace.MODE.PUBLIC, 0);
             workspace.setPublicProfile(tags);
             user.addWorkspace(workspace);
-            setResult(RESULT_OK, new Intent());
             finish();
         }
     }

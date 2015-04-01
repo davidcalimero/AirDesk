@@ -60,7 +60,6 @@ public class MainMenu extends ActionBarActivity {
     protected void onStop() {
         if(appState.hasActiveUser()) {
             appState.getActiveUser().commit(getApplicationContext());
-            Log.e("MainMenu", "user committed:" + appState.getActiveUser().getID());
         }
         super.onStop();
     }
@@ -126,9 +125,5 @@ public class MainMenu extends ActionBarActivity {
         catch (Exception e) {
             Log.e("MainMenu", "Force action bar menu error");
         }
-    }
-
-    public void refresh(){
-        adapter.notifyDataSetChanged();
     }
 }

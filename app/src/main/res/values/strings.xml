@@ -4,6 +4,7 @@
     <!-- Title Names -->
     <string name="app_name">AirDesk</string>
     <string name="create_new_workspace">Create New Workspace</string>
+    <string name="create_new_file">Create New File</string>
 
     <!-- Options -->
     <string name="settings">Settings</string>
@@ -42,10 +43,6 @@
     <string name="invalid_input">Invalid Input</string>
     <string name="enter_a_valid_name">Enter a valid name</string>
     <string name="title_activity_settings">SettingsActivity</string>
-
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-
     <!-- Not Organized -->
 
 </resources>

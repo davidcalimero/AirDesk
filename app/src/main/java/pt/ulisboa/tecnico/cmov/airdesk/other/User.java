@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class User implements Serializable{
 
@@ -20,10 +21,7 @@ public class User implements Serializable{
     private String _nickname;
 
     /* Owned Workspace List */
-    private ArrayList<Workspace> _ownedWorkspaceList = new ArrayList<>();
-
-    /* Foreign Workspace List */
-    private ArrayList<Workspace> _foreignWorkspaceList = new ArrayList<>();
+    private HashMap<String, Workspace> _workspaceList = new HashMap<>();
 
     /* Keywords List */
     private ArrayList<CharSequence> _subscriptions = new ArrayList<>();
@@ -57,13 +55,8 @@ public class User implements Serializable{
     }
 
     /* Client Owned Workspace List */
-    public ArrayList<Workspace> getOwnedWorkspaceList() {
-        return _ownedWorkspaceList;
-    }
-
-    /* Client Foreign Workspace List */
-    public ArrayList<Workspace> getForeignWorkspaceList() {
-        return _foreignWorkspaceList;
+    public HashMap<String, Workspace> getWorkspaceList() {
+        return _workspaceList;
     }
 
     /* Client Keyword List */
@@ -74,6 +67,7 @@ public class User implements Serializable{
     public void setSubscriptions(ArrayList<CharSequence> value) {
         _subscriptions.clear();
         _subscriptions = value;
+        Log.e("ForeignFragment", "subscriptions modified");
     }
 
     /*********************************/
@@ -81,27 +75,18 @@ public class User implements Serializable{
     /*********************************/
 
     /* Workspace List */
-    public boolean removeWorkspace(Workspace workspace){
-        if(_ownedWorkspaceList.contains(workspace))
-            return _ownedWorkspaceList.remove(workspace);
-        else
-            return _foreignWorkspaceList.remove(workspace);
+    public void removeWorkspace(Workspace workspace){
+        Log.e("User", "workspace removed: " + workspace.getName());
+        _workspaceList.remove(workspace.getName());
     }
 
-    public boolean addWorkspace(Workspace workspace){
-        try{
-            if(workspace.getOwnerID().equals(getID())) {
-                Log.e("User", "Owner workspace added: " + workspace.getName());
-                return _ownedWorkspaceList.add(workspace);
-            }
-            else {
-                Log.e("User", "Foreign workspace added: " + workspace.getName());
-                return _foreignWorkspaceList.add(workspace);
-            }
-        } catch (Exception e){
-            Log.e("User", "Can't add workspace. Had " + e.toString());
-            return false;
-        }
+    public void addWorkspace(Workspace workspace){
+        Log.e("User", "workspace added: " + workspace.getName());
+        _workspaceList.put(workspace.getName(), workspace);
+    }
+
+    public Workspace getWorkspaceByID(String id){
+        return _workspaceList.get(id);
     }
 
     /*********************************/
@@ -122,5 +107,6 @@ public class User implements Serializable{
 
     public void commit(Context context){
         FileManager.objectToFile(getID(), this, context);
+        Log.e("MainMenu", "user committed:" + getID());
     }
 }

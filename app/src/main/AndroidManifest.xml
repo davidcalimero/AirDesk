@@ -56,6 +56,10 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>-->
+        <activity
+            android:name=".CreateFileActivity"
+            android:label="@string/create_new_file" >
+        </activity>
     </application>
 
 </manifest>

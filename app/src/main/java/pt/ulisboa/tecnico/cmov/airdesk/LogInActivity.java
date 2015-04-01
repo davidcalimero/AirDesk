@@ -64,7 +64,6 @@ public class LogInActivity extends ActionBarActivity {
         editor.commit();
 
         sendLoginData(nickname, email);
-        Log.e("LogInActivity", "Login: " + email);
     }
 
     private void sendLoginData(String nickname, String email){
@@ -74,5 +73,6 @@ public class LogInActivity extends ActionBarActivity {
         intent.putExtra(MainMenu.EMAIL, email);
         startActivity(intent);
         finish();
+        Log.e("LogInActivity", "Login: " + email);
     }
 }

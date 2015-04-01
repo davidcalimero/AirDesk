@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
@@ -58,17 +57,11 @@ public class OwnedFragment extends Fragment {
 
     //Adds workspace views to the list view
     private void populateListView(){
-        ArrayList<Workspace> workspaces = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser().getOwnedWorkspaceList();
-        for(Workspace w : workspaces){
+        HashMap<String, Workspace> workspaces = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser().getWorkspaceList();
+        for(Workspace w : workspaces.values()){
             adapter.createGroup(w.getName());
-            Log.e("OwnedFragment", "workspace added: " + w.getName());
             //TODO check for files
         }
         adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        ((MainMenu) getActivity()).refresh();
     }
 }
