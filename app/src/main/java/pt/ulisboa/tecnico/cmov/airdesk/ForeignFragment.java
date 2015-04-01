@@ -2,7 +2,6 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,27 +10,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
-import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
 
-public class ForeignFragment extends Fragment {
+public class ForeignFragment extends ExpandableListFragment {
 
-    private  WorkspaceListAdapter adapter;
     private User user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_foreign, container, false);
-
-        ExpandableListView expandableListView = (ExpandableListView) view.findViewById(R.id.foreignListView);
-        adapter = new WorkspaceListAdapter(getActivity(), R.layout.list_group_foreign, R.layout.list_item);
-        expandableListView.setAdapter(adapter);
-        setHasOptionsMenu(true);
-
+        makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
         user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
 
-        populateListView();
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -50,7 +42,7 @@ public class ForeignFragment extends Fragment {
                 Intent intent = new Intent(getActivity().getApplicationContext(), TagsActivity.class);
                 intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, user.getSubscriptions());
                 intent.putExtra(TagsActivity.TITLE, getString(R.string.subscriptions));
-                startActivityForResult(intent, 1);
+                getActivity().startActivityForResult(intent, MainMenu.FOREIGN);
                 break;
 
             default:
@@ -58,23 +50,5 @@ public class ForeignFragment extends Fragment {
         }
 
         return true;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null)
-            return;
-        user.setSubscriptions(data.getCharSequenceArrayListExtra(TagsActivity.TAGS));
-    }
-
-    //Adds workspace views to the list view
-    private void populateListView(){
-        /*for(Workspace w : user.getWorkspaceList().values()){
-            if(w.getPrivacy() == Workspace.MODE.PUBLIC && Utils.hasSameElement(w.getPublicProfile(), user.getSubscriptions())) {
-                adapter.createGroup(w.getName());
-            }
-            //TODO check for files
-        }
-        adapter.notifyDataSetChanged();*/
     }
 }

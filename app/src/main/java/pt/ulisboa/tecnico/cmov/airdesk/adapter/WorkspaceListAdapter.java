@@ -85,13 +85,22 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
-    public void createGroup(String title){
+    public void addGroup(String title){
         groupHeaders.add(title);
         childHeaders.put(title, new ArrayList<String>());
     }
 
+    public boolean removeGroup(String title){
+        childHeaders.remove(title).clear();
+        return groupHeaders.remove(title);
+    }
+
     public void addChild(String groupTitle, String childTitle){
         childHeaders.get(groupTitle).add(childTitle);
+    }
+
+    public boolean removeChild(String groupTitle, String childTitle){
+        return childHeaders.get(groupTitle).remove(childTitle);
     }
 
     @Override

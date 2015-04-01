@@ -17,13 +17,13 @@
     <EditText android:id="@+id/tagWriteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="text"
+        android:inputType="textShortMessage"
         android:layout_above="@+id/tagsDone"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/addTag"
         android:layout_toStartOf="@+id/addTag"
-        android:hint="@string/enter_new_tag" />
+        android:hint="@string/enter_text" />
 
     <Button android:id="@+id/addTag"
         android:layout_width="wrap_content"

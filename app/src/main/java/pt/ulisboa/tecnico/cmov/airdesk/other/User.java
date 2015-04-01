@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
+
 public class User implements Serializable{
 
     /*********************************/
@@ -25,6 +27,8 @@ public class User implements Serializable{
 
     /* Keywords List */
     private ArrayList<CharSequence> _subscriptions = new ArrayList<>();
+
+    private WorkspacesChangeListener listener;
 
     /*********************************/
     /********** CONSTRUCTOR **********/
@@ -70,6 +74,10 @@ public class User implements Serializable{
         Log.e("ForeignFragment", "subscriptions modified");
     }
 
+    public void setEventListener(WorkspacesChangeListener listener){
+        this.listener = listener;
+    }
+
     /*********************************/
     /******** LIST MANAGEMENT ********/
     /*********************************/
@@ -78,11 +86,29 @@ public class User implements Serializable{
     public void removeWorkspace(Workspace workspace){
         Log.e("User", "workspace removed: " + workspace.getName());
         _workspaceList.remove(workspace.getName());
+        if(listener != null)
+            listener.onWorkspaceRemoved(workspace.getName());
     }
 
     public void addWorkspace(Workspace workspace){
         Log.e("User", "workspace added: " + workspace.getName());
         _workspaceList.put(workspace.getName(), workspace);
+        if(listener != null)
+            listener.onWorkspaceCreated(workspace.getName());
+    }
+
+    public void removeFile(String workspaceName, TextFile file){
+        Log.e("User", "file removed: " + file.getTitle());
+        _workspaceList.get(workspaceName).removeFile(file);
+        if(listener != null)
+            listener.onFileRemoved(workspaceName, file.getTitle());
+    }
+
+    public void addFile(String workspaceName, TextFile file){
+        Log.e("User", "file added: " + file.getTitle());
+        _workspaceList.get(workspaceName).addFile(file);
+        if(listener != null)
+            listener.onFileCreated(workspaceName, file.getTitle());
     }
 
     public Workspace getWorkspaceByID(String id){

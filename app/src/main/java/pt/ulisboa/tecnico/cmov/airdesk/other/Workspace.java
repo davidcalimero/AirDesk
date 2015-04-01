@@ -32,6 +32,9 @@ public class Workspace implements Serializable{
     /* Public Profile */
     private ArrayList<CharSequence> _tags = new ArrayList<>();
 
+    /* File List */
+    private ArrayList<TextFile> _files = new ArrayList<>();
+
     /* Privacy */
     private MODE _privacy = MODE.PRIVATE;
 
@@ -77,6 +80,7 @@ public class Workspace implements Serializable{
     public ArrayList<CharSequence> getPublicProfile() {
         return _tags;
     }
+
     public void setPublicProfile(ArrayList<CharSequence> tags) {
         _tags.clear();
         _tags = tags;
@@ -115,13 +119,13 @@ public class Workspace implements Serializable{
 
     /* Equals */
     @Override
-    public boolean equals(Object o) {
-        if(o instanceof Workspace){
-            Workspace workspace = (Workspace) o;
+    public boolean equals(Object object) {
+        if(object instanceof Workspace){
+            Workspace workspace = (Workspace) object;
             if(this.getOwnerID().equals((workspace.getOwnerID())) && this.getName().equals(workspace.getName()))
                 return true;
         }
-        return super.equals(o);
+        return false;
     }
 
     /*********************************/
@@ -147,8 +151,8 @@ public class Workspace implements Serializable{
     /******** FILE MANAGEMENT ********/
     /*********************************/
 
-    public boolean addFile(Context context, String title, String content){
-        if(!verifySpace(content))
+    public boolean addFile(TextFile file){
+        /*if(!verifySpace(content))
             return false;
         String path = getWorkspacePath(context);
         if(!FileManager.createFile(path, title + ".txt"))
@@ -157,14 +161,19 @@ public class Workspace implements Serializable{
         if(!FileManager.writeFile(path, content))
             return false;
         incrementQuota(content.length());
+        return true;*/
+        _files.add(file);
         return true;
+
     }
 
-    public boolean removeFile(Context context, String filename){
-        String fileLocation = getWorkspacePath(context) + FileManager.LINE_SEP + filename + ".txt";
+    public boolean removeFile(TextFile file){
+        /*String fileLocation = getWorkspacePath(context) + FileManager.LINE_SEP + filename + ".txt";
         long amount = FileManager.getUsedSpace(fileLocation);
         FileManager.deleteFile(fileLocation);
         decrementQuota(amount);
+        return true;*/
+        _files.remove(file);
         return true;
     }
 

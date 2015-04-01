@@ -18,7 +18,8 @@
     <string name="nickname">Nickname</string>
     <string name="email">E-Mail</string>
     <string name="name">Name</string>
-    <string name="enter_new_tag">Enter new tag</string>
+    <string name="title">Title</string>
+    <string name="enter_text">Enter Text</string>
 
     <!-- Descriptions -->
     <string name="app_logo">App Logo</string>
@@ -42,7 +43,6 @@
     <!-- Toasts -->
     <string name="invalid_input">Invalid Input</string>
     <string name="enter_a_valid_name">Enter a valid name</string>
-    <string name="title_activity_settings">SettingsActivity</string>
     <!-- Not Organized -->
 
 </resources>

@@ -11,8 +11,8 @@ public class TextFile {
     private String filename;
     private Context context;
 
-    public TextFile(Context context, String ownerID, String workspaceName, String title, String  content){
-        filename = ownerID + "-" + workspaceName + "-" + title;
+    public TextFile(Context context, String filename, String title, String  content){
+        this.filename = filename;
         this.context = context;
         this.title = title;
         setContent(content);

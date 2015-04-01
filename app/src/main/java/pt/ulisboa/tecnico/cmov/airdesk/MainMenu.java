@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.TextView;
 
 import java.lang.reflect.Field;
 
@@ -21,9 +22,11 @@ import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspacePagerAdapter;
 
 public class MainMenu extends ActionBarActivity {
 
+    public static final int OWNED = 1;
+    public static final int FOREIGN = 2;
+
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
-    //public static final String WORKSPACE = "workspace";
 
     private ApplicationContext appState;
     private WorkspacePagerAdapter adapter;
@@ -103,6 +106,17 @@ public class MainMenu extends ActionBarActivity {
         startActivity(intent);*/
     }
 
+    public void onOwnerAddFileButtonPressed(View view){
+        String workspaceName = ((TextView) view.getRootView().findViewById(R.id.groupHeader)).getText().toString();
+        Intent intent = new Intent(getApplicationContext(), CreateFileActivity.class);
+        intent.putExtra(CreateFileActivity.WORKSPACE, workspaceName);
+        startActivity(intent);
+    }
+
+    public void onForeignAddFileButtonPressed(View view){
+        //TODO
+    }
+
     private void logout(){
         Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
         intent.putExtra(LogInActivity.LOGOUT, true);
@@ -124,6 +138,16 @@ public class MainMenu extends ActionBarActivity {
         }
         catch (Exception e) {
             Log.e("MainMenu", "Force action bar menu error");
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(data != null && resultCode == RESULT_OK) {
+
+            if (requestCode == FOREIGN) {
+                ((ApplicationContext) getApplicationContext()).getActiveUser().setSubscriptions(data.getCharSequenceArrayListExtra(TagsActivity.TAGS));
+            }
         }
     }
 }

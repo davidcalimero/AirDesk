@@ -171,6 +171,7 @@ public class FileManager {
             os = new ObjectOutputStream(fos);
             os.writeObject(object);
         } catch (IOException e) {
+            e.printStackTrace();
             Log.e("FileManager", "Error saving object into file");
         } finally {
             try {
