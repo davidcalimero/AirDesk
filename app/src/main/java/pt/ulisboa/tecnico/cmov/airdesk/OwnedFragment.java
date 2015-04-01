@@ -13,7 +13,9 @@ import android.widget.ExpandableListView;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
+import pt.ulisboa.tecnico.cmov.airdesk.other.TextFile;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
@@ -53,6 +55,22 @@ public class OwnedFragment extends ExpandableListFragment implements Serializabl
             }
         });
 
+        final ExpandableListView workspaceList = (ExpandableListView) view.findViewById(R.id.ownedListView);
+        workspaceList.setOnChildClickListener(
+                new ExpandableListView.OnChildClickListener() {
+                    @Override
+                    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                        Intent intent = new Intent(getActivity().getApplicationContext(), ShowFileActivity.class);
+                        String workspace = (String)((WorkspaceListAdapter) (workspaceList.getExpandableListAdapter())).getGroup(groupPosition);
+                        User user = ((ApplicationContext) (getActivity().getApplicationContext())).getActiveUser();
+                        TextFile f = user.getWorkspaceList().get(workspace).getFiles().get(childPosition);
+                        intent.putExtra(ShowFileActivity.TITLE, f.getTitle());
+                        intent.putExtra(ShowFileActivity.TEXT, f.getContent());
+                        startActivity(intent);
+                        return false;
+                    }
+                });
+
         setHasOptionsMenu(true);
         return view;
     }
@@ -85,7 +103,9 @@ public class OwnedFragment extends ExpandableListFragment implements Serializabl
         HashMap<String, Workspace> workspaces = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser().getWorkspaceList();
         for(Workspace w : workspaces.values()){
             getAdapter().addGroup(w.getName());
-            //TODO check for files
+            for(TextFile f : w.getFiles()){
+                getAdapter().addChild(w.getName(), f.getTitle());
+            }
         }
     }
 }

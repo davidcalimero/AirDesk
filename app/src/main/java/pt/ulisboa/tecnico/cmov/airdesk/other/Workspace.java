@@ -86,6 +86,11 @@ public class Workspace implements Serializable{
         _tags = tags;
     }
 
+    /* Files */
+    public ArrayList<TextFile> getFiles(){
+        return _files;
+    }
+
     /* Privacy */
     public MODE getPrivacy() {
         return _privacy;

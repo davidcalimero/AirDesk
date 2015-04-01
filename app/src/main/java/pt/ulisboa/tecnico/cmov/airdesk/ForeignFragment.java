@@ -23,6 +23,19 @@ public class ForeignFragment extends ExpandableListFragment {
         makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
         user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
 
+        ExpandableListView workspaceList = (ExpandableListView) view.findViewById(R.id.foreignListView);
+        workspaceList.setOnChildClickListener(
+        new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), ShowFileActivity.class);
+
+
+                startActivity(intent);
+                return false;
+            }
+        });
+
         setHasOptionsMenu(true);
         return view;
     }
