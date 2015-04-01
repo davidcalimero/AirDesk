@@ -1,7 +1,11 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,16 +14,43 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
-import java.io.Serializable;
 import java.util.HashMap;
 
-import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
-import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.TextFile;
-import pt.ulisboa.tecnico.cmov.airdesk.other.User;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
-public class OwnedFragment extends ExpandableListFragment implements Serializable {
+public class OwnedFragment extends ExpandableListFragment /*implements Serializable*/ {
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String workspaceName = intent.getStringExtra(Utils.WORKSPACE_NAME);
+            String fileName = intent.getStringExtra(Utils.FILE_NAME);
+
+            switch (intent.getAction()){
+                case Utils.ADD_WORKSPACE:
+                    Log.e("OwnedFragment", "ADD_WORKSPACE: " + workspaceName);
+                    getAdapter().addGroup(workspaceName);
+                    break;
+                case Utils.REMOVE_WORKSPACE:
+                    Log.e("OwnedFragment", "REMOVE_WORKSPACE: " + workspaceName);
+                    getAdapter().removeGroup(workspaceName);
+                    break;
+                case Utils.ADD_FILE:
+                    Log.e("OwnedFragment", "ADD_FILE: " + "[" + workspaceName + "] " + fileName);
+                    getAdapter().addChild(workspaceName, fileName);
+                    break;
+                case Utils.REMOVE_FILE:
+                    Log.e("OwnedFragment", "REMOVE_FILE: " + "[" + workspaceName + "] " + fileName);
+                    getAdapter().removeChild(workspaceName, fileName);
+                    break;
+                default:
+                    return;
+            }
+            getAdapter().notifyDataSetChanged();
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -28,7 +59,15 @@ public class OwnedFragment extends ExpandableListFragment implements Serializabl
         makeAdapter((ExpandableListView) view.findViewById(R.id.ownedListView), R.layout.list_group_owner, R.layout.list_item);
         populateView();
 
-        User user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
+        //Receiver register
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Utils.ADD_WORKSPACE);
+        filter.addAction(Utils.REMOVE_WORKSPACE);
+        filter.addAction(Utils.ADD_FILE);
+        filter.addAction(Utils.REMOVE_FILE);
+        getActivity().registerReceiver(receiver, filter);
+        
+        /*User user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
         user.setEventListener(new WorkspacesChangeListener(){
             @Override
             public void onWorkspaceCreated(String name) {
@@ -53,23 +92,7 @@ public class OwnedFragment extends ExpandableListFragment implements Serializabl
                 getAdapter().removeChild(workspaceName, fileName);
                 getAdapter().notifyDataSetChanged();
             }
-        });
-
-        final ExpandableListView workspaceList = (ExpandableListView) view.findViewById(R.id.ownedListView);
-        workspaceList.setOnChildClickListener(
-                new ExpandableListView.OnChildClickListener() {
-                    @Override
-                    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                        Intent intent = new Intent(getActivity().getApplicationContext(), ShowFileActivity.class);
-                        String workspace = (String)((WorkspaceListAdapter) (workspaceList.getExpandableListAdapter())).getGroup(groupPosition);
-                        User user = ((ApplicationContext) (getActivity().getApplicationContext())).getActiveUser();
-                        TextFile f = user.getWorkspaceList().get(workspace).getFiles().get(childPosition);
-                        intent.putExtra(ShowFileActivity.TITLE, f.getTitle());
-                        intent.putExtra(ShowFileActivity.TEXT, f.getContent());
-                        startActivity(intent);
-                        return false;
-                    }
-                });
+        });*/
 
         setHasOptionsMenu(true);
         return view;
@@ -103,9 +126,8 @@ public class OwnedFragment extends ExpandableListFragment implements Serializabl
         HashMap<String, Workspace> workspaces = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser().getWorkspaceList();
         for(Workspace w : workspaces.values()){
             getAdapter().addGroup(w.getName());
-            for(TextFile f : w.getFiles()){
-                getAdapter().addChild(w.getName(), f.getTitle());
-            }
+            for(TextFile t : w.getFiles().values())
+                getAdapter().addChild(w.getName(), t.getTitle());
         }
     }
 }

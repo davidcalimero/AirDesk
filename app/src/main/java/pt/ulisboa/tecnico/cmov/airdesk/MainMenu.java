@@ -60,11 +60,11 @@ public class MainMenu extends ActionBarActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         if(appState.hasActiveUser()) {
             appState.getActiveUser().commit(getApplicationContext());
         }
-        super.onStop();
+        super.onPause();
     }
 
     @Override
@@ -72,7 +72,6 @@ public class MainMenu extends ActionBarActivity {
         User user = appState.getActiveUser();
         outState.putString(NICKNAME, user.getNickname());
         outState.putString(EMAIL, user.getEmail());
-
         super.onSaveInstanceState(outState);
     }
 

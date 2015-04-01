@@ -5,7 +5,14 @@ import java.util.List;
 public class Utils {
 
     // MACRO
-    public static String UPDATE_REQUEST = "pt.ulisboa.tecnico.cmov.airdesk.UPDATE";
+    public static final String ADD_WORKSPACE = "pt.ulisboa.tecnico.cmov.airdesk.ADD_WORKSPACE";
+    public static final String REMOVE_WORKSPACE = "pt.ulisboa.tecnico.cmov.airdesk.REMOVE_WORKSPACE";
+    public static final String ADD_FILE = "pt.ulisboa.tecnico.cmov.airdesk.ADD_FILE";
+    public static final String REMOVE_FILE = "pt.ulisboa.tecnico.cmov.airdesk.REMOVE_FILE";
+
+    public static final String WORKSPACE_NAME = "workspace";
+    public static final String FILE_NAME = "file";
+    public static final String OWNER = "owner";
 
     /*public static byte[] objectoToByteArray(Object object){
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

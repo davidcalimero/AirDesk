@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Workspace implements Serializable{
 
@@ -33,7 +34,7 @@ public class Workspace implements Serializable{
     private ArrayList<CharSequence> _tags = new ArrayList<>();
 
     /* File List */
-    private ArrayList<TextFile> _files = new ArrayList<>();
+    private HashMap<String, TextFile> _files = new HashMap<>();
 
     /* Privacy */
     private MODE _privacy = MODE.PRIVATE;
@@ -81,14 +82,12 @@ public class Workspace implements Serializable{
         return _tags;
     }
 
+    /* Files List */
+    public HashMap<String, TextFile> getFiles() { return _files; }
+
     public void setPublicProfile(ArrayList<CharSequence> tags) {
         _tags.clear();
         _tags = tags;
-    }
-
-    /* Files */
-    public ArrayList<TextFile> getFiles(){
-        return _files;
     }
 
     /* Privacy */
@@ -167,7 +166,8 @@ public class Workspace implements Serializable{
             return false;
         incrementQuota(content.length());
         return true;*/
-        _files.add(file);
+        Log.e("Workspace", "file dadded: " + file.getTitle());
+        _files.put(file.getTitle(), file);
         return true;
 
     }
@@ -178,7 +178,8 @@ public class Workspace implements Serializable{
         FileManager.deleteFile(fileLocation);
         decrementQuota(amount);
         return true;*/
-        _files.remove(file);
+        Log.e("Workspace", "file removed: " + file.getTitle());
+        _files.remove(file.getTitle());
         return true;
     }
 

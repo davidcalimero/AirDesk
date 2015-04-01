@@ -16,25 +16,41 @@ public class ForeignFragment extends ExpandableListFragment {
 
     private User user;
 
+    /*private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String workspaceName = intent.getStringExtra(Utils.WORKSPACE_NAME);
+            String fileName = intent.getStringExtra(Utils.FILE_NAME);
+
+            switch (intent.getAction()){
+                case Utils.ADD_WORKSPACE:
+                    Log.e("OwnedFragment", "ADD_WORKSPACE: " + workspaceName);
+                    getAdapter().addGroup(workspaceName);
+                    break;
+                case Utils.REMOVE_WORKSPACE:
+                    Log.e("OwnedFragment", "REMOVE_WORKSPACE: " + workspaceName);
+                    getAdapter().removeGroup(workspaceName);
+                    break;
+                case Utils.ADD_FILE:
+                    Log.e("OwnedFragment", "ADD_FILE: " + "[" + workspaceName + "] " + fileName);
+                    getAdapter().addChild(workspaceName, fileName);
+                    break;
+                case Utils.REMOVE_FILE:
+                    Log.e("OwnedFragment", "REMOVE_FILE: " + "[" + workspaceName + "] " + fileName);
+                    getAdapter().removeChild(workspaceName, fileName);
+                    break;
+                default:
+                    return;
+            }
+            getAdapter().notifyDataSetChanged();
+        }
+    };*/
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_foreign, container, false);
         makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
         user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
-
-        ExpandableListView workspaceList = (ExpandableListView) view.findViewById(R.id.foreignListView);
-        workspaceList.setOnChildClickListener(
-        new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), ShowFileActivity.class);
-
-
-                startActivity(intent);
-                return false;
-            }
-        });
 
         setHasOptionsMenu(true);
         return view;

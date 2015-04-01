@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.widget.EditText;
 
 import pt.ulisboa.tecnico.cmov.airdesk.other.TextFile;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 
 public class CreateFileActivity extends ActionBarActivity {
@@ -37,7 +39,15 @@ public class CreateFileActivity extends ActionBarActivity {
         String content = ((EditText) findViewById(R.id.createFileContent)).getText().toString();
 
         User user = ((ApplicationContext) getApplicationContext()).getActiveUser();
-        user.addFile(workspaceName, new TextFile(getApplicationContext(), user.getID(), title, content));
+        user.getWorkspaceList().get(workspaceName).addFile(new TextFile(getApplicationContext(), user.getID(), title, content));
+
+        //NotifyAll
+        Intent intent = new Intent(Utils.ADD_FILE);
+        intent.putExtra(Utils.WORKSPACE_NAME, workspaceName);
+        intent.putExtra(Utils.OWNER, user.getID());
+        intent.putExtra(Utils.FILE_NAME, title);
+        sendBroadcast(intent);
+
         finish();
     }
 
