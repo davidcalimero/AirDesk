@@ -10,6 +10,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
 
@@ -40,6 +41,10 @@ public class NewWorkspaceActivity extends ActionBarActivity {
             Workspace workspace = new Workspace(name, user.getID(), Workspace.MODE.PUBLIC, 0);
             workspace.setPublicProfile(tags);
             user.addWorkspace(workspace);
+
+            // Notification of new workspace via broadcast
+            Intent notification = new Intent(Utils.UPDATE_REQUEST);
+            sendBroadcast(notification);
             finish();
         }
     }

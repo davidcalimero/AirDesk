@@ -4,6 +4,9 @@ import java.util.List;
 
 public class Utils {
 
+    // MACRO
+    public static String UPDATE_REQUEST = "pt.ulisboa.tecnico.cmov.airdesk.UPDATE";
+
     /*public static byte[] objectoToByteArray(Object object){
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;

@@ -52,14 +52,25 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />
         </activity>
-        <!--<activity
+        <!--
+        <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
-        </activity>-->
+        </activity>
+        -->
         <activity
             android:name=".CreateFileActivity"
             android:label="@string/create_new_file" >
         </activity>
+
+        <receiver
+            android:name=".other.UpdateReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="pt.ulisboa.tecnico.cmov.airdesk.UPDATE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
