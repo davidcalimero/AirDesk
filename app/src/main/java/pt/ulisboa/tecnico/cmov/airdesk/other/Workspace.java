@@ -28,7 +28,7 @@ public class Workspace implements Serializable{
     private String _owner = "";
 
     /* User List */
-    private ArrayList<String> _users = new ArrayList<>();
+    private ArrayList<CharSequence> _users = new ArrayList<>();
 
     /* Public Profile */
     private ArrayList<CharSequence> _tags = new ArrayList<>();
@@ -73,8 +73,13 @@ public class Workspace implements Serializable{
     }
 
     /* User List */
-    public ArrayList<String> getUserList() {
+    public ArrayList<CharSequence> getUserList() {
         return _users;
+    }
+
+    public  void setUserList(ArrayList<CharSequence> users){
+        _users.clear();
+        _users=users;
     }
 
     /* Public Profile */

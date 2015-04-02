@@ -12,6 +12,8 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.lang.reflect.Field;
 
@@ -30,6 +32,7 @@ public class MainMenu extends ActionBarActivity {
 
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
+    public static final String WORKSPACE_NAME = "workspaceName";
 
     private ApplicationContext appState;
     private WorkspacePagerAdapter adapter;
@@ -102,10 +105,11 @@ public class MainMenu extends ActionBarActivity {
     }
 
     public void onSettingsButtonPressed(View view){
-        /*Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-        byte[] byteArray = null; //chamar método;
-        intent.putExtra(WORKSPACE, byteArray);
-        startActivity(intent);*/
+        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        String workspaceName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.groupHeader)).getText().toString();
+        //Toast.makeText(getApplicationContext(), (workspaceName), Toast.LENGTH_SHORT).show();
+        intent.putExtra(MainMenu.WORKSPACE_NAME, workspaceName);
+        startActivity(intent);
     }
 
     public void onAddFileButtonPressed(View view){

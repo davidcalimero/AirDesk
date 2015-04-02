@@ -54,6 +54,22 @@
     <string name="dialog_confirm_delete">Do you want to delete file </string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
+
+    <!-- Settings -->
+    <string name="action_settings">Settings</string> <!--Provavelmente não será necessário -->
+    <string name="edit_people">Add/Remove People</string>
+    <string name="change_privacy">Change privacy</string>
+    <string name="change_quota">Change Quota</string>
+    <string name="public_privacy">Public</string>
+    <string name="private_privacy">Private</string>
+
     <!-- Not Organized -->
+    <string name="title_activity_workspace_privacy">WorkspacePrivacyActivity</string>
+    <string name="title_activity_quota">QuotaActivity</string>
+
+
+
+
+
 
 </resources>

@@ -103,4 +103,10 @@ public class User implements Serializable{
         FileManager.objectToFile(getID(), this, context);
         Log.e("MainMenu", "user committed:" + getID());
     }
+
+    public Workspace getWorkspaceByName(String name){
+       return getWorkspaceList().get(name);
+    }
 }
+
+
