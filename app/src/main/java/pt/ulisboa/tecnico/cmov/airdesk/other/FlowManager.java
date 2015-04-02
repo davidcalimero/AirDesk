@@ -59,6 +59,10 @@ public class FlowManager {
         user.getWorkspaceList().get(workspaceName).getFiles().get(fileName).setContent(context, content);
     }
 
+    public static void notifySubscriptionsChange(Context context, ArrayList<CharSequence> tags){
+        ((ApplicationContext) context).getActiveUser().setSubscriptions(tags);
+    }
+
     public static String getFileContent(Context context, String workspaceName, String fileName){
         User user = ((ApplicationContext) context).getActiveUser();
         return user.getWorkspaceList().get(workspaceName).getFiles().get(fileName).getContent(context);

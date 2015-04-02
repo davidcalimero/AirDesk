@@ -60,12 +60,6 @@ public class TagsActivity extends ActionBarActivity {
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void onBackPressed() {
-        sendData();
-        super.onBackPressed();
-    }
-
     public void done(View view){
         sendData();
         finish();

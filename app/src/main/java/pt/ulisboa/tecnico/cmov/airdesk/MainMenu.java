@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Field;
 
 
+import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
 import pt.ulisboa.tecnico.cmov.airdesk.slidingTab.SlidingTabLayout;
 
@@ -142,9 +144,9 @@ public class MainMenu extends ActionBarActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(data != null && resultCode == RESULT_OK) {
-
             if (requestCode == FOREIGN) {
-                ((ApplicationContext) getApplicationContext()).getActiveUser().setSubscriptions(data.getCharSequenceArrayListExtra(TagsActivity.TAGS));
+                FlowManager.notifySubscriptionsChange(getApplicationContext(), data.getCharSequenceArrayListExtra(TagsActivity.TAGS));
+                Toast.makeText(getApplicationContext(), getString(R.string.subscriptions_changed_successfully), Toast.LENGTH_SHORT).show();
             }
         }
     }

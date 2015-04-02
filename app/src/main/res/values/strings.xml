@@ -48,6 +48,7 @@
     <string name="file_edited_successfully">File edited successfully</string>
     <string name="workspace_created_successfully">Workspace created successfully</string>
     <string name="workspace_removed_successfully">Workspace removed successfully</string>
+    <string name="subscriptions_changed_successfully">Subscriptions changed successfully</string>
 
     <!-- AlertDialogs -->
     <string name="dialog_confirm_delete">Do you want to delete file </string>
