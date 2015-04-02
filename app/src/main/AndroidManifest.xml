@@ -46,15 +46,18 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/Workspace_settings" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainMenu" />
         </activity>
         <activity
             android:name=".PrivacyActivity"
-            android:label="@string/title_activity_workspace_privacy" >
+            android:label="@string/workspace_privacy" >
         </activity>
         <activity
             android:name=".QuotaActivity"
-            android:label="@string/title_activity_quota" >
+            android:label="@string/workspace_quota" >
         </activity>
 
         <activity

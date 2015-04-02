@@ -56,7 +56,6 @@
     <string name="dialog_no">No</string>
 
     <!-- Settings -->
-    <string name="action_settings">Settings</string> <!--Provavelmente não será necessário -->
     <string name="edit_people">Add/Remove People</string>
     <string name="change_privacy">Change privacy</string>
     <string name="change_quota">Change Quota</string>
@@ -64,12 +63,9 @@
     <string name="private_privacy">Private</string>
 
     <!-- Not Organized -->
-    <string name="title_activity_workspace_privacy">WorkspacePrivacyActivity</string>
-    <string name="title_activity_quota">QuotaActivity</string>
-
-
-
-
-
+    <string name="workspace_collaborators">Workspace Collaborators</string>
+    <string name="workspace_privacy">Workspace Privacy</string>
+    <string name="workspace_quota">Workspace Quota</string>
+    <string name="Workspace_settings">Workspace Settings</string>
 
 </resources>

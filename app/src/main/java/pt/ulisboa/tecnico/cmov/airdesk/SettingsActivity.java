@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,6 +15,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
 public class SettingsActivity extends ActionBarActivity {
 
+    public static final String WORKSPACE_NAME = "workspaceName";
     public static final String PRIVACY = "privacy";
     public static final String QUOTA = "quota";
 
@@ -32,39 +31,16 @@ public class SettingsActivity extends ActionBarActivity {
         setContentView(R.layout.activity_settings);
 
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
-        workspaceName = (String) bundle.get(MainMenu.WORKSPACE_NAME);
+        workspaceName = (String) bundle.get(WORKSPACE_NAME);
         ApplicationContext applicationContext = (ApplicationContext) getApplicationContext();
         User activeUser = applicationContext.getActiveUser();
-        workspace = activeUser.getWorkspaceByName(workspaceName);
+        workspace = activeUser.getWorkspaceList().get(workspaceName);
         Log.e("SettingsActivity", "user: "+activeUser+"  workspace: "+workspaceName);
 
         if(workspace == null){
             Log.e("SettingsActivity", workspaceName + " nao e o nome de um workspace.");
             finish();
         }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void onEditPersonPressed(View view){
@@ -75,6 +51,7 @@ public class SettingsActivity extends ActionBarActivity {
         Intent intent = new Intent(getApplicationContext(), TagsActivity.class);
         users = new ArrayList<>(workspace.getUserList());
         intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, users);
+        intent.putExtra(TagsActivity.TITLE, getString(R.string.workspace_collaborators));
         startActivityForResult(intent, 1);
     }
 
