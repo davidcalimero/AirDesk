@@ -48,6 +48,11 @@
     <string name="file_edited_successfully">File edited successfully</string>
     <string name="workspace_created_successfully">Workspace created successfully</string>
     <string name="workspace_removed_successfully">Workspace removed successfully</string>
+
+    <!-- AlertDialogs -->
+    <string name="dialog_confirm_delete">Do you want to delete file </string>
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
     <!-- Not Organized -->
 
 </resources>

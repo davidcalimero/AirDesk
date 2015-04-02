@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -81,9 +83,26 @@ public class CreateEditFileActivity extends ActionBarActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.action_delete:
-                FlowManager.notifyRemoveFile(getApplicationContext(), workspaceName, title);
-                Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
-                finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(getString(R.string.dialog_confirm_delete) + " \"" + title + "\"")
+                    .setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            //Delete File
+                            //((ApplicationContext) getApplicationContext()).getActiveUser().getWorkspaceList().get(workspace).removeFile(title);
+                            FlowManager.notifyRemoveFile(getApplicationContext(), workspaceName, title);
+                            Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    })
+                    .setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                // Display the AlertDialog object
+                builder.create();
+                builder.show();
                 break;
 
             default:
