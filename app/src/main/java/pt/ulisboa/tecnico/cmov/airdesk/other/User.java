@@ -73,9 +73,9 @@ public class User implements Serializable{
     /*********************************/
 
     /* Workspace List */
-    public void removeWorkspace(Workspace workspace){
-        Log.e("User", "workspace removed: " + workspace.getName());
-        _workspaceList.remove(workspace.getName());
+    public void removeWorkspace(String name){
+        Log.e("User", "workspace removed: " + name);
+        _workspaceList.remove(name);
     }
 
     public void addWorkspace(Workspace workspace){

@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.airdesk.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,20 +87,24 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
     }
 
     public void addGroup(String title){
+        Log.e("WorkspaceListAdapter", "addGroup: " + title);
         groupHeaders.add(title);
         childHeaders.put(title, new ArrayList<String>());
     }
 
     public boolean removeGroup(String title){
+        Log.e("WorkspaceListAdapter", "removeGroup: " + title);
         childHeaders.remove(title).clear();
         return groupHeaders.remove(title);
     }
 
     public void addChild(String groupTitle, String childTitle){
+        Log.e("WorkspaceListAdapter", "addChild: " + childTitle);
         childHeaders.get(groupTitle).add(childTitle);
     }
 
     public boolean removeChild(String groupTitle, String childTitle){
+        Log.e("WorkspaceListAdapter", "removeChild: " + childTitle);
         return childHeaders.get(groupTitle).remove(childTitle);
     }
 

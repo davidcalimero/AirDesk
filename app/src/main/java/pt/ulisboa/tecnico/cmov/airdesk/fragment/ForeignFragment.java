@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.airdesk;
+package pt.ulisboa.tecnico.cmov.airdesk.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,11 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
-import pt.ulisboa.tecnico.cmov.airdesk.other.User;
+import java.util.ArrayList;
+
+import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
+import pt.ulisboa.tecnico.cmov.airdesk.MainMenu;
+import pt.ulisboa.tecnico.cmov.airdesk.R;
+import pt.ulisboa.tecnico.cmov.airdesk.TagsActivity;
 
 public class ForeignFragment extends ExpandableListFragment {
-
-    private User user;
 
     /*private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -50,7 +53,6 @@ public class ForeignFragment extends ExpandableListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_foreign, container, false);
         makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
-        user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
 
         setHasOptionsMenu(true);
         return view;
@@ -68,8 +70,9 @@ public class ForeignFragment extends ExpandableListFragment {
 
         switch (id) {
             case R.id.action_subscriptions:
+                ArrayList<CharSequence> tags = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser().getSubscriptions();
                 Intent intent = new Intent(getActivity().getApplicationContext(), TagsActivity.class);
-                intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, user.getSubscriptions());
+                intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, tags);
                 intent.putExtra(TagsActivity.TITLE, getString(R.string.subscriptions));
                 getActivity().startActivityForResult(intent, MainMenu.FOREIGN);
                 break;

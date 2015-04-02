@@ -4,25 +4,24 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 
-public class TextFile {
+public class TextFile implements Serializable{
 
     private String title;
     private String filename;
-    private Context context;
 
-    public TextFile(Context context, String filename, String title, String  content){
+    public TextFile(Context context, String filename, String title, String content){
         this.filename = filename;
-        this.context = context;
         this.title = title;
-        setContent(content);
+        setContent(context, content);
     }
 
     public String getTitle() {
         return title;
     }
 
-    public String getContent() {
+    public String getContent(Context context) {
         String content = "";
         try {
             content =  (String) FileManager.fileToObject(filename, context);
@@ -32,7 +31,7 @@ public class TextFile {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(Context context, String content) {
         FileManager.objectToFile(filename, content, context);
     }
 }

@@ -142,6 +142,7 @@ public class FileManager {
             is = new ObjectInputStream(fis);
             object = is.readObject();
         } catch (Exception e) {
+            e.printStackTrace();
             Log.e("FileManager", "Error loading object from file");
         } finally {
             try {

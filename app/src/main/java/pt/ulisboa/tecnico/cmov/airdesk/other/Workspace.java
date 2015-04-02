@@ -86,6 +86,7 @@ public class Workspace implements Serializable{
     public HashMap<String, TextFile> getFiles() { return _files; }
 
     public void setPublicProfile(ArrayList<CharSequence> tags) {
+        Log.e("Workspace", "public profile changed: " + getName());
         _tags.clear();
         _tags = tags;
     }
@@ -166,20 +167,20 @@ public class Workspace implements Serializable{
             return false;
         incrementQuota(content.length());
         return true;*/
-        Log.e("Workspace", "file dadded: " + file.getTitle());
+        Log.e("Workspace", "file added: " + file.getTitle());
         _files.put(file.getTitle(), file);
         return true;
 
     }
 
-    public boolean removeFile(TextFile file){
+    public boolean removeFile(String name){
         /*String fileLocation = getWorkspacePath(context) + FileManager.LINE_SEP + filename + ".txt";
         long amount = FileManager.getUsedSpace(fileLocation);
         FileManager.deleteFile(fileLocation);
         decrementQuota(amount);
         return true;*/
-        Log.e("Workspace", "file removed: " + file.getTitle());
-        _files.remove(file.getTitle());
+        Log.e("Workspace", "file removed: " + name);
+        _files.remove(name);
         return true;
     }
 

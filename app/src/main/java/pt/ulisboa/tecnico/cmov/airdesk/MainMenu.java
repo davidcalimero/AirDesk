@@ -107,8 +107,10 @@ public class MainMenu extends ActionBarActivity {
 
     public void onOwnerAddFileButtonPressed(View view){
         String workspaceName = ((TextView) view.getRootView().findViewById(R.id.groupHeader)).getText().toString();
-        Intent intent = new Intent(getApplicationContext(), CreateFileActivity.class);
-        intent.putExtra(CreateFileActivity.WORKSPACE, workspaceName);
+        Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
+        intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, getString(R.string.create_new_file));
+        intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.CREATE);
+        intent.putExtra(CreateEditFileActivity.FILE_WORKSPACE, workspaceName);
         startActivity(intent);
     }
 

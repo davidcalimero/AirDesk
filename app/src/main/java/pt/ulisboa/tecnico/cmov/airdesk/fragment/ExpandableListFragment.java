@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.airdesk;
+package pt.ulisboa.tecnico.cmov.airdesk.fragment;
 
 
 import android.content.Intent;
@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.ExpandableListView;
 
+import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
+import pt.ulisboa.tecnico.cmov.airdesk.ShowFileActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.other.TextFile;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
@@ -29,7 +31,7 @@ public class ExpandableListFragment extends Fragment {
                 User user = ((ApplicationContext) (getActivity().getApplicationContext())).getActiveUser();
                 TextFile file = user.getWorkspaceList().get(workspaceName).getFiles().get(filename);
                 intent.putExtra(ShowFileActivity.TITLE, file.getTitle());
-                intent.putExtra(ShowFileActivity.TEXT, file.getContent());
+                intent.putExtra(ShowFileActivity.TEXT, file.getContent(getActivity().getApplicationContext()));
                 startActivity(intent);
                 return false;
             }

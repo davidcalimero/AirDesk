@@ -12,9 +12,11 @@ import android.widget.TextView;
 
 public class ShowFileActivity extends ActionBarActivity {
 
+    public static final String WORKSPACE = "workspace";
     public static final String TITLE = "title";
     public static final String TEXT = "text";
 
+    private String workspace;
     private String title;
     private String text;
 
@@ -25,6 +27,7 @@ public class ShowFileActivity extends ActionBarActivity {
 
         //Restore data
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
+        workspace = bundle.getString(WORKSPACE);
         title = bundle.getString(TITLE);
         text = bundle.getString(TEXT);
 
@@ -64,9 +67,12 @@ public class ShowFileActivity extends ActionBarActivity {
     }
 
     public void editButtonPressed(View view){
-        Intent intent = new Intent(getApplicationContext(), EditFileActivity.class);
-        intent.putExtra(TITLE, title);
-        intent.putExtra(TEXT, text);
+        Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
+        intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, title);
+        intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);
+        intent.putExtra(CreateEditFileActivity.FILE_WORKSPACE, workspace);
+        intent.putExtra(CreateEditFileActivity.FILE_TITLE, title);
+        intent.putExtra(CreateEditFileActivity.FILE_CONTENT, text);
         startActivity(intent);
     }
 }

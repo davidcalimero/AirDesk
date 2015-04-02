@@ -1,11 +1,7 @@
-package pt.ulisboa.tecnico.cmov.airdesk;
+package pt.ulisboa.tecnico.cmov.airdesk.fragment;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,13 +12,18 @@ import android.widget.ExpandableListView;
 
 import java.util.HashMap;
 
+import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
+import pt.ulisboa.tecnico.cmov.airdesk.MainMenu;
+import pt.ulisboa.tecnico.cmov.airdesk.NewWorkspaceActivity;
+import pt.ulisboa.tecnico.cmov.airdesk.R;
+import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.other.TextFile;
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 
 public class OwnedFragment extends ExpandableListFragment /*implements Serializable*/ {
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    /*private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String workspaceName = intent.getStringExtra(Utils.WORKSPACE_NAME);
@@ -50,7 +51,7 @@ public class OwnedFragment extends ExpandableListFragment /*implements Serializa
             }
             getAdapter().notifyDataSetChanged();
         }
-    };
+    };*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,16 +60,15 @@ public class OwnedFragment extends ExpandableListFragment /*implements Serializa
         makeAdapter((ExpandableListView) view.findViewById(R.id.ownedListView), R.layout.list_group_owner, R.layout.list_item);
         populateView();
 
-        //Receiver register
+        /*//Receiver register
         IntentFilter filter = new IntentFilter();
         filter.addAction(Utils.ADD_WORKSPACE);
         filter.addAction(Utils.REMOVE_WORKSPACE);
         filter.addAction(Utils.ADD_FILE);
         filter.addAction(Utils.REMOVE_FILE);
-        getActivity().registerReceiver(receiver, filter);
-        
-        /*User user = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser();
-        user.setEventListener(new WorkspacesChangeListener(){
+        getActivity().registerReceiver(receiver, filter);*/
+
+        FlowManager.setWorkspacesChangeListener(new WorkspacesChangeListener() {
             @Override
             public void onWorkspaceCreated(String name) {
                 getAdapter().addGroup(name);
@@ -92,7 +92,7 @@ public class OwnedFragment extends ExpandableListFragment /*implements Serializa
                 getAdapter().removeChild(workspaceName, fileName);
                 getAdapter().notifyDataSetChanged();
             }
-        });*/
+        });
 
         setHasOptionsMenu(true);
         return view;

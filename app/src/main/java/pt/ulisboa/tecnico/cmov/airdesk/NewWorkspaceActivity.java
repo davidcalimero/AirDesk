@@ -9,21 +9,18 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import pt.ulisboa.tecnico.cmov.airdesk.other.User;
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
 
 public class NewWorkspaceActivity extends ActionBarActivity {
 
-    private User user;
     private ArrayList<CharSequence> tags = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_workspace);
-        user = ((ApplicationContext) getApplicationContext()).getActiveUser();
     }
 
     public boolean isWorkspaceNameEmpty(){
@@ -38,16 +35,7 @@ public class NewWorkspaceActivity extends ActionBarActivity {
             EditText workspaceName = (EditText) findViewById(R.id.workspaceName);
             String name = workspaceName.getText().toString();
             // TODO falta privacidade e cota
-            Workspace workspace = new Workspace(name, user.getID(), Workspace.MODE.PUBLIC, 0);
-            workspace.setPublicProfile(tags);
-            user.addWorkspace(workspace);
-
-            //NotifyAll
-            Intent intent = new Intent(Utils.ADD_WORKSPACE);
-            intent.putExtra(Utils.WORKSPACE_NAME, workspace.getName());
-            intent.putExtra(Utils.OWNER, workspace.getOwnerID());
-            sendBroadcast(intent);
-
+            FlowManager.notifyAddWorkspace(getApplicationContext(), name, Workspace.MODE.PUBLIC, tags, 0);
             finish();
         }
     }

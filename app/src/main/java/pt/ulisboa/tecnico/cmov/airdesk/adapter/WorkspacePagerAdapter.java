@@ -1,7 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk.adapter;
 
-import pt.ulisboa.tecnico.cmov.airdesk.OwnedFragment;
-import pt.ulisboa.tecnico.cmov.airdesk.ForeignFragment;
+import pt.ulisboa.tecnico.cmov.airdesk.fragment.OwnedFragment;
+import pt.ulisboa.tecnico.cmov.airdesk.fragment.ForeignFragment;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 
 import android.content.Context;

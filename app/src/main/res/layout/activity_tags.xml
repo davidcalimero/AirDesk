@@ -17,7 +17,7 @@
     <EditText android:id="@+id/tagWriteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textShortMessage"
+        android:inputType="textEmailAddress"
         android:layout_above="@+id/tagsDone"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

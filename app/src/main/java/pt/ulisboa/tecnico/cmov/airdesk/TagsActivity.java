@@ -48,7 +48,7 @@ public class TagsActivity extends ActionBarActivity {
             }
         });
 
-        populateListView();
+        populate();
         setTitle(title);
     }
 
@@ -92,7 +92,7 @@ public class TagsActivity extends ActionBarActivity {
     }
 
     //ListView population
-    private void populateListView(){
+    private void populate(){
         for(CharSequence tag : tags){
             adapter.add(tag.toString());
         }
