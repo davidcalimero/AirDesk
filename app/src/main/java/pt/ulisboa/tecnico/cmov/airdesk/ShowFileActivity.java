@@ -44,6 +44,7 @@ public class ShowFileActivity extends ActionBarActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(WORKSPACE, workspace);
         outState.putString(TITLE, title);
         outState.putString(TEXT, text);
         Log.e("ShowFileActivity", "state saved: " + title);
