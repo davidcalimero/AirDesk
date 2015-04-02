@@ -19,6 +19,6 @@
         android:src="@drawable/ic_action_new_dark"
         android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
         android:contentDescription="@string/add_file_icon"
-        android:onClick="onForeignAddFileButtonPressed" />
+        android:onClick="onAddFileButtonPressed" />
 
 </LinearLayout>

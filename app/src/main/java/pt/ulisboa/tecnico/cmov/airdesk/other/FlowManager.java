@@ -59,4 +59,9 @@ public class FlowManager {
         user.getWorkspaceList().get(workspaceName).getFiles().get(fileName).setContent(context, content);
     }
 
+    public static String getFileContent(Context context, String workspaceName, String fileName){
+        User user = ((ApplicationContext) context).getActiveUser();
+        return user.getWorkspaceList().get(workspaceName).getFiles().get(fileName).getContent(context);
+    }
+
 }

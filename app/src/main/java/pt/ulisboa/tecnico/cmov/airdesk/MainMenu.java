@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.lang.reflect.Field;
@@ -105,17 +106,13 @@ public class MainMenu extends ActionBarActivity {
         startActivity(intent);*/
     }
 
-    public void onOwnerAddFileButtonPressed(View view){
-        String workspaceName = ((TextView) view.getRootView().findViewById(R.id.groupHeader)).getText().toString();
+    public void onAddFileButtonPressed(View view){
+        String workspaceName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.groupHeader)).getText().toString();
         Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
         intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, getString(R.string.create_new_file));
         intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.CREATE);
         intent.putExtra(CreateEditFileActivity.FILE_WORKSPACE, workspaceName);
         startActivity(intent);
-    }
-
-    public void onForeignAddFileButtonPressed(View view){
-        //TODO
     }
 
     private void logout(){

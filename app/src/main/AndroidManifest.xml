@@ -53,6 +53,9 @@
         <activity
             android:name=".CreateEditFileActivity"
             android:label="@string/create_new_file" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainMenu" />
         </activity>
 
     </application>

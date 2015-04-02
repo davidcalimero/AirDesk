@@ -68,7 +68,6 @@ public class ShowFileActivity extends ActionBarActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                //((ApplicationContext) getApplicationContext()).getActiveUser().getWorkspaceList().get(workspace).removeFile(title);
                                 FlowManager.notifyRemoveFile(getApplicationContext(), workspace, title);
                                 Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
                                 finish();

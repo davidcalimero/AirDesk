@@ -15,11 +15,13 @@
         android:inputType="textShortMessage"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:hint="@string/title"/>
+        android:hint="@string/title"
+        android:textStyle="bold"
+        android:textSize="22sp"/>
 
     <EditText
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/createFileContent"
         android:layout_below="@+id/createFileTitle"
         android:layout_alignParentLeft="true"
@@ -29,7 +31,8 @@
         android:inputType="textMultiLine"
         android:gravity="top|left"
         android:layout_above="@+id/createFileCreate"
-        android:hint="@string/enter_text"/>
+        android:hint="@string/enter_text"
+        android:textSize="22sp"/>
 
     <Button
         android:layout_width="wrap_content"

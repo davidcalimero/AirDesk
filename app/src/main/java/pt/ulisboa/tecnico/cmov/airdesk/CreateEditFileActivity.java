@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -52,7 +53,7 @@ public class CreateEditFileActivity extends ActionBarActivity {
 
         //Update Interface
         if(mode.equals(MODE.EDIT)) {
-            titleView.setVisibility(View.INVISIBLE);
+            ((ViewGroup) titleView.getParent()).removeView(titleView);
             ((Button) findViewById(R.id.createFileCreate)).setText(getString(R.string.done));
         }
         titleView.setText(title);
@@ -89,7 +90,6 @@ public class CreateEditFileActivity extends ActionBarActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
                             //Delete File
-                            //((ApplicationContext) getApplicationContext()).getActiveUser().getWorkspaceList().get(workspace).removeFile(title);
                             FlowManager.notifyRemoveFile(getApplicationContext(), workspaceName, title);
                             Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
                             finish();
