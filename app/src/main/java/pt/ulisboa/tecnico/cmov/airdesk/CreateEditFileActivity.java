@@ -50,7 +50,7 @@ public class CreateEditFileActivity extends ActionBarActivity {
 
         //Update Interface
         if(mode.equals(MODE.EDIT)) {
-            titleView.setEnabled(false);
+            titleView.setVisibility(View.INVISIBLE);
             ((Button) findViewById(R.id.createFileCreate)).setText(getString(R.string.done));
         }
         titleView.setText(title);
@@ -81,6 +81,9 @@ public class CreateEditFileActivity extends ActionBarActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.action_delete:
+                FlowManager.notifyRemoveFile(getApplicationContext(), workspaceName, title);
+                Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
+                finish();
                 break;
 
             default:
@@ -98,10 +101,14 @@ public class CreateEditFileActivity extends ActionBarActivity {
             return;
         }
 
-        if(mode.equals(MODE.CREATE))
+        if(mode.equals(MODE.CREATE)) {
+            Toast.makeText(getApplicationContext(), getString(R.string.file_created_successfully), Toast.LENGTH_SHORT).show();
             FlowManager.notifyAddFile(getApplicationContext(), workspaceName, newTitle, newContent);
-        else
+        }
+        else {
+            Toast.makeText(getApplicationContext(), getString(R.string.file_edited_successfully), Toast.LENGTH_SHORT).show();
             FlowManager.notifyEditFile(getApplicationContext(), workspaceName, newTitle, newContent);
+        }
         finish();
     }
 

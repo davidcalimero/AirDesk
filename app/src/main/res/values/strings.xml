@@ -43,6 +43,11 @@
     <!-- Toasts -->
     <string name="invalid_input">Invalid Input</string>
     <string name="enter_a_valid_name">Enter a valid name</string>
+    <string name="file_created_successfully">File created successfully</string>
+    <string name="file_removed_successfully">File removed successfully</string>
+    <string name="file_edited_successfully">File edited successfully</string>
+    <string name="workspace_created_successfully">Workspace created successfully</string>
+    <string name="workspace_removed_successfully">Workspace removed successfully</string>
     <!-- Not Organized -->
 
 </resources>

@@ -8,6 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 
 
 public class ShowFileActivity extends ActionBarActivity {
@@ -57,6 +60,9 @@ public class ShowFileActivity extends ActionBarActivity {
 
         switch (id){
             case R.id.action_delete:
+                FlowManager.notifyRemoveFile(getApplicationContext(), workspace, title);
+                Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
+                finish();
                 break;
 
             default:
