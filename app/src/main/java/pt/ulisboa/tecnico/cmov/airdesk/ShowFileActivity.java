@@ -74,5 +74,6 @@ public class ShowFileActivity extends ActionBarActivity {
         intent.putExtra(CreateEditFileActivity.FILE_TITLE, title);
         intent.putExtra(CreateEditFileActivity.FILE_CONTENT, text);
         startActivity(intent);
+        finish();
     }
 }

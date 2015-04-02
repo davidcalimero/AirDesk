@@ -98,7 +98,10 @@ public class CreateEditFileActivity extends ActionBarActivity {
             return;
         }
 
-        FlowManager.notifyAddFile(getApplicationContext(), workspaceName, newTitle, newContent);
+        if(mode.equals(MODE.CREATE))
+            FlowManager.notifyAddFile(getApplicationContext(), workspaceName, newTitle, newContent);
+        else
+            FlowManager.notifyEditFile(getApplicationContext(), workspaceName, newTitle, newContent);
         finish();
     }
 

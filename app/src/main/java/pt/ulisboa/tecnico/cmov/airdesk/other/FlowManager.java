@@ -54,4 +54,9 @@ public class FlowManager {
         user.getWorkspaceList().get(workspaceName).removeFile(fileName);
     }
 
+    public static void notifyEditFile(Context context, String workspaceName, String fileName, String content){
+        User user = ((ApplicationContext) context).getActiveUser();
+        user.getWorkspaceList().get(workspaceName).getFiles().get(fileName).setContent(context, content);
+    }
+
 }
