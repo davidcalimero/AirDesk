@@ -10,6 +10,7 @@ public class TextFile implements Serializable{
 
     private String title;
     private String filename;
+    private String text = null;
 
     public TextFile(Context context, String filename, String title, String content){
         this.filename = filename;
@@ -17,11 +18,20 @@ public class TextFile implements Serializable{
         setContent(context, content);
     }
 
+    public TextFile(String filename, String title, String content){
+        this.filename = filename;
+        this.title = title;
+        this.text = content;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public String getContent(Context context) {
+        if(text != null)
+            return text;
+
         String content = "";
         try {
             content =  (String) FileManager.fileToObject(filename, context);
@@ -33,5 +43,9 @@ public class TextFile implements Serializable{
 
     public void setContent(Context context, String content) {
         FileManager.objectToFile(filename, content, context);
+    }
+
+    public void saveContent(Context context){
+        setContent(context, text);
     }
 }
