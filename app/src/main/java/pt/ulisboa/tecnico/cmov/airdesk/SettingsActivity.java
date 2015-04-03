@@ -68,8 +68,8 @@ public class SettingsActivity extends ActionBarActivity {
         tags = new ArrayList<>(workspace.getPublicProfile());
         */
 
-        users = workspace.getUserList();
-        tags = workspace.getPublicProfile();
+        users = (ArrayList<CharSequence>) workspace.getUserList().clone();
+        tags = (ArrayList<CharSequence>) workspace.getPublicProfile().clone();
 
         //////////////////////////////////////////////
         // Privacy
