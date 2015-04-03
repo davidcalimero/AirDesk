@@ -29,37 +29,41 @@
                 android:gravity="center_horizontal" />
 
 
-            <ListView
-                android:id="@+id/personList"
-                android:layout_width="match_parent"
-                android:layout_height="194dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/editPeopleView" />
-
-            <EditText
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/personID"
-                android:hint="@string/personID"
+                android:text="@string/users"
+                android:id="@+id/addRemoveUsers"
+                android:layout_below="@+id/editPeopleView"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:onClick="addRemoveUsers" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_people"
+                android:id="@+id/editTagsView"
+                android:clickable="true"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:gravity="center_horizontal"
+                android:layout_below="@+id/addRemoveUsers"
+                android:layout_marginTop="50dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_toLeftOf="@+id/button"
-                android:layout_toStartOf="@+id/button"
-                android:layout_below="@+id/personList" />
+                android:layout_alignRight="@+id/confirmButton"
+                android:layout_alignEnd="@+id/confirmButton" />
 
             <Button
-                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add"
-                android:id="@+id/button"
-                android:layout_alignBottom="@+id/personID"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignLeft="@+id/button2"
-                android:layout_alignStart="@+id/button2"
-                android:onClick="addItem" />
+                android:text="@string/tags"
+                android:id="@+id/addRemoveTags"
+                android:layout_below="@+id/editTagsView"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:onClick="addRemoveTags" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -70,7 +74,7 @@
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:gravity="center_horizontal"
-                android:layout_below="@+id/personID"
+                android:layout_below="@+id/addRemoveTags"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentRight="true"
@@ -92,14 +96,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/private_privacy"
                     android:id="@+id/privateButton"
-                    android:onClick="onPrivateButtonPressed" />
+                    android:onClick="onPrivateButtonPressed"
+                    android:textSize="25sp" />
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/public_privacy"
                     android:id="@+id/publicButton"
-                    android:onClick="onPublicButtonPressed" />
+                    android:onClick="onPublicButtonPressed"
+                    android:textSize="25sp" />
             </RadioGroup>
 
             <TextView
@@ -142,7 +148,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/confirm"
-                android:id="@+id/button2"
+                android:id="@+id/confirmButton"
                 android:layout_below="@+id/seekBar"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
@@ -153,7 +159,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/cancel"
-                android:id="@+id/button3"
+                android:id="@+id/cancelButton"
                 android:layout_below="@+id/seekBar"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
@@ -162,8 +168,6 @@
 
         </RelativeLayout>
     </ScrollView>
-
-    <requestFocus />
 
     <requestFocus />
 </RelativeLayout>

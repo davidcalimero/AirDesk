@@ -68,8 +68,8 @@ public class FlowManager {
         return user.getWorkspaceList().get(workspaceName).getFiles().get(fileName).getContent(context);
     }
 
-    public static void notifyEditWorkspace(Context context, String workspaceName, ArrayList<CharSequence> users, Workspace.MODE privacy, long quota){
+    public static void notifyEditWorkspace(Context context, String workspaceName, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, Workspace.MODE privacy, long quota){
         Workspace w = ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName);
-        w.editWorkspace(users, privacy, quota);
+        w.editWorkspace(users, tags, privacy, quota);
     }
 }

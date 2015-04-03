@@ -84,7 +84,7 @@ public class Workspace implements Serializable{
             Log.e("Workspace","IT HAS SOMETHING");
         //_users.clear();
         //_users = users;
-        _users = new ArrayList<CharSequence>(users);
+        _users = new ArrayList<>(users);
         Log.e("Workspace","User List Updated.");
     }
 
@@ -166,8 +166,9 @@ public class Workspace implements Serializable{
     /******** EDIT WORKSPACE *********/
     /*********************************/
 
-    public void editWorkspace(ArrayList<CharSequence> users, MODE privacy, long quota){
+    public void editWorkspace(ArrayList<CharSequence> users, ArrayList<CharSequence> tags, MODE privacy, long quota){
         setUserList(users);
+        setPublicProfile(tags);
         setPrivacy(privacy);
         setMaximumQuota(quota);
     }
