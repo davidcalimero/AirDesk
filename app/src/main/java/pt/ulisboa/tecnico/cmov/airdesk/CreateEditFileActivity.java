@@ -55,7 +55,7 @@ public class CreateEditFileActivity extends ActionBarActivity {
         //Update Interface
         if(mode.equals(MODE.EDIT)) {
             ((ViewGroup) titleView.getParent()).removeView(titleView);
-            ((Button) findViewById(R.id.createFileCreate)).setText(getString(R.string.done));
+            ((Button) findViewById(R.id.createFileCreate)).setText(getString(R.string.confirm));
         }
         titleView.setText(title);
         contentView.setText(content);

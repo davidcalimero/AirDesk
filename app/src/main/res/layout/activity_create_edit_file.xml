@@ -17,7 +17,8 @@
         android:layout_alignParentEnd="true"
         android:hint="@string/title"
         android:textStyle="bold"
-        android:textSize="22sp"/>
+        android:textSize="22sp"
+        android:maxLength="40"/>
 
     <EditText
         android:layout_width="wrap_content"

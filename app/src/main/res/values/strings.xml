@@ -30,7 +30,6 @@
     <!-- Buttons -->
     <string name="login">Login</string>
     <string name="edit">Edit</string>
-    <string name="done">Done</string>
     <string name="cancel">Cancel</string>
     <string name="tags">Tags</string>
     <string name="create">Create</string>

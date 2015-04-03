@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/addTag" />
+        android:layout_above="@+id/addTag"
+        android:textSize="22sp"/>
 
     <EditText android:id="@+id/tagWriteView"
         android:layout_width="wrap_content"
@@ -23,7 +24,8 @@
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/addTag"
         android:layout_toStartOf="@+id/addTag"
-        android:hint="@string/enter_text" />
+        android:hint="@string/enter_text"
+        android:maxLength="40"/>
 
     <Button android:id="@+id/addTag"
         android:layout_width="wrap_content"
@@ -37,7 +39,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/done"
+        android:text="@string/confirm"
         android:id="@+id/tagsDone"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/addTag"

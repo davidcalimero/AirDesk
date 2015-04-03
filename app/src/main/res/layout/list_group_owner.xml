@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:descendantFocusability="blocksDescendants"
+    android:gravity="center_vertical">
 
     <TextView
         android:id="@+id/groupHeader"
@@ -11,17 +13,19 @@
         android:layout_height="wrap_content"
         android:textSize="25sp"
         android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
-        android:layout_weight="1.00" />
+        android:layout_weight="1.00"
+        android:ellipsize="end"
+        android:singleLine="true"/>
 
-    <ImageView android:id="@+id/addFileIcon"
+    <ImageButton android:id="@+id/addFileIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_action_new_dark"
         android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
         android:contentDescription="@string/add_file_icon"
-        android:onClick="onAddFileButtonPressed" />
+        android:onClick="onAddFileButtonPressed"/>
 
-    <ImageView android:id="@+id/settingsIcon"
+    <ImageButton android:id="@+id/settingsIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_menu_edit"
