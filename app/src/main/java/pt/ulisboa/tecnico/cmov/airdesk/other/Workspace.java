@@ -178,14 +178,14 @@ public class Workspace implements Serializable{
 
     }
 
-    public boolean removeFile(String name){
+    public boolean removeFile(Context context, String name){
         /*String fileLocation = getWorkspacePath(context) + FileManager.LINE_SEP + filename + ".txt";
         long amount = FileManager.getUsedSpace(fileLocation);
         FileManager.deleteFile(fileLocation);
         decrementQuota(amount);
         return true;*/
         Log.e("Workspace", "file removed: " + name);
-        _files.remove(name);
+        _files.remove(name).delete(context);
         return true;
     }
 

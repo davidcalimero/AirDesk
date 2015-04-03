@@ -30,7 +30,7 @@ public class NewWorkspaceActivity extends ActionBarActivity {
 
     public void onCreateWorkspaceButtonPressed (View view){
         if(isWorkspaceNameEmpty())
-            Toast.makeText(getApplicationContext(), getString(R.string.enter_a_valid_name), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
         else {
             EditText workspaceName = (EditText) findViewById(R.id.workspaceName);
             String name = workspaceName.getText().toString();
@@ -43,14 +43,14 @@ public class NewWorkspaceActivity extends ActionBarActivity {
 
     public void onAddTagButtonPressed (View view){
         if(isWorkspaceNameEmpty())
-            Toast.makeText(getApplicationContext(), R.string.enter_a_valid_name, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
         else {
             EditText workspaceName = (EditText) findViewById(R.id.workspaceName);
             String name = workspaceName.getText().toString();
 
-            Intent intent = new Intent(getApplicationContext(), TagsActivity.class);
-            intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, tags);
-            intent.putExtra(TagsActivity.TITLE, name + " Tags");
+            Intent intent = new Intent(getApplicationContext(), ListActivity.class);
+            intent.putCharSequenceArrayListExtra(ListActivity.LIST, tags);
+            intent.putExtra(ListActivity.TITLE, getString(R.string.tags_of) + " \"" + name + "\"");
             startActivityForResult(intent, 1);
         }
     }
@@ -61,6 +61,6 @@ public class NewWorkspaceActivity extends ActionBarActivity {
         if (data == null) {
             return;
         }
-        tags = data.getCharSequenceArrayListExtra(TagsActivity.TAGS);
+        tags = data.getCharSequenceArrayListExtra(ListActivity.LIST);
     }
 }

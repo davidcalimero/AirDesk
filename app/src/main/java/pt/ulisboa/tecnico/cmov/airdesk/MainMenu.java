@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -50,13 +51,10 @@ public class MainMenu extends ActionBarActivity {
 
         //Restore data
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
-        String nickname = bundle.getString(NICKNAME);
-        String email = bundle.getString(EMAIL);
+        final String nickname = bundle.getString(NICKNAME);
+        final String email = bundle.getString(EMAIL);
 
-        //Load current user
-        if(!appState.hasActiveUser())
-            appState.setActiveUser(User.LoadUser(email, nickname, getApplicationContext()));
-        setTitle(nickname + ": " + email);
+        loadUser(email, nickname);
 
         //Force overflow menu on actionBar
         forceMenuOverflow();
@@ -118,10 +116,11 @@ public class MainMenu extends ActionBarActivity {
     }
 
     private void logout(){
+        Log.e("MainMenu", "Logout: " + appState.getActiveUser().getID());
+        appState.removeUser();
         Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
         intent.putExtra(LogInActivity.LOGOUT, true);
         startActivity(intent);
-        Log.e("MainMenu", "Logout: " + appState.getActiveUser().getID());
         finish();
     }
 
@@ -141,11 +140,34 @@ public class MainMenu extends ActionBarActivity {
         }
     }
 
+    //Load current user
+    private void loadUser(final String email, final String nickname){
+        final ProgressDialog dialog = ProgressDialog.show(this,"Please Wait", "Loading User...", false, false);
+        if(!appState.isActiveUser(email)){
+            dialog.show();
+            /*Thread thread = new Thread(){
+                @Override
+                public void run() {
+                    try {
+                        sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }*/
+                    appState.setActiveUser(User.LoadUser(email, nickname, getApplicationContext()));
+                    dialog.dismiss();
+                }
+           /* };
+            thread.start();
+        }
+        else*/ dialog.dismiss();
+        setTitle(nickname + ": " + email);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(data != null && resultCode == RESULT_OK) {
             if (requestCode == FOREIGN) {
-                FlowManager.notifySubscriptionsChange(getApplicationContext(), data.getCharSequenceArrayListExtra(TagsActivity.TAGS));
+                FlowManager.notifySubscriptionsChange(getApplicationContext(), data.getCharSequenceArrayListExtra(ListActivity.LIST));
                 Toast.makeText(getApplicationContext(), getString(R.string.subscriptions_changed_successfully), Toast.LENGTH_SHORT).show();
             }
         }

@@ -6,7 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="pt.ulisboa.tecnico.cmov.airdesk.TagsActivity">
+    tools:context="pt.ulisboa.tecnico.cmov.airdesk.ListActivity">
 
     <ListView android:id="@+id/tagsView"
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add"
-        android:onClick="addTag"
+        android:onClick="addItem"
         android:layout_above="@+id/tagsDone"
         android:layout_alignRight="@+id/tagsView"
         android:layout_alignEnd="@+id/tagsView" />

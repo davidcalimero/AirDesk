@@ -19,4 +19,10 @@ public class ApplicationContext extends Application{
     public boolean hasActiveUser(){
         return activeUser != null;
     }
+
+    public boolean isActiveUser(String id){
+        return hasActiveUser() && activeUser.getID().equals(id);
+    }
+
+    public void removeUser(){ activeUser = null; }
 }

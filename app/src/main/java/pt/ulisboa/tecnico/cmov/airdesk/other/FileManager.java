@@ -164,9 +164,10 @@ public class FileManager {
         return object;
     }
 
-    public static void objectToFile(String fileName, Object object, Context context){
+    public static boolean objectToFile(String fileName, Object object, Context context){
         FileOutputStream fos = null;
         ObjectOutputStream os = null;
+        boolean ret = true;
         try {
             fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
             os = new ObjectOutputStream(fos);
@@ -174,6 +175,7 @@ public class FileManager {
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("FileManager", "Error saving object into file");
+            ret = false;
         } finally {
             try {
                 if (os != null) {
@@ -181,6 +183,7 @@ public class FileManager {
                 }
             } catch (IOException ex) {
                 Log.e("FileManager", "Error cloasing OS");
+                ret = false;
             }
             try {
                 if (fos != null) {
@@ -188,8 +191,10 @@ public class FileManager {
                 }
             } catch (IOException ex) {
                 Log.e("FileManager", "Error cloasing FOS");
+                ret = false;
             }
         }
+        return ret;
     }
 
 

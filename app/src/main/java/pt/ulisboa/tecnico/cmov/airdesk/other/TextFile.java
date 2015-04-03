@@ -48,4 +48,9 @@ public class TextFile implements Serializable{
     public void saveContent(Context context){
         setContent(context, text);
     }
+
+    public void delete(Context context){
+        Log.e("TextFile", "File deleted: " + getTitle());
+        context.deleteFile(filename);
+    }
 }

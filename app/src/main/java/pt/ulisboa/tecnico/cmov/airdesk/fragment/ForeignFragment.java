@@ -13,9 +13,9 @@ import android.widget.ExpandableListView;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
+import pt.ulisboa.tecnico.cmov.airdesk.ListActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.MainMenu;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
-import pt.ulisboa.tecnico.cmov.airdesk.TagsActivity;
 
 public class ForeignFragment extends ExpandableListFragment {
 
@@ -71,9 +71,9 @@ public class ForeignFragment extends ExpandableListFragment {
         switch (id) {
             case R.id.action_subscriptions:
                 ArrayList<CharSequence> tags = ((ApplicationContext) getActivity().getApplicationContext()).getActiveUser().getSubscriptions();
-                Intent intent = new Intent(getActivity().getApplicationContext(), TagsActivity.class);
-                intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, tags);
-                intent.putExtra(TagsActivity.TITLE, getString(R.string.subscriptions));
+                Intent intent = new Intent(getActivity().getApplicationContext(), ListActivity.class);
+                intent.putCharSequenceArrayListExtra(ListActivity.LIST, tags);
+                intent.putExtra(ListActivity.TITLE, getString(R.string.subscriptions));
                 getActivity().startActivityForResult(intent, MainMenu.FOREIGN);
                 break;
 

@@ -45,13 +45,13 @@ public class SettingsActivity extends ActionBarActivity {
 
     public void onEditPersonPressed(View view){
         /*
-         * A TagsActivity e utilizada como forma de poupar codigo duplicado,
+         * A ListActivity e utilizada como forma de poupar codigo duplicado,
          * porque faz o que e preciso para adicionar e remover pessoas
          */
-        Intent intent = new Intent(getApplicationContext(), TagsActivity.class);
+        Intent intent = new Intent(getApplicationContext(), ListActivity.class);
         users = new ArrayList<>(workspace.getUserList());
-        intent.putCharSequenceArrayListExtra(TagsActivity.TAGS, users);
-        intent.putExtra(TagsActivity.TITLE, getString(R.string.workspace_collaborators));
+        intent.putCharSequenceArrayListExtra(ListActivity.LIST, users);
+        intent.putExtra(ListActivity.TITLE, getString(R.string.workspace_collaborators));
         startActivityForResult(intent, 1);
     }
 
@@ -79,7 +79,7 @@ public class SettingsActivity extends ActionBarActivity {
         switch (requestCode){
 
             case(1):{
-                users = data.getCharSequenceArrayListExtra(TagsActivity.TAGS);
+                users = data.getCharSequenceArrayListExtra(ListActivity.LIST);
                 workspace.setUserList(users);
                 break;
             }

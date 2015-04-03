@@ -100,8 +100,8 @@ public class User implements Serializable{
     }
 
     public void commit(Context context){
-        FileManager.objectToFile(getID(), this, context);
-        Log.e("MainMenu", "user committed:" + getID());
+        if(FileManager.objectToFile(getID(), this, context))
+            Log.e("MainMenu", "user committed:" + getID());
     }
 }
 

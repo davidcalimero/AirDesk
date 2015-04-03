@@ -51,7 +51,7 @@ public class FlowManager {
         if(getInstance().listener != null)
             getInstance().listener.onFileRemoved(workspaceName, fileName);
         User user = ((ApplicationContext) context).getActiveUser();
-        user.getWorkspaceList().get(workspaceName).removeFile(fileName);
+        user.getWorkspaceList().get(workspaceName).removeFile(context, fileName);
     }
 
     public static void notifyEditFile(Context context, String workspaceName, String fileName, String content){

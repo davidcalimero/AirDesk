@@ -33,7 +33,7 @@
                 android:value=".MainMenu" />
         </activity>
         <activity
-            android:name=".TagsActivity"
+            android:name=".ListActivity"
             android:label="@string/app_name" >
         </activity>
         <activity

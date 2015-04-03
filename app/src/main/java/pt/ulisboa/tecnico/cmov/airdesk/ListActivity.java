@@ -14,13 +14,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 
-public class TagsActivity extends ActionBarActivity {
+public class ListActivity extends ActionBarActivity {
 
-    public static final String TAGS = "tags";
+    public static final String LIST = "list";
     public static final String TITLE = "title";
 
     private String title;
-    private ArrayList<CharSequence> tags;
+    private ArrayList<CharSequence> list;
     private ArrayAdapter<String> adapter;
     private EditText tagWriter;
 
@@ -31,7 +31,7 @@ public class TagsActivity extends ActionBarActivity {
 
         //Restore data
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
-        tags = bundle.getCharSequenceArrayList(TAGS);
+        list = bundle.getCharSequenceArrayList(LIST);
         title = bundle.getString(TITLE);
 
         tagWriter = (EditText) findViewById(R.id.tagWriteView);
@@ -43,20 +43,20 @@ public class TagsActivity extends ActionBarActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                adapter.remove(tags.get(position).toString());
-                tags.remove(position);
+                adapter.remove(list.get(position).toString());
+                list.remove(position);
             }
         });
 
-        populate();
+        populateView();
         setTitle(title);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putCharSequenceArrayList(TAGS, tags);
+        outState.putCharSequenceArrayList(LIST, list);
         outState.putString(TITLE, title);
-        Log.e("TagsActivity", "state saved: " + title);
+        Log.e("ListActivity", "state saved: " + title);
         super.onSaveInstanceState(outState);
     }
 
@@ -67,28 +67,31 @@ public class TagsActivity extends ActionBarActivity {
 
     public void sendData(){
         Intent intent = new Intent();
-        intent.putCharSequenceArrayListExtra(TAGS, tags);
+        intent.putCharSequenceArrayListExtra(LIST, list);
         setResult(RESULT_OK, intent);
     }
 
-    public void addTag(View view){
-        String tag = tagWriter.getText().toString();
+    public void addItem(View view){
+        String item = tagWriter.getText().toString();
 
         //Invalid input verification
-        if(tag.equals("")){
-            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
-            return;
+        String[] words = item.split(" "); // Get all words
+        if (words.length != 1) {
+            //if(item.equals("")){
+                Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
+                return;
+            //}
         }
 
         tagWriter.getText().clear();
-        adapter.add(tag);
-        tags.add(tag);
+        adapter.add(item);
+        list.add(item);
     }
 
     //ListView population
-    private void populate(){
-        for(CharSequence tag : tags){
-            adapter.add(tag.toString());
+    private void populateView(){
+        for(CharSequence item : list){
+            adapter.add(item.toString());
         }
     }
 }
