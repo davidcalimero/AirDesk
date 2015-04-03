@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,19 +16,15 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.other.FileManager;
-//import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
-
 
 public class SettingsActivity extends ActionBarActivity {
 
     public static final String WORKSPACE_NAME = "workspaceName";
-    public static final String PRIVACY = "privacy";
-    public static final String QUOTA = "quota";
 
     private String workspaceName;
-    private Workspace workspace;
 
     // Privacy
     private Workspace.MODE privacy;
@@ -50,7 +47,7 @@ public class SettingsActivity extends ActionBarActivity {
         workspaceName = (String) bundle.get(WORKSPACE_NAME);
         ApplicationContext applicationContext = (ApplicationContext) getApplicationContext();
         User activeUser = applicationContext.getActiveUser();
-        workspace = activeUser.getWorkspaceList().get(workspaceName);
+        Workspace workspace = activeUser.getWorkspaceList().get(workspaceName);
         if(workspace == null) {
             Log.e("SettingsActivity", "This is a problem: Workspace " + workspaceName + " doesn't exist.");
             finish();
@@ -74,6 +71,20 @@ public class SettingsActivity extends ActionBarActivity {
 
         populateView();
 
+        //////////////////////////////////////////////
+        // Privacy
+        RadioButton publicButton = (RadioButton) findViewById(R.id.publicButton);
+        RadioButton privateButton = (RadioButton) findViewById(R.id.privateButton);
+
+        if(workspace.getPrivacy() == Workspace.MODE.PUBLIC){
+            publicButton.setChecked(true);
+            privateButton.setChecked(false);
+        } else {
+            publicButton.setChecked(false);
+            privateButton.setChecked(true);
+        }
+
+        //////////////////////////////////////////////
         // Quota
         SeekBar quotaSeekBar = (SeekBar) findViewById(R.id.seekBar);
         final TextView quotaText = (TextView) findViewById(R.id.quotaValue);
@@ -152,7 +163,7 @@ public class SettingsActivity extends ActionBarActivity {
 
     // Final Buttons
     public void confirm(View v){
-        // Change Workspace
+        FlowManager.notifyEditWorkspace(getApplicationContext(), workspaceName, list, privacy, ((long) quota) * 1048576);
         finish();
     }
 

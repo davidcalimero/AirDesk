@@ -29,37 +29,24 @@
                 android:gravity="center_horizontal" />
 
 
-            <ScrollView
+            <ListView
+                android:id="@+id/personList"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:id="@+id/userScroll"
-                android:layout_below="@+id/editPeopleView"
-                android:layout_alignRight="@+id/button"
-                android:layout_alignEnd="@+id/button">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <ListView
-                        android:id="@+id/personList"
-                        android:layout_width="match_parent"
-                        android:layout_height="194dp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@+id/editPeopleView" />
-                </LinearLayout>
-            </ScrollView>
+                android:layout_height="194dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/editPeopleView" />
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/personID"
                 android:hint="@string/personID"
-                android:layout_below="@+id/userScroll"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_toLeftOf="@+id/button"
-                android:layout_toStartOf="@+id/button" />
+                android:layout_toStartOf="@+id/button"
+                android:layout_below="@+id/personList" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -104,14 +91,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/private_privacy"
-                    android:id="@+id/radioButton"
+                    android:id="@+id/privateButton"
                     android:onClick="onPrivateButtonPressed" />
 
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/public_privacy"
-                    android:id="@+id/radioButton2"
+                    android:id="@+id/publicButton"
                     android:onClick="onPublicButtonPressed" />
             </RadioGroup>
 

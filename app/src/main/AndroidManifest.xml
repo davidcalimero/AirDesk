@@ -51,14 +51,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />
         </activity>
-        <activity
-            android:name=".PrivacyActivity"
-            android:label="@string/workspace_privacy" >
-        </activity>
-        <activity
-            android:name=".QuotaActivity"
-            android:label="@string/workspace_quota" >
-        </activity>
 
         <activity
             android:name=".CreateEditFileActivity"

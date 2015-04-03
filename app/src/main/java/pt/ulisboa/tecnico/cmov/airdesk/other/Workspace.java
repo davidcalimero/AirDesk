@@ -74,12 +74,18 @@ public class Workspace implements Serializable{
 
     /* User List */
     public ArrayList<CharSequence> getUserList() {
+        if(_users.isEmpty())
+            Log.e("Workspace", "HAS NOTHING!");
         return _users;
     }
 
-    public  void setUserList(ArrayList<CharSequence> users){
-        _users.clear();
-        _users=users;
+    public void setUserList(ArrayList<CharSequence> users){
+        if(users != null)
+            Log.e("Workspace","IT HAS SOMETHING");
+        //_users.clear();
+        //_users = users;
+        _users = new ArrayList<CharSequence>(users);
+        Log.e("Workspace","User List Updated.");
     }
 
     /* Public Profile */
@@ -154,6 +160,16 @@ public class Workspace implements Serializable{
             Log.e("Workspace", "Can't add user. Had " + e.toString());
             return false;
         }
+    }
+
+    /*********************************/
+    /******** EDIT WORKSPACE *********/
+    /*********************************/
+
+    public void editWorkspace(ArrayList<CharSequence> users, MODE privacy, long quota){
+        setUserList(users);
+        setPrivacy(privacy);
+        setMaximumQuota(quota);
     }
 
 
