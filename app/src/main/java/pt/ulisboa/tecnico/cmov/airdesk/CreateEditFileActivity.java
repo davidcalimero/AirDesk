@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 
 public class CreateEditFileActivity extends ActionBarActivity {
@@ -112,10 +113,10 @@ public class CreateEditFileActivity extends ActionBarActivity {
     }
 
     public void createFile(View view){
-        String newTitle = titleView.getText().toString();
+        String newTitle = Utils.trim(titleView.getText().toString());
         String newContent = ((EditText) findViewById(R.id.createFileContent)).getText().toString();
 
-        if(newTitle.equals("")){
+        if(newTitle.length() == 0){
             Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
             return;
         }

@@ -41,6 +41,7 @@
 
     <!-- Toasts -->
     <string name="invalid_input">Invalid Input</string>
+    <string name="already_exists">already exists</string>
     <string name="file_created_successfully">File created successfully</string>
     <string name="file_removed_successfully">File removed successfully</string>
     <string name="file_edited_successfully">File edited successfully</string>

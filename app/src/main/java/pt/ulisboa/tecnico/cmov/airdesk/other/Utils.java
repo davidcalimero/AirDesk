@@ -25,4 +25,9 @@ public class Utils {
         }
         return false;
     }
+
+    //Trim that also replace inner string multiple spaces by a single one
+    public static String trim(String string){
+        return string.trim().replaceAll("( )+", " ");
+    }
 }

@@ -27,7 +27,7 @@ public class ListActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tags);
+        setContentView(R.layout.activity_list);
 
         //Restore data
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
@@ -71,16 +71,17 @@ public class ListActivity extends ActionBarActivity {
         setResult(RESULT_OK, intent);
     }
 
-    public void addItem(View view){
-        String item = tagWriter.getText().toString();
+    public void addItem(View view) {
+        String item = tagWriter.getText().toString().trim();
 
         //Invalid input verification
-        String[] words = item.split(" "); // Get all words
-        if (words.length != 1) {
-            //if(item.equals("")){
-                Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
-                return;
-            //}
+        if (item.split(" ").length != 1 || item.length() == 0) {
+            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (list.contains(item)){
+            Toast.makeText(getApplicationContext(), "\"" + item + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
+            return;
         }
 
         tagWriter.getText().clear();

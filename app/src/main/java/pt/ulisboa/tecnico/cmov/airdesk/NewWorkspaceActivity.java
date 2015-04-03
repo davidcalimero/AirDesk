@@ -10,6 +10,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
 
@@ -25,7 +26,7 @@ public class NewWorkspaceActivity extends ActionBarActivity {
 
     public boolean isWorkspaceNameEmpty(){
         EditText workspaceName = (EditText) findViewById(R.id.workspaceName);
-        return workspaceName.getText().length() == 0;
+        return Utils.trim(workspaceName.getText().toString()).length() == 0;
     }
 
     public void onCreateWorkspaceButtonPressed (View view){
@@ -33,7 +34,7 @@ public class NewWorkspaceActivity extends ActionBarActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
         else {
             EditText workspaceName = (EditText) findViewById(R.id.workspaceName);
-            String name = workspaceName.getText().toString();
+            String name = Utils.trim(workspaceName.getText().toString());
             // TODO falta privacidade e cota
             FlowManager.notifyAddWorkspace(getApplicationContext(), name, Workspace.MODE.PUBLIC, tags, 0);
             Toast.makeText(getApplicationContext(), getString(R.string.workspace_created_successfully), Toast.LENGTH_SHORT).show();
