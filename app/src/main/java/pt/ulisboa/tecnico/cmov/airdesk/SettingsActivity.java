@@ -1,14 +1,21 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import pt.ulisboa.tecnico.cmov.airdesk.other.FileManager;
+//import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Workspace;
 
@@ -21,100 +28,135 @@ public class SettingsActivity extends ActionBarActivity {
 
     private String workspaceName;
     private Workspace workspace;
-    private ArrayList<CharSequence> users;
-    private boolean publicPrivacy;  //true = public     false = private
-    private float quota;
+
+    // Privacy
+    private Workspace.MODE privacy;
+
+    // Quota
+    int quota;
+
+    // New Code
+    private ArrayList<CharSequence> list;
+    private ArrayAdapter<String> adapter;
+    private EditText personEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        // Checks if workspace exists
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
         workspaceName = (String) bundle.get(WORKSPACE_NAME);
         ApplicationContext applicationContext = (ApplicationContext) getApplicationContext();
         User activeUser = applicationContext.getActiveUser();
         workspace = activeUser.getWorkspaceList().get(workspaceName);
-        Log.e("SettingsActivity", "user: "+activeUser+"  workspace: "+workspaceName);
-
-        if(workspace == null){
-            Log.e("SettingsActivity", workspaceName + " nao e o nome de um workspace.");
+        if(workspace == null) {
+            Log.e("SettingsActivity", "This is a problem: Workspace " + workspaceName + " doesn't exist.");
             finish();
         }
+
+        //Restore data
+        personEdit = (EditText) findViewById(R.id.personID);
+        list = workspace.getUserList();
+
+        //ListView inicialization
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        ListView listView = (ListView) findViewById(R.id.personList);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                adapter.remove(list.get(position).toString());
+                list.remove(position);
+            }
+        });
+
+        populateView();
+
+        // Quota
+        SeekBar quotaSeekBar = (SeekBar) findViewById(R.id.seekBar);
+        final TextView quotaText = (TextView) findViewById(R.id.quotaValue);
+
+        // Define minimal and maximal Value
+        // Get current minimal value (sum of all file sizes), given by getQuota
+        final long minQuota = workspace.getQuota();
+
+        // Get maximal value (maximal space available in internal storage) in megabytes
+        final long maxQuota = FileManager.getInternalFreeSpace();
+
+        // Customize SeekBar placement
+        // Get current quota value, in bytes
+        final long currentQuota = workspace.getMaximumQuota() / 1048576;
+
+        //set SeekBar Progress and Max
+        quotaSeekBar.setMax((int) (maxQuota - minQuota));
+        quotaSeekBar.setProgress((int) (currentQuota - minQuota));
+
+        quota = (int) currentQuota;
+        quotaText.setText(((Integer) quota).toString());
+
+        quotaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                quota = (int) minQuota + progress;
+                quotaText.setText(((Integer) quota).toString());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        setTitle(workspaceName);
     }
 
-    public void onEditPersonPressed(View view){
-        /*
-         * A ListActivity e utilizada como forma de poupar codigo duplicado,
-         * porque faz o que e preciso para adicionar e remover pessoas
-         */
-        Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-        users = new ArrayList<>(workspace.getUserList());
-        intent.putCharSequenceArrayListExtra(ListActivity.LIST, users);
-        intent.putExtra(ListActivity.TITLE, getString(R.string.workspace_collaborators));
-        startActivityForResult(intent, 1);
-    }
+    public void addItem(View view){
+        String item = personEdit.getText().toString();
 
-    public void onChangePrivacyPressed(View view){
-        Intent intent = new Intent(getApplicationContext(), PrivacyActivity.class);
-        publicPrivacy = modeToBoolean(workspace.getPrivacy());
-        intent.putExtra(SettingsActivity.PRIVACY, publicPrivacy);
-        startActivityForResult(intent, 2);
-    }
-
-    public void onChangeQuotaPressed(View view){
-        Intent intent = new Intent(getApplicationContext(), QuotaActivity.class);
-        intent.putExtra(SettingsActivity.QUOTA, quota);
-        startActivityForResult(intent, 3);
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) {
-            Toast.makeText(getApplicationContext(), "No data Received", Toast.LENGTH_SHORT).show();
+        //Invalid input verification
+        if (item.split(" ").length != 1 || item.length() == 0) {
+            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
             return;
         }
-        switch (requestCode){
-
-            case(1):{
-                users = data.getCharSequenceArrayListExtra(ListActivity.LIST);
-                workspace.setUserList(users);
-                break;
-            }
-
-            case(2):{
-                publicPrivacy = data.getBooleanExtra(SettingsActivity.PRIVACY, false);
-                workspace.setPrivacy(booleanToMode(publicPrivacy));
-                break;
-            }
-
-            case(3):{
-                quota = data.getFloatExtra(SettingsActivity.QUOTA, -1);
-                break;
-            }
-
-            default:
-                Toast.makeText(getApplicationContext(), "Error on request code", Toast.LENGTH_SHORT).show();
+        if (list.contains(item)){
+            Toast.makeText(getApplicationContext(), "\"" + item + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        personEdit.getText().clear();
+        adapter.add(item);
+        list.add(item);
     }
 
-    /*
-     * Converte o MODE num boolean
-     * true = PUBLIC e false = PRIVATE
-     */
-    private boolean modeToBoolean(Workspace.MODE mode){
-        return mode == Workspace.MODE.PUBLIC;
+    //ListView population
+    private void populateView(){
+        for(CharSequence item : list){
+            adapter.add(item.toString());
+        }
     }
 
-    private Workspace.MODE booleanToMode(boolean publicPrivacy){
-        if(publicPrivacy)
-            return Workspace.MODE.PUBLIC;
-        else
-            return Workspace.MODE.PRIVATE;
+    // Privacy
+    public void onPublicButtonPressed(View view){
+        privacy = Workspace.MODE.PUBLIC;
     }
 
+    public void onPrivateButtonPressed(View view){
+        privacy = Workspace.MODE.PRIVATE;
+    }
 
+    // Final Buttons
+    public void confirm(View v){
+        // Change Workspace
+        finish();
+    }
+
+    public void cancel(View v){
+        finish();
+    }
 }

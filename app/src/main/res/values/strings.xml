@@ -19,6 +19,7 @@
     <string name="name">Name</string>
     <string name="title">Title</string>
     <string name="enter_text">Enter Text</string>
+    <string name="personID">Person\'s ID</string>
 
     <!-- Descriptions -->
     <string name="app_logo">App Logo</string>
@@ -34,6 +35,7 @@
     <string name="tags">Tags</string>
     <string name="create">Create</string>
     <string name="add">Add</string>
+    <string name="confirm">Confirm</string>
 
     <!-- Tabs -->
     <string name="owned">Owned</string>
@@ -51,6 +53,7 @@
 
     <!-- AlertDialogs -->
     <string name="dialog_confirm_delete">Do you want to delete</string>
+    <string name="dialog_confirm_remove_user">Do you want to remove user</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
 
