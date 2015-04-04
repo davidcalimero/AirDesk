@@ -44,7 +44,7 @@ public class FlowManager {
             getInstance().listener.onFileCreated(workspaceName, fileName);
         User user = ((ApplicationContext) context).getActiveUser();
         String file = user.getID() + "-" + workspaceName + "-" + "-" + fileName;
-        user.getWorkspaceList().get(workspaceName).addFile(new TextFile(context, file, fileName, content));
+        user.getWorkspaceList().get(workspaceName).addFile(context, file, fileName, content);
     }
 
     public static void notifyRemoveFile(Context context, String workspaceName, String fileName){
@@ -56,7 +56,8 @@ public class FlowManager {
 
     public static void notifyEditFile(Context context, String workspaceName, String fileName, String content){
         User user = ((ApplicationContext) context).getActiveUser();
-        user.getWorkspaceList().get(workspaceName).getFiles().get(fileName).setContent(context, content);
+        user.getWorkspaceList().get(workspaceName).editFile(context, fileName, content);
+        //user.getWorkspaceList().get(workspaceName).getFiles().get(fileName).setContent(context, content);
     }
 
     public static void notifySubscriptionsChange(Context context, ArrayList<CharSequence> tags){

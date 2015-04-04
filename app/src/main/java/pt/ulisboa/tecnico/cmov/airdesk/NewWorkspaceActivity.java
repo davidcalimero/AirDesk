@@ -37,7 +37,7 @@ public class NewWorkspaceActivity extends ActionBarActivity {
             String name = Utils.trim(workspaceName.getText().toString());
             // TODO falta privacidade e cota
             FlowManager.notifyAddWorkspace(getApplicationContext(), name, Workspace.MODE.PUBLIC, tags, 0);
-            Toast.makeText(getApplicationContext(), getString(R.string.workspace_created_successfully), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), getString(R.string.workspace_created_successfully), Toast.LENGTH_SHORT).show();
             finish();
         }
     }

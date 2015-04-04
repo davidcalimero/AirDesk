@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk.other;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class Workspace implements Serializable{
         _name = name;
         _owner = owner;
         _privacy = privacy;
-        _maximumQuota = quota;
+        _maximumQuota = 30;
         _quota = 0;
     }
 
@@ -178,31 +179,43 @@ public class Workspace implements Serializable{
     /******** FILE MANAGEMENT ********/
     /*********************************/
 
-    public boolean addFile(TextFile file){
-        /*if(!verifySpace(content))
+    public boolean addFile(Context context, String file, String filename, String content){
+        Log.e("Workspace", "Current Quota = " + getQuota());
+        if(!verifySpace(content.length())) {
+            Toast.makeText(context, "Maximum Quota reached. Can't create new file.", Toast.LENGTH_SHORT).show();
             return false;
-        String path = getWorkspacePath(context);
-        if(!FileManager.createFile(path, title + ".txt"))
-            return false;
-        path += FileManager.LINE_SEP + title + ".txt";
-        if(!FileManager.writeFile(path, content))
-            return false;
+        }
+        TextFile newFile = new TextFile(context, file, filename, content);
+
+        _files.put(newFile.getTitle(), newFile);
         incrementQuota(content.length());
-        return true;*/
-        Log.e("Workspace", "file added: " + file.getTitle());
-        _files.put(file.getTitle(), file);
+
+        Log.e("Workspace", "file added: " + newFile.getTitle());
+        Log.e("Workspace", "Quota increased by " + content.length());
+        Log.e("Workspace", "Current Quota = " + getQuota());
+        Toast.makeText(context, "File successfully created.", Toast.LENGTH_SHORT).show();
         return true;
 
     }
 
     public boolean removeFile(Context context, String name){
-        /*String fileLocation = getWorkspacePath(context) + FileManager.LINE_SEP + filename + ".txt";
-        long amount = FileManager.getUsedSpace(fileLocation);
-        FileManager.deleteFile(fileLocation);
-        decrementQuota(amount);
-        return true;*/
         Log.e("Workspace", "file removed: " + name);
+        int size = _files.get(name).getContent(context).length();
+        decrementQuota(size);
+        Log.e("Workspace","File removed: quota reduced by " + size);
         _files.remove(name).delete(context);
+        return true;
+    }
+
+    public boolean editFile(Context context, String fileName, String newContent){
+        String oldContent = getFiles().get(fileName).getContent(context);
+        if(!verifySpace(newContent.length() - oldContent.length())){
+            Toast.makeText(context, "Maximum Quota reached. Can't modify file.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        incrementQuota(newContent.length() - oldContent.length());
+        getFiles().get(fileName).setContent(context, newContent);
+        Toast.makeText(context, "File successfully edited.", Toast.LENGTH_SHORT).show();
         return true;
     }
 
@@ -214,7 +227,7 @@ public class Workspace implements Serializable{
         return context.getFilesDir().getAbsolutePath() + FileManager.LINE_SEP + _owner + FileManager.LINE_SEP + _name;
     }
 
-    public boolean verifySpace(String content){
-        return !(content.length() + _quota > _maximumQuota);
+    public boolean verifySpace(int contentSize){
+        return !(contentSize + getQuota() > getMaximumQuota());
     }
 }

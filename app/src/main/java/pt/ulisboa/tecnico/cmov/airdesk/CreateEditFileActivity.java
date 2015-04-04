@@ -122,11 +122,11 @@ public class CreateEditFileActivity extends ActionBarActivity {
         }
 
         if(mode.equals(MODE.CREATE)) {
-            Toast.makeText(getApplicationContext(), getString(R.string.file_created_successfully), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), getString(R.string.file_created_successfully), Toast.LENGTH_SHORT).show();
             FlowManager.notifyAddFile(getApplicationContext(), workspaceName, newTitle, newContent);
         }
         else {
-            Toast.makeText(getApplicationContext(), getString(R.string.file_edited_successfully), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), getString(R.string.file_edited_successfully), Toast.LENGTH_SHORT).show();
             FlowManager.notifyEditFile(getApplicationContext(), workspaceName, newTitle, newContent);
         }
         finish();
