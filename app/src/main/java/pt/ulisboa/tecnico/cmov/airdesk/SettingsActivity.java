@@ -33,7 +33,6 @@ public class SettingsActivity extends ActionBarActivity {
     public static final int TAGS = 1;
 
     private String workspaceName;
-    private Workspace workspace;
 
     // Privacy
     private Workspace.MODE privacy;
@@ -57,20 +56,20 @@ public class SettingsActivity extends ActionBarActivity {
         workspaceName = (String) bundle.get(WORKSPACE_NAME);
         ApplicationContext applicationContext = (ApplicationContext) getApplicationContext();
         User activeUser = applicationContext.getActiveUser();
-        workspace = activeUser.getWorkspaceList().get(workspaceName);
+        Workspace workspace = activeUser.getWorkspaceList().get(workspaceName);
         if(workspace == null) {
             Log.e("SettingsActivity", "This is a problem: Workspace " + workspaceName + " doesn't exist.");
             finish();
         }
 
-        /*
-        users = new ArrayList<>(workspace.getUserList());
-        tags = new ArrayList<>(workspace.getPublicProfile());
-        */
-
-        users = (ArrayList<CharSequence>) workspace.getUserList().clone();
-        tags = (ArrayList<CharSequence>) workspace.getPublicProfile().clone();
-
+        if(savedInstanceState != null) {
+            users = savedInstanceState.getCharSequenceArrayList(USERS_LIST);
+            tags = savedInstanceState.getCharSequenceArrayList(TAGS_LIST);
+        }
+        else{
+            users = (ArrayList<CharSequence>) workspace.getUserList().clone();
+            tags = (ArrayList<CharSequence>) workspace.getPublicProfile().clone();
+        }
         //////////////////////////////////////////////
         // Privacy
         RadioButton publicButton = (RadioButton) findViewById(R.id.publicButton);
@@ -105,7 +104,7 @@ public class SettingsActivity extends ActionBarActivity {
         quotaSeekBar.setProgress((int) (currentQuota - minQuota));
 
         quota = (int) currentQuota;
-        quotaText.setText(((Integer) quota).toString());
+        quotaText.setText(((Integer) quota).toString() + " MB");
 
         quotaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -159,21 +158,15 @@ public class SettingsActivity extends ActionBarActivity {
         if(data != null && resultCode == RESULT_OK)
             switch(requestCode){
                 case USERS:
-                    //tags = data.getCharSequenceArrayListExtra(TAGS_LIST);
                     users = data.getCharSequenceArrayListExtra(ListActivity.LIST);
+                    Log.e("OnActivityResult", "User List loaded");
                     break;
 
                 case TAGS:
-                    //users = data.getCharSequenceArrayListExtra(USERS_LIST);
                     tags = data.getCharSequenceArrayListExtra(ListActivity.LIST);
+                    Log.e("OnActivityResult", "Tag List loaded");
                     break;
             }
-        /*
-        if(data != null) {
-            users = new ArrayList<>(data.getCharSequenceArrayListExtra(USERS_LIST));
-            tags = new ArrayList<>(data.getCharSequenceArrayListExtra(TAGS_LIST));
-        }*/
-
     }
 
     // Privacy
