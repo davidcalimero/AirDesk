@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.MainMenu">
 
-    <item android:id="@+id/action_logout"
+    <item
+        android:id="@+id/action_logout"
         android:title="@string/logout"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
 </menu>

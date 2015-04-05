@@ -3,8 +3,8 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +19,6 @@ public class ShowFileActivity extends ActionBarActivity {
 
     public static final String WORKSPACE = "workspace";
     public static final String TITLE = "title";
-    public static final String TEXT = "text";
 
     private String workspace;
     private String title;
@@ -31,10 +30,10 @@ public class ShowFileActivity extends ActionBarActivity {
         setContentView(R.layout.activity_show_file);
 
         //Restore data
-        Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
+        Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
         workspace = bundle.getString(WORKSPACE);
         title = bundle.getString(TITLE);
-        text = bundle.getString(TEXT);
+        text = FlowManager.getFileContent(getApplicationContext(), workspace, title);
 
         //Init
         TextView showText = (TextView) findViewById(R.id.textView);
@@ -46,25 +45,24 @@ public class ShowFileActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(WORKSPACE, workspace);
         outState.putString(TITLE, title);
-        outState.putString(TEXT, text);
         Log.e("ShowFileActivity", "state saved: " + title);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_file, menu);
+        getMenuInflater().inflate(R.menu.menu_delete, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        switch (id){
+        switch (id) {
             case R.id.action_delete:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(getString(R.string.dialog_confirm_delete) + " \"" + title + "\"")
+                // Create the AlertDialog object
+                new AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.dialog_confirm_delete) + " \"" + title + "\"")
                         .setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
@@ -78,26 +76,25 @@ public class ShowFileActivity extends ActionBarActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                             }
-                        });
-                // Display the AlertDialog object
-                builder.create();
-                builder.show();
+                        }).create().show();
                 break;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
         return true;
     }
 
-    public void editButtonPressed(View view){
-        Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
-        intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, title);
-        intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);
-        intent.putExtra(CreateEditFileActivity.FILE_WORKSPACE, workspace);
-        intent.putExtra(CreateEditFileActivity.FILE_TITLE, title);
-        intent.putExtra(CreateEditFileActivity.FILE_CONTENT, text);
-        startActivity(intent);
-        finish();
+    public void editButtonPressed(View view) {
+        if (FlowManager.canPermissionToEditFile(getApplicationContext(), workspace, title)) {
+            Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
+            intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, title);
+            intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);
+            intent.putExtra(CreateEditFileActivity.FILE_WORKSPACE, workspace);
+            intent.putExtra(CreateEditFileActivity.FILE_TITLE, title);
+            intent.putExtra(CreateEditFileActivity.FILE_CONTENT, text);
+            startActivity(intent);
+            finish();
+        } else
+            Toast.makeText(getApplicationContext(), getString(R.string.file_cant_be_edited_at_the_moment), Toast.LENGTH_SHORT).show();
     }
 }

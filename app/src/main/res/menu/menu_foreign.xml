@@ -3,9 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.fragment.ForeignFragment">
 
-    <item android:id="@+id/action_subscriptions"
-        android:title="@string/subscriptions"
+    <item
+        android:id="@+id/action_subscriptions"
         android:icon="@android:drawable/ic_menu_preferences"
-        app:showAsAction="always"/>
+        android:title="@string/subscriptions"
+        app:showAsAction="always" />
 
 </menu>

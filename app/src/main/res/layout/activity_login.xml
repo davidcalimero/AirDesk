@@ -2,49 +2,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity"
-    android:orientation="vertical"
-    android:weightSum="1">
+    android:weightSum="1"
+    tools:context=".MainActivity">
 
     <ImageView
+        android:id="@+id/login_logo"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:id="@+id/login_logo"
         android:layout_gravity="center_horizontal"
-        android:src="@raw/logo"
-        android:contentDescription="@string/app_logo" />
+        android:contentDescription="@string/app_logo"
+        android:src="@raw/logo" />
 
-    <EditText android:id="@+id/loginNickname"
+    <EditText
+        android:id="@+id/loginNickname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
         android:hint="@string/nickname"
-        android:paddingTop="@dimen/activity_vertical_margin"
+        android:inputType="textPersonName"
         android:maxLength="40"
-        android:textSize="22sp"
-        android:paddingBottom="@dimen/activity_vertical_margin" />
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:textSize="22sp" />
 
-    <EditText android:id="@+id/loginEmail"
+    <EditText
+        android:id="@+id/loginEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="@string/email"
         android:inputType="textEmailAddress"
         android:maxLength="40"
-        android:textSize="22sp"
-        android:hint="@string/email"
+        android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin" />
+        android:textSize="22sp" />
 
-    <Button android:id="@+id/login"
+    <Button
+        android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/login"
-        android:onClick="login"
         android:layout_gravity="center_horizontal"
+        android:onClick="onLoginButtonPressed"
+        android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin" />
+        android:text="@string/login" />
 
 </LinearLayout>

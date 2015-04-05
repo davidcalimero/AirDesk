@@ -1,58 +1,60 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.CreateEditFileActivity">
 
     <EditText
+        android:id="@+id/createFileTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/createFileTitle"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:inputType="textShortMessage"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
         android:hint="@string/title"
-        android:textStyle="bold"
+        android:inputType="textShortMessage"
+        android:maxLength="40"
         android:textSize="22sp"
-        android:maxLength="40"/>
+        android:textStyle="bold" />
 
     <EditText
+        android:id="@+id/createFileContent"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:id="@+id/createFileContent"
+        android:layout_above="@+id/createFileCreate"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/createFileTitle"
+        android:gravity="top|left"
+        android:hint="@string/enter_text"
+        android:inputType="textMultiLine"
+        android:textSize="22sp" />
+
+    <Button
+        android:id="@+id/createFileCreate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:onClick="onCreateFileButtonPressed"
+        android:text="@string/create" />
+
+    <Button
+        android:id="@+id/createFileCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:inputType="textMultiLine"
-        android:gravity="top|left"
-        android:layout_above="@+id/createFileCreate"
-        android:hint="@string/enter_text"
-        android:textSize="22sp"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/create"
-        android:id="@+id/createFileCreate"
-        android:onClick="createFile"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/cancel"
-        android:id="@+id/createFileCancel"
-        android:onClick="cancelCreateFile"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:onClick="onCancelCreateFileButtonPressed"
+        android:text="@string/cancel" />
 
 </RelativeLayout>

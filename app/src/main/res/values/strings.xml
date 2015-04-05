@@ -6,6 +6,7 @@
     <string name="create_new_workspace">Create New Workspace</string>
     <string name="create_new_file">Create New File</string>
     <string name="tags_of">Tags of</string>
+    <string name="users_of">Users of</string>
 
     <!-- Options -->
     <string name="logout">Logout</string>
@@ -49,25 +50,27 @@
     <string name="file_edited_successfully">File edited successfully</string>
     <string name="workspace_created_successfully">Workspace created successfully</string>
     <string name="workspace_removed_successfully">Workspace removed successfully</string>
+    <string name="workspace_edited_successfully">Workspace edited successfully</string>
     <string name="subscriptions_changed_successfully">Subscriptions changed successfully</string>
+    <string name="not_enough_memory_available">Not enough memory available</string>
+    <string name="file_cant_be_edited_at_the_moment">File can\'t be edited at the moment</string>
 
     <!-- AlertDialogs -->
     <string name="dialog_confirm_delete">Do you want to delete</string>
     <string name="dialog_confirm_remove_user">Do you want to remove user</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
+    <string name="dialog_please_wait">Please Wait</string>
+    <string name="dialog_loading_user">Loading User...</string>
 
     <!-- Settings -->
-    <string name="edit_people">Add/Remove People</string>
+    <string name="change_users">Change Users</string>
+    <string name="change_tags">Change Tags</string>
     <string name="change_privacy">Change privacy</string>
     <string name="change_quota">Change Quota</string>
     <string name="public_privacy">Public</string>
     <string name="private_privacy">Private</string>
 
     <!-- Not Organized -->
-    <string name="workspace_collaborators">Workspace Collaborators</string>
-    <string name="workspace_privacy">Workspace Privacy</string>
-    <string name="workspace_quota">Workspace Quota</string>
-    <string name="Workspace_settings">Workspace Settings</string>
 
 </resources>

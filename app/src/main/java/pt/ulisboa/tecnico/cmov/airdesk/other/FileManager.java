@@ -6,27 +6,24 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 public class FileManager {
 
     /* MACROS */
     // Line Separator
-    public static final String LINE_SEP = System.getProperty("line.separator");
+    //public static final String LINE_SEP = System.getProperty("line.separator");
 
     /**
      * Create File Function.
      * Receives the filename and the path to which the file will be created on.
      */
-    public static boolean createFile(String path, String filename){
+    /*public static boolean createFile(String path, String filename){
         try {
             File file = new File(path, filename);
 
@@ -39,13 +36,13 @@ public class FileManager {
         } catch (NullPointerException e) {
             return false;
         }
-    }
+    }*/
 
     /**
      * List Directory Function.
      * Receives the path of the directory and returns the files in it.
      */
-    public static ArrayList<String> listDir(String path){
+    /*public static ArrayList<String> listDir(String path){
         ArrayList<String> files = new ArrayList<>();
         File file = new File(path);
         if(file.exists()) {
@@ -57,13 +54,13 @@ public class FileManager {
         else
             Log.e("FileSystem", "File does not exist");
         return files;
-    }
+    }*/
 
     /**
      * Read File Function.
      * Receives the file's path, and returns the content of it.
      */
-    public static String readFile(String path){
+    /*public static String readFile(String path){
         FileInputStream fis = null;
         String content = null;
         Scanner scanner = null;
@@ -91,13 +88,13 @@ public class FileManager {
             }
         }
         return content;
-    }
+    }*/
 
     /**
      * Write File Function.
      * Receives the file's path and the content to be put, and write it over the file, replacing other existing content.
      */
-    public static boolean writeFile(String path, String content){
+    /*public static boolean writeFile(String path, String content){
         FileOutputStream fos = null;
         boolean returnValue = false;
         try {
@@ -116,13 +113,13 @@ public class FileManager {
             }
         }
         return returnValue;
-    }
+    }*/
 
     /**
      * Delete File Function.
      * Receives the file's path, and delete it. If file is a directory, the function deletes all children first.
      */
-    public static void deleteFile(String path){
+    /*public static void deleteFile(String path){
         File file = new File(path);
         if(file.exists()){
             if(file.isDirectory()){
@@ -132,8 +129,7 @@ public class FileManager {
             }
             file.delete();
         }
-    }
-
+    }*/
     public static Object fileToObject(String fileName, Context context) throws FileNotFoundException {
         FileInputStream fis = context.openFileInput(fileName);
         ObjectInputStream is = null;
@@ -164,7 +160,7 @@ public class FileManager {
         return object;
     }
 
-    public static boolean objectToFile(String fileName, Object object, Context context){
+    public static boolean objectToFile(String fileName, Object object, Context context) {
         FileOutputStream fos = null;
         ObjectOutputStream os = null;
         boolean ret = true;
@@ -202,13 +198,13 @@ public class FileManager {
      * Get Free Space Function.
      * Returns the free space of the internal storage, in megabytes.
      */
-    public static long getInternalFreeSpace(){
+    public static long getInternalFreeSpace() {
         StatFs statFs = new StatFs(Environment.getDataDirectory().getAbsolutePath());
         long free;
-        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-            free = statFs.getAvailableBytes() / 1048576;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+            free = statFs.getAvailableBytes() /*/ 1048576*/;
         else
-            free = ((long)statFs.getAvailableBlocks() * (long)statFs.getBlockSize()) / 1048576;
+            free = ((long) statFs.getAvailableBlocks() * (long) statFs.getBlockSize()) /*/ 1048576*/;
         return free;
     }
 
@@ -217,7 +213,7 @@ public class FileManager {
      * Returns space used by directory or file, in bytes.
      * If it's a directory, it will sum the size of all children recursively.
      */
-    public static long getUsedSpace(String path){
+    /*public static long getUsedSpace(String path){
         File file = new File(path);
         if(file.isDirectory()){
             File[] children = file.listFiles();
@@ -228,5 +224,5 @@ public class FileManager {
         }
         else
             return file.length();
-    }
+    }*/
 }

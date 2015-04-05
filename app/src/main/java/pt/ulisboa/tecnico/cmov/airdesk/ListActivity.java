@@ -1,8 +1,8 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+
 
 public class ListActivity extends ActionBarActivity {
 
@@ -22,7 +24,6 @@ public class ListActivity extends ActionBarActivity {
     private String title;
     private ArrayList<CharSequence> list;
     private ArrayAdapter<String> adapter;
-    private EditText tagWriter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +31,9 @@ public class ListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_list);
 
         //Restore data
-        Bundle bundle = savedInstanceState == null ? getIntent().getExtras(): savedInstanceState;
+        Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
         list = bundle.getCharSequenceArrayList(LIST);
         title = bundle.getString(TITLE);
-
-        tagWriter = (EditText) findViewById(R.id.tagWriteView);
 
         //ListView inicialization
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -60,38 +59,35 @@ public class ListActivity extends ActionBarActivity {
         super.onSaveInstanceState(outState);
     }
 
-    public void done(View view){
-        sendData();
-        finish();
-    }
-
-    public void sendData(){
+    public void onConfirmButtonPressed(View view) {
         Intent intent = new Intent();
         intent.putCharSequenceArrayListExtra(LIST, list);
         setResult(RESULT_OK, intent);
+        finish();
     }
 
-    public void addItem(View view) {
-        String item = tagWriter.getText().toString().trim();
+    public void onAddButtonPressed(View view) {
+        EditText editText = (EditText) findViewById(R.id.tagWriteView);
+        String item = editText.getText().toString().trim();
 
         //Invalid input verification
-        if (item.split(" ").length != 1 || item.length() == 0) {
+        if (!Utils.isSingleWord(item)) {
             Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
             return;
         }
-        if (list.contains(item)){
+        if (list.contains(item)) {
             Toast.makeText(getApplicationContext(), "\"" + item + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        tagWriter.getText().clear();
+        editText.getText().clear();
         adapter.add(item);
         list.add(item);
     }
 
     //ListView population
-    private void populateView(){
-        for(CharSequence item : list){
+    private void populateView() {
+        for (CharSequence item : list) {
             adapter.add(item.toString());
         }
     }

@@ -1,18 +1,20 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
-import android.content.Context;
 import android.util.Log;
 
-import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class User implements Serializable{
+import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
+
+public class User implements Serializable {
 
     /*********************************/
     /*********** VARIABLES ***********/
-    /*********************************/
+    /**
+     * *****************************
+     */
 
     /* E-mail. Used as ID. */
     private String _email;
@@ -28,19 +30,23 @@ public class User implements Serializable{
 
     /*********************************/
     /********** CONSTRUCTOR **********/
-    /*********************************/
+    /**
+     * *****************************
+     */
 
-    private User(String mail, String nick){
+    public User(String mail, String nick) {
         _email = mail;
         _nickname = nick;
     }
 
     /*********************************/
     /****** GETTERS AND SETTERS ******/
-    /*********************************/
+    /**
+     * *****************************
+     */
 
     /* Client ID. The client Email is the identifier.*/
-    public String getID(){
+    public String getID() {
         return _email;
     }
 
@@ -60,48 +66,33 @@ public class User implements Serializable{
     }
 
     /* Client Keyword List */
-    public ArrayList<CharSequence> getSubscriptions() { return _subscriptions; }
+    public ArrayList<CharSequence> getSubscriptions() {
+        return _subscriptions;
+    }
 
     public void setSubscriptions(ArrayList<CharSequence> value) {
+        Log.e("User", "subscriptions modified");
         _subscriptions.clear();
         _subscriptions = value;
-        Log.e("ForeignFragment", "subscriptions modified");
     }
 
     /*********************************/
     /******** LIST MANAGEMENT ********/
-    /*********************************/
+    /**
+     * *****************************
+     */
 
     /* Workspace List */
-    public void removeWorkspace(String name){
+    public void removeWorkspace(String name) {
         Log.e("User", "workspace removed: " + name);
         _workspaceList.remove(name);
     }
 
-    public void addWorkspace(Workspace workspace){
+    public void addWorkspace(Workspace workspace) throws AlreadyExistsException {
+        if (_workspaceList.containsKey(workspace.getName()))
+            throw new AlreadyExistsException();
         Log.e("User", "workspace added: " + workspace.getName());
         _workspaceList.put(workspace.getName(), workspace);
-    }
-
-    /*********************************/
-    /******** USER MANAGEMENT ********/
-    /*********************************/
-
-    public static User LoadUser(String email, String nickName, Context context){
-        User user;
-        try {
-            user = (User) FileManager.fileToObject(email, context);
-            Log.e("User", "user loaded: " + user.getID());
-        } catch (FileNotFoundException e) {
-            user = new User(email, nickName);
-            Log.e("User", "user created: " + user.getID());
-        }
-        return user;
-    }
-
-    public void commit(Context context){
-        if(FileManager.objectToFile(getID(), this, context))
-            Log.e("MainMenu", "user committed:" + getID());
     }
 }
 

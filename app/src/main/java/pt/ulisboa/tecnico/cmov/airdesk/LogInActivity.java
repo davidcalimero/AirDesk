@@ -1,14 +1,17 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 
 public class LogInActivity extends ActionBarActivity {
@@ -16,43 +19,63 @@ public class LogInActivity extends ActionBarActivity {
     public static final String PREFERENCES = "loginPrefs";
     public static final String LOGOUT = "logout";
 
+    private static final String NICKNAME = "nickname";
+    private static final String EMAIL = "email";
+
     private SharedPreferences sharedPreferences;
+    private ApplicationContext appState;
+
+    private EditText nicknameView;
+    private EditText emailView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.activity_login);
         //Hide ActionBar
         getSupportActionBar().hide();
 
-        String nickname;
-        String email;
-
-        //Get login data from shareddprefs
+        //Get login data from sharedPreferences
         sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        nickname = sharedPreferences.getString(MainMenu.NICKNAME, "");
-        email = sharedPreferences.getString(MainMenu.EMAIL, "");
+        String nickname = sharedPreferences.getString(MainMenu.NICKNAME, "");
+        String email = sharedPreferences.getString(MainMenu.EMAIL, "");
+
+        //Init variable
+        appState = (ApplicationContext) getApplicationContext();
 
         //Logout if applicable
-        if(getIntent().getBooleanExtra(LOGOUT, false))
+        if (getIntent().getBooleanExtra(LOGOUT, false)) {
+            Log.e("LogInActivity", "Logout: " + email);
             sharedPreferences.edit().clear().commit();
+            appState.removeUser();
+        }
 
         //If was not logout and have data to login autologin
-        if(!nickname.equals("") && !email.equals("") && !getIntent().getBooleanExtra(LOGOUT, false)){
-            sendLoginData(nickname, email);
+        if (!nickname.equals("") && !email.equals("") && !getIntent().getBooleanExtra(LOGOUT, false)) {
+            loadUser(nickname, email);
         }
+
+        nicknameView = (EditText) findViewById(R.id.loginNickname);
+        nicknameView.setText(getIntent().getStringExtra(NICKNAME));
+        emailView = (EditText) findViewById(R.id.loginEmail);
+        emailView.setText(getIntent().getStringExtra(EMAIL));
     }
 
-    public void login(View view){
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(NICKNAME, nicknameView.getText().toString());
+        outState.putString(EMAIL, emailView.getText().toString());
+        super.onSaveInstanceState(outState);
+    }
+
+
+    public void onLoginButtonPressed(View view) {
         //Get data from views
-        EditText nicknameView = (EditText) findViewById(R.id.loginNickname);
-        EditText emailView = (EditText) findViewById(R.id.loginEmail);
-        String nickname = nicknameView.getText().toString();
-        String email = emailView.getText().toString();
+        String nickname = nicknameView.getText().toString().trim();
+        String email = emailView.getText().toString().trim();
 
         //Invalid input verification
-        if(nickname.equals("") || email.equals("")){
+        if (!Utils.isSingleWord(nickname) || !Utils.isSingleWord(email)) {
             Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -63,10 +86,16 @@ public class LogInActivity extends ActionBarActivity {
         editor.putString(MainMenu.EMAIL, email);
         editor.commit();
 
-        sendLoginData(nickname, email);
+        loadUser(nickname, email);
     }
 
-    private void sendLoginData(String nickname, String email){
+    private void loadUser(String nickname, String email) {
+        //load user to application context
+        ProgressDialog dialog = ProgressDialog.show(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_user), false, false);
+        dialog.show();
+        appState.setActiveUser(email, nickname);
+        dialog.dismiss();
+
         //Change activity
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);
         intent.putExtra(MainMenu.NICKNAME, nickname);

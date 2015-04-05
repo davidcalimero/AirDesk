@@ -3,9 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.fragment.OwnedFragment">
 
-    <item android:id="@+id/action_new_workspace"
-        android:title="@string/new_workspace"
+    <item
+        android:id="@+id/action_new_workspace"
         android:icon="@drawable/ic_action_new_white"
-        app:showAsAction="always"/>
+        android:title="@string/new_workspace"
+        app:showAsAction="always" />
 
 </menu>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="pt.ulisboa.tecnico.cmov.airdesk" >
+    package="pt.ulisboa.tecnico.cmov.airdesk">
 
     <application
         android:name=".ApplicationContext"
@@ -8,45 +8,39 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:screenOrientation="portrait"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
+
         <activity
             android:name=".LogInActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainMenu"
             android:label="@string/app_name"
-            android:launchMode="singleTop" >
-        </activity>
+            android:launchMode="singleTop" />
+
         <activity
             android:name=".ShowFileActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainMenu" >
+            android:parentActivityName=".MainMenu">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />
         </activity>
+
         <activity
             android:name=".ListActivity"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
+
         <activity
-            android:name=".NewWorkspaceActivity"
-            android:label="@string/create_new_workspace"
-            android:parentActivityName=".MainMenu" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainMenu" />
-        </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/Workspace_settings" >
+            android:name=".CreateEditWorkspaceActivity"
+            android:label="@string/create_new_workspace">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />
@@ -54,7 +48,7 @@
 
         <activity
             android:name=".CreateEditFileActivity"
-            android:label="@string/create_new_file" >
+            android:label="@string/create_new_file">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />

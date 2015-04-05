@@ -2,51 +2,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.ListActivity">
 
-    <ListView android:id="@+id/tagsView"
+    <ListView
+        android:id="@+id/tagsView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
         android:layout_above="@+id/addTag"
-        android:textSize="22sp"/>
+        android:layout_centerHorizontal="true"
+        android:textSize="22sp" />
 
-    <EditText android:id="@+id/tagWriteView"
+    <EditText
+        android:id="@+id/tagWriteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
         android:layout_above="@+id/tagsDone"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/addTag"
         android:layout_toStartOf="@+id/addTag"
         android:hint="@string/enter_text"
-        android:maxLength="40"/>
-
-    <Button android:id="@+id/addTag"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/add"
-        android:onClick="addItem"
-        android:layout_above="@+id/tagsDone"
-        android:layout_alignRight="@+id/tagsView"
-        android:layout_alignEnd="@+id/tagsView" />
+        android:inputType="textEmailAddress"
+        android:maxLength="40" />
 
     <Button
+        android:id="@+id/addTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/confirm"
+        android:layout_above="@+id/tagsDone"
+        android:layout_alignEnd="@+id/tagsView"
+        android:layout_alignRight="@+id/tagsView"
+        android:onClick="onAddButtonPressed"
+        android:text="@string/add" />
+
+    <Button
         android:id="@+id/tagsDone"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/addTag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/addTag"
-        android:layout_toEndOf="@+id/tagWriteView"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:onClick="done" />
+        android:layout_alignRight="@+id/addTag"
+        android:layout_toEndOf="@+id/tagWriteView"
+        android:onClick="onConfirmButtonPressed"
+        android:text="@string/confirm" />
 
 </RelativeLayout>
