@@ -7,6 +7,7 @@
     <string name="create_new_file">Create New File</string>
     <string name="tags_of">Tags of</string>
     <string name="users_of">Users of</string>
+    <string name="new_workspace">new workspace</string>
 
     <!-- Options -->
     <string name="logout">Logout</string>

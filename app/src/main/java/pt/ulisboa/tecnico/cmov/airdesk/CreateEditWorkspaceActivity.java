@@ -141,7 +141,8 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     public void addRemoveUsers(View v) {
         Intent intent = new Intent(getApplicationContext(), ListActivity.class);
         intent.putCharSequenceArrayListExtra(ListActivity.LIST, users);
-        intent.putExtra(ListActivity.TITLE, getString(R.string.users_of) + " " + workspaceName);
+        String name = mode == MODE.EDIT ? workspaceName : getString(R.string.new_workspace);
+        intent.putExtra(ListActivity.TITLE, getString(R.string.users_of) + " " + name);
         startActivityForResult(intent, USERS);
     }
 
@@ -149,7 +150,8 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     public void addRemoveTags(View v) {
         Intent intent = new Intent(getApplicationContext(), ListActivity.class);
         intent.putCharSequenceArrayListExtra(ListActivity.LIST, tags);
-        intent.putExtra(ListActivity.TITLE, getString(R.string.tags_of) + " " + workspaceName);
+        String name = mode == MODE.EDIT ? workspaceName : getString(R.string.new_workspace);
+        intent.putExtra(ListActivity.TITLE, getString(R.string.tags_of) + " " + name);
         startActivityForResult(intent, TAGS);
     }
 
