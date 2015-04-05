@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
+import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 
 
@@ -36,9 +39,43 @@ public class ShowFileActivity extends ActionBarActivity {
         text = FlowManager.getFileContent(getApplicationContext(), workspace, title);
 
         //Init
-        TextView showText = (TextView) findViewById(R.id.textView);
+        final TextView showText = (TextView) findViewById(R.id.textView);
         showText.setText(text);
         setTitle(title);
+
+        FlowManager.addWorkspacesChangeListener( new WorkspacesChangeListener() {
+            @Override
+            public void onWorkspaceCreated(String name) {}
+
+            @Override
+            public void onWorkspaceRemoved(String name) {
+                if(workspace.equals(name))
+                    finish();
+            }
+
+            @Override
+            public void onFileCreated(String workspaceName, String fileName) {}
+
+            @Override
+            public void onFileRemoved(String workspaceName, String fileName) {
+                if(workspace.equals(workspaceName) && text.equals(fileName))
+                    finish();
+            }
+
+            @Override
+            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {
+                //TODO finish activity if needed
+            }
+
+            @Override
+            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
+
+            @Override
+            public void onFileContentChange(String workspaceName, String filename, String content) {
+                if(workspace.equals(workspaceName) && text.equals(filename))
+                    showText.setText(content);
+            }
+        });
     }
 
     @Override

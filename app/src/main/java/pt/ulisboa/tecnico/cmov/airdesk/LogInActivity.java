@@ -6,12 +6,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+import pt.ulisboa.tecnico.cmov.airdesk.exception.InvalidInputException;
 
 
 public class LogInActivity extends ActionBarActivity {
@@ -45,7 +44,6 @@ public class LogInActivity extends ActionBarActivity {
 
         //Logout if applicable
         if (getIntent().getBooleanExtra(LOGOUT, false)) {
-            Log.e("LogInActivity", "Logout: " + email);
             sharedPreferences.edit().clear().commit();
             appState.removeUser();
         }
@@ -55,6 +53,7 @@ public class LogInActivity extends ActionBarActivity {
             loadUser(nickname, email);
         }
 
+        //Restore data
         nicknameView = (EditText) findViewById(R.id.loginNickname);
         nicknameView.setText(getIntent().getStringExtra(NICKNAME));
         emailView = (EditText) findViewById(R.id.loginEmail);
@@ -74,26 +73,28 @@ public class LogInActivity extends ActionBarActivity {
         String nickname = nicknameView.getText().toString().trim();
         String email = emailView.getText().toString().trim();
 
-        //Invalid input verification
-        if (!Utils.isSingleWord(nickname) || !Utils.isSingleWord(email)) {
-            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
-            return;
-        }
+        loadUser(nickname, email);
 
         //Save views content
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(MainMenu.NICKNAME, nickname);
         editor.putString(MainMenu.EMAIL, email);
         editor.commit();
-
-        loadUser(nickname, email);
     }
 
     private void loadUser(String nickname, String email) {
         //load user to application context
         ProgressDialog dialog = ProgressDialog.show(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_user), false, false);
         dialog.show();
-        appState.setActiveUser(email, nickname);
+
+        try {
+            appState.setActiveUser(email, nickname);
+        } catch (InvalidInputException e) {
+            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+            return;
+        }
+
         dialog.dismiss();
 
         //Change activity
@@ -102,6 +103,5 @@ public class LogInActivity extends ActionBarActivity {
         intent.putExtra(MainMenu.EMAIL, email);
         startActivity(intent);
         finish();
-        Log.e("LogInActivity", "Login: " + email);
     }
 }

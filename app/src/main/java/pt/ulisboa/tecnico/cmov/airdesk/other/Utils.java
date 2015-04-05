@@ -5,7 +5,7 @@ import java.util.List;
 public class Utils {
 
     //Returns true if list1 has at least one element contained in list2
-    public static boolean hasSameElement(List list1, List list2) {
+    public static boolean haveElementsInCommon(List list1, List list2) {
         for (Object object1 : list1) {
             for (Object object2 : list2) {
                 if (object1.equals(object2)) {
@@ -18,7 +18,7 @@ public class Utils {
 
     //Trim that also replace inner string multiple spaces by a single one
     public static String trim(String text) {
-        return text.trim().replaceAll("( )+", " ");
+        return text == null ? "" : text.replaceAll("( )+", " ").trim();
     }
 
     //Returns true if the string has only one word

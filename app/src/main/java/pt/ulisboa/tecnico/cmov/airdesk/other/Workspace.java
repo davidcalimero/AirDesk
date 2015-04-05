@@ -13,19 +13,14 @@ import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 
 public class Workspace implements Serializable {
 
-    /*********************************/
-    /************ MACROS *************/
-    /**
-     * *****************************
-     */
-
-    /* Name of the workspace. */
-    private String _name = "";
+    /* Privacy */
+    public enum PRIVACY { PUBLIC, PRIVATE }
 
     /*********************************/
     /*********** VARIABLES ***********/
-    /* Workspace Owner */
-    private String _owner = "";
+    /*********************************/
+    /* Name of the workspace. */
+    private String _name = "";
     /* User List */
     private ArrayList<CharSequence> _users = new ArrayList<>();
     /* Public Profile */
@@ -37,39 +32,25 @@ public class Workspace implements Serializable {
     /* Maximum Quota */
     private long _maximumQuota = 0;
     /* Actual Quota */
-    private long _quota = 0;
+    private long _currentSize = 0;
 
-    /**
-     * *****************************
-     */
-
-    /* Workspace */
-    public Workspace(String name, String owner, PRIVACY privacy, long quota) {
-        _name = name;
-        _owner = owner;
-        _privacy = privacy;
-        _maximumQuota = quota;
-        _quota = 0;
-    }
 
     /*********************************/
     /********** CONSTRUCTOR **********/
-
-    /**
-     * *****************************
-     */
-
-    /* Name */
-    public String getName() {
-        return _name;
+    /*********************************/
+    /* Workspace */
+    public Workspace(String name, PRIVACY privacy, long quota) {
+        _name = name;
+        _privacy = privacy;
+        _maximumQuota = quota;
     }
 
     /*********************************/
     /****** GETTERS AND SETTERS ******/
-
-    /* Owner */
-    public String getOwnerID() {
-        return _owner;
+    /*********************************/
+    /* Name */
+    public String getName() {
+        return _name;
     }
 
     /* User List */
@@ -83,6 +64,19 @@ public class Workspace implements Serializable {
         _users = users;
     }
 
+    public void addUser(String id) throws AlreadyExistsException {
+        if(_users.contains(id))
+            throw new AlreadyExistsException();
+
+        Log.e("Workspace", "User added: " + id);
+        _users.add(id);
+    }
+
+    public void removeUser(String id){
+        Log.e("Workspace", "User removed: " + id);
+        _users.remove(id);
+    }
+
     /* Public Profile */
     public ArrayList<CharSequence> getTagList() {
         return _tags;
@@ -92,6 +86,19 @@ public class Workspace implements Serializable {
         Log.e("Workspace", "public profile changed: " + getName());
         _tags.clear();
         _tags = tags;
+    }
+
+    public void addTag(String tag) throws AlreadyExistsException {
+        if(_users.contains(tag))
+            throw new AlreadyExistsException();
+
+        Log.e("Workspace", "Tag added: " + tag);
+        _tags.add(tag);
+    }
+
+    public void removeTag(String tag){
+        Log.e("Workspace", "Tag removed: " + tag);
+        _tags.remove(tag);
     }
 
     /* Files List */
@@ -105,7 +112,7 @@ public class Workspace implements Serializable {
     }
 
     public void setPrivacy(PRIVACY privacy) {
-        Log.e("Workspace", "privacy changed to: " + getName() + ": " + privacy.name());
+        Log.e("Workspace", "privacy changed to: " + privacy.name());
         _privacy = privacy;
     }
 
@@ -115,25 +122,25 @@ public class Workspace implements Serializable {
     }
 
     public void setMaximumQuota(long quota) {
-        Log.e("Workspace", "quota changed to: " + getName() + ": " + quota);
+        Log.e("Workspace", "max quota changed to: " + quota);
         _maximumQuota = quota;
     }
 
     /* Actual Quota */
-    public long getQuota() {
-        return _quota;
+    public long getCurrentMemorySize() {
+        return _currentSize;
     }
 
-    private void incrementQuota(long amount) {
-        _quota += amount;
+    private void incrementMemorySize(long amount) {
+        _currentSize += amount;
     }
 
-    private void decrementQuota(long amount) {
-        _quota -= amount;
+    private void decrementMemorySize(long amount) {
+        _currentSize -= amount;
     }
 
     /* Equals */
-    @Override
+    /*@Override
     public boolean equals(Object object) {
         if (object instanceof Workspace) {
             Workspace workspace = (Workspace) object;
@@ -141,11 +148,11 @@ public class Workspace implements Serializable {
                 return true;
         }
         return false;
-    }
+    }*/
 
-    /**
-     * *****************************
-     */
+    /*********************************/
+    /******** FILE MANAGEMENT ********/
+    /*********************************/
 
     public void addFile(Context context, String fileName, String title, String content) throws AlreadyExistsException, OutOfMemoryException {
         int size = content.length();
@@ -156,20 +163,17 @@ public class Workspace implements Serializable {
         if (!haveSpace(size))
             throw new OutOfMemoryException();
 
-        incrementQuota(size);
+        incrementMemorySize(size);
         _files.put(title, new TextFile(context, fileName, title, content));
-        Log.e("Workspace", "file added: " + title + "[quota]: " + getQuota());
+        Log.e("Workspace", "file added: " + title + "[quota]: " + getCurrentMemorySize());
 
     }
 
-    /*********************************/
-    /******** FILE MANAGEMENT ********/
-
     public void removeFile(Context context, String name) {
         TextFile file = _files.remove(name);
-        decrementQuota(file.getContent(context).length());
+        decrementMemorySize(file.getContent(context).length());
         file.delete(context);
-        Log.e("Workspace", "file removed: " + name + "[quota]: " + getQuota());
+        Log.e("Workspace", "file removed: " + name + "[quota]: " + getCurrentMemorySize());
     }
 
     public void editFile(Context context, String fileName, String newContent) throws OutOfMemoryException {
@@ -178,8 +182,15 @@ public class Workspace implements Serializable {
         if (!haveSpace(sizeDif))
             throw new OutOfMemoryException();
 
-        incrementQuota(sizeDif);
+        incrementMemorySize(sizeDif);
         file.setContent(context, newContent);
+        Log.e("Workspace", "file edited: " + fileName + "[quota]: " + getCurrentMemorySize());
+    }
+
+    public void delete(Context context){
+        Log.e("Workspace", "workspace deleted: " + getName());
+        for(TextFile f : _files.values())
+            f.delete(context);
     }
 
     /**
@@ -190,17 +201,6 @@ public class Workspace implements Serializable {
         return context.getFilesDir().getAbsolutePath() + FileManager.LINE_SEP + _owner + FileManager.LINE_SEP + _name;
     }*/
     public boolean haveSpace(int contentSize) {
-        return contentSize + getQuota() <= getMaximumQuota();
-    }
-
-    /*********************************/
-    /************* UTILS *************/
-    /**
-     * *****************************
-     */
-
-    /* Privacy */
-    public enum PRIVACY {
-        PUBLIC, PRIVATE
+        return contentSize + getCurrentMemorySize() <= getMaximumQuota();
     }
 }

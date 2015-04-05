@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.Serializable;
@@ -12,9 +13,7 @@ public class User implements Serializable {
 
     /*********************************/
     /*********** VARIABLES ***********/
-    /**
-     * *****************************
-     */
+    /** ******************************/
 
     /* E-mail. Used as ID. */
     private String _email;
@@ -30,20 +29,16 @@ public class User implements Serializable {
 
     /*********************************/
     /********** CONSTRUCTOR **********/
-    /**
-     * *****************************
-     */
+    /*********************************/
 
-    public User(String mail, String nick) {
-        _email = mail;
-        _nickname = nick;
+    public User(String email, String nickname) {
+        _email = email;
+        _nickname = nickname;
     }
 
     /*********************************/
     /****** GETTERS AND SETTERS ******/
-    /**
-     * *****************************
-     */
+    /*********************************/
 
     /* Client ID. The client Email is the identifier.*/
     public String getID() {
@@ -78,21 +73,33 @@ public class User implements Serializable {
 
     /*********************************/
     /******** LIST MANAGEMENT ********/
-    /**
-     * *****************************
-     */
+    /*********************************/
 
-    /* Workspace List */
-    public void removeWorkspace(String name) {
-        Log.e("User", "workspace removed: " + name);
-        _workspaceList.remove(name);
+    public void addSubscription(String subscription) throws AlreadyExistsException {
+        if(_subscriptions.contains(subscription))
+            throw new AlreadyExistsException();
+
+        Log.e("User", "subscriptions add: " + subscription);
+        _subscriptions.add(subscription);
+    }
+
+    public void removeSubscription(String subscription) {
+        Log.e("User", "subscriptions removed: " + subscription);
+        _subscriptions.remove(subscription);
     }
 
     public void addWorkspace(Workspace workspace) throws AlreadyExistsException {
         if (_workspaceList.containsKey(workspace.getName()))
             throw new AlreadyExistsException();
+
         Log.e("User", "workspace added: " + workspace.getName());
         _workspaceList.put(workspace.getName(), workspace);
+    }
+
+    /* Workspace List */
+    public void removeWorkspace(String name, Context context) {
+        Log.e("User", "workspace removed: " + name);
+        _workspaceList.remove(name).delete(context);
     }
 }
 

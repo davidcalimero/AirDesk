@@ -13,7 +13,7 @@ public class TextFile implements Serializable {
 
     public TextFile(Context context, String filename, String title, String content) {
         this.filename = filename;
-        this.title = title;
+        this.title = Utils.trim(title);
         setContent(context, content);
     }
 

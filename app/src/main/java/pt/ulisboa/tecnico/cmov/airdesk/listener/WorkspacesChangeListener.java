@@ -15,4 +15,6 @@ public interface WorkspacesChangeListener {
     public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags);
 
     public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions);
+
+    public void onFileContentChange(String workspaceName, String filename, String content);
 }

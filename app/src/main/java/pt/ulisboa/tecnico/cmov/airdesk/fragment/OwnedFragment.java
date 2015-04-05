@@ -17,7 +17,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 
-public class OwnedFragment extends ExpandableListFragment /*implements Serializable*/ {
+public class OwnedFragment extends ExpandableListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,12 +53,13 @@ public class OwnedFragment extends ExpandableListFragment /*implements Serializa
             }
 
             @Override
-            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {
-            }
+            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {}
 
             @Override
-            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {
-            }
+            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
+
+            @Override
+            public void onFileContentChange(String workspaceName, String filename, String content) {}
         });
 
         return view;

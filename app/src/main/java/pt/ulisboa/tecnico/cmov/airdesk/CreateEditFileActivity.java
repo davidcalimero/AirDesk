@@ -13,8 +13,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
+import pt.ulisboa.tecnico.cmov.airdesk.exception.InvalidInputException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
@@ -25,11 +29,13 @@ public class CreateEditFileActivity extends ActionBarActivity {
     public static final String FILE_WORKSPACE = "workspace";
     public static final String FILE_TITLE = "title";
     public static final String FILE_CONTENT = "content";
+
     private String activityTitle;
     private MODE mode;
     private String workspaceName;
     private String title;
     private String content;
+
     private EditText titleView;
     private EditText contentView;
 
@@ -55,9 +61,41 @@ public class CreateEditFileActivity extends ActionBarActivity {
             ((ViewGroup) titleView.getParent()).removeView(titleView);
             ((Button) findViewById(R.id.createFileCreate)).setText(getString(R.string.confirm));
         }
+
         titleView.setText(title);
         contentView.setText(content);
         setTitle(activityTitle);
+
+        FlowManager.addWorkspacesChangeListener( new WorkspacesChangeListener() {
+            @Override
+            public void onWorkspaceCreated(String name) {}
+
+            @Override
+            public void onWorkspaceRemoved(String name) {
+                if(workspaceName.equals(name))
+                    finish();
+            }
+
+            @Override
+            public void onFileCreated(String workspaceName, String fileName) {}
+
+            @Override
+            public void onFileRemoved(String workspace, String fileName) {
+                if(workspaceName.equals(workspace) && title.equals(fileName) && mode == MODE.EDIT)
+                    finish();
+            }
+
+            @Override
+            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {
+                //TODO finish activity if needed
+            }
+
+            @Override
+            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
+
+            @Override
+            public void onFileContentChange(String workspaceName, String filename, String content) {}
+        });
     }
 
     @Override
@@ -65,8 +103,8 @@ public class CreateEditFileActivity extends ActionBarActivity {
         outState.putString(ACTIVITY_TITLE, activityTitle);
         outState.putSerializable(ACTIVITY_MODE, mode);
         outState.putString(FILE_WORKSPACE, workspaceName);
-        outState.putString(FILE_TITLE, title);
-        outState.putString(FILE_CONTENT, content);
+        outState.putString(FILE_TITLE, titleView.getText().toString());
+        outState.putString(FILE_CONTENT, contentView.getText().toString());
         Log.e("CreateEditFileActivity", "state saved: " + title);
         super.onSaveInstanceState(outState);
     }
@@ -111,11 +149,6 @@ public class CreateEditFileActivity extends ActionBarActivity {
         String newTitle = Utils.trim(titleView.getText().toString());
         String newContent = contentView.getText().toString();
 
-        if (newTitle.length() == 0) {
-            Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         try {
             if (mode.equals(MODE.CREATE)) {
                 FlowManager.notifyAddFile(getApplicationContext(), workspaceName, newTitle, newContent);
@@ -129,6 +162,8 @@ public class CreateEditFileActivity extends ActionBarActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.not_enough_memory_available), Toast.LENGTH_SHORT).show();
         } catch (AlreadyExistsException e) {
             Toast.makeText(getApplicationContext(), "\"" + newTitle + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
+        } catch (InvalidInputException e) {
+            Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
         }
     }
 

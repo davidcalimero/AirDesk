@@ -87,6 +87,7 @@ public class MainMenu extends ActionBarActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data != null && resultCode == RESULT_OK) {
             if (requestCode == SUBSCRIPTIONS) {
+                //TODO add and remove one by one
                 FlowManager.notifySubscriptionsChange(getApplicationContext(), data.getCharSequenceArrayListExtra(ListActivity.LIST));
                 Toast.makeText(getApplicationContext(), getString(R.string.subscriptions_changed_successfully), Toast.LENGTH_SHORT).show();
             }

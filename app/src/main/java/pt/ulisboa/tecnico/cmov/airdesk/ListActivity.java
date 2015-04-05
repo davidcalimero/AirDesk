@@ -18,12 +18,19 @@ import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 public class ListActivity extends ActionBarActivity {
 
+    //TODO remake to add and remove methods and verify input in flowmanager
+
     public static final String LIST = "list";
     public static final String TITLE = "title";
 
+    private static final String TEXT = "text";
+
     private String title;
+    private String text;
     private ArrayList<CharSequence> list;
     private ArrayAdapter<String> adapter;
+
+    private EditText writer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +41,7 @@ public class ListActivity extends ActionBarActivity {
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
         list = bundle.getCharSequenceArrayList(LIST);
         title = bundle.getString(TITLE);
+        text = bundle.getString(TEXT);
 
         //ListView inicialization
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -47,6 +55,9 @@ public class ListActivity extends ActionBarActivity {
             }
         });
 
+        writer = (EditText) findViewById(R.id.tagWriteView);
+        writer.setText(text);
+
         populateView();
         setTitle(title);
     }
@@ -55,6 +66,7 @@ public class ListActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putCharSequenceArrayList(LIST, list);
         outState.putString(TITLE, title);
+        outState.putString(TEXT, writer.getText().toString());
         Log.e("ListActivity", "state saved: " + title);
         super.onSaveInstanceState(outState);
     }
@@ -67,8 +79,7 @@ public class ListActivity extends ActionBarActivity {
     }
 
     public void onAddButtonPressed(View view) {
-        EditText editText = (EditText) findViewById(R.id.tagWriteView);
-        String item = editText.getText().toString().trim();
+        String item = writer.getText().toString().trim();
 
         //Invalid input verification
         if (!Utils.isSingleWord(item)) {
@@ -80,7 +91,7 @@ public class ListActivity extends ActionBarActivity {
             return;
         }
 
-        editText.getText().clear();
+        writer.getText().clear();
         adapter.add(item);
         list.add(item);
     }

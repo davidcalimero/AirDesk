@@ -36,7 +36,6 @@ public class ForeignFragment extends ExpandableListFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         switch (id) {
             case R.id.action_subscriptions:
                 ArrayList<CharSequence> subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
