@@ -25,6 +25,16 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
             this.group = group;
             this.files = new ArrayList<>();
         }
+
+        @Override
+         public boolean equals(Object o) {
+            if(o instanceof Item){
+                Item item = (Item) o;
+                if(item.tag.equals(this.tag) && item.group.equals(this.group))
+                    return true;
+            }
+            return false;
+        }
     }
 
     private Context context;
@@ -109,25 +119,21 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
     }
 
     public void addGroup(String tag, String title) {
-        Log.e("WorkspaceListAdapter", "addGroup: " + tag + " "  + title);
-        items.add(new Item(tag, title));
-    }
-
-    public void removeGroup(String tag, String title) {
-        Log.e("WorkspaceListAdapter", "removeGroup: " + tag + " " + title);
-        for(int i = 0; i < items.size(); i++){
-            Item item = items.get(i);
-            if(item.tag.equals(tag) && item.group.equals(title)){
-                items.remove(i).files.clear();
-                return;
-            }
+        if(!items.contains(new Item(tag, title))) {
+            items.add(new Item(tag, title));
+            Log.e("WorkspaceListAdapter", "addGroup: " + tag + " "  + title);
         }
     }
 
+    public void removeGroup(String tag, String title) {
+        items.remove(new Item(tag, title));
+        Log.e("WorkspaceListAdapter", "removeGroup: " + tag + " " + title);
+    }
+
     public void addChild(String tag, String groupTitle, String childTitle) {
-        Log.e("WorkspaceListAdapter", "addChild: " + tag + " " + groupTitle + " " + childTitle);
         for(Item item : items){
-            if(item.tag.equals(tag) && item.group.equals(groupTitle)){
+            if(item.equals(new Item(tag, groupTitle))){
+                Log.e("WorkspaceListAdapter", "addChild: " + tag + " " + groupTitle + " " + childTitle);
                 item.files.add(childTitle);
                 return;
             }
@@ -135,9 +141,9 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
     }
 
     public void removeChild(String tag, String groupTitle, String childTitle) {
-        Log.e("WorkspaceListAdapter", "removeChild: " + tag + " " + groupTitle + " " + childTitle);
         for(Item item : items){
-            if(item.tag.equals(tag) && item.group.equals(groupTitle)){
+            if(item.equals(new Item(tag, groupTitle))){
+                Log.e("WorkspaceListAdapter", "removeChild: " + tag + " " + groupTitle + " " + childTitle);
                 item.files.remove(childTitle);
                 return;
             }

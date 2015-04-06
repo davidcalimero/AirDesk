@@ -23,12 +23,14 @@ public class ForeignFragment extends ExpandableListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_foreign, container, false);
-        makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
         setHasOptionsMenu(true);
-
         setListener(new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceAdded(String owner, String name) {}
+            public void onWorkspaceAdded(String owner, String name) {
+                // In N-Version it will check if user is the same
+                getAdapter().addGroup(owner, name);
+                updateAdapter();
+            }
 
             @Override
             public void onWorkspaceRemoved(String owner, String name) {}
@@ -49,6 +51,7 @@ public class ForeignFragment extends ExpandableListFragment {
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
         });
 
+        refreshView(view);
         return view;
     }
 
@@ -62,6 +65,10 @@ public class ForeignFragment extends ExpandableListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.action_refresh:
+                refreshView(getView());
+                break;
+
             case R.id.action_subscriptions:
                 ArrayList<CharSequence> subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
                 Intent intent = new Intent(getActivity().getApplicationContext(), ListActivity.class);
@@ -74,5 +81,10 @@ public class ForeignFragment extends ExpandableListFragment {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    public void refreshView(View view){
+        makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
+        FlowManager.updateForeignList(getActivity().getApplicationContext(), FlowManager.getSubscriptions(getActivity().getApplicationContext()));
     }
 }

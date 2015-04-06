@@ -112,6 +112,24 @@ public class FlowManager {
         ((ApplicationContext) context).commit();
     }
 
+    public static void updateForeignList(Context context, ArrayList<CharSequence> tags){
+        // N-Version TODO
+        // Get public workspaces from users
+        // Compare tags from Subscription and Public Profile
+
+        // S-Version
+        ArrayList<String> workspaces = getWorkspaces(context);
+        for(String w : workspaces){
+            ArrayList<CharSequence> tagList = getWorkspaceTagList(context, w);
+            if(Utils.haveElementsInCommon(tagList, tags)){
+                for(WorkspacesChangeListener l : getInstance().listeners){
+                    // Warn Foreign Fragment
+                    l.onWorkspaceAdded(((ApplicationContext) context).getActiveUser().getID(), w);
+                }
+            }
+        }
+    }
+
     public static void notifyEditWorkspace(Context context, String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) {
         //TODO verify input and and remove methods
         Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName);

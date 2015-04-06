@@ -67,7 +67,6 @@ public class User implements Serializable {
 
     public void setSubscriptions(ArrayList<CharSequence> value) {
         Log.e("User", "subscriptions modified");
-        _subscriptions.clear();
         _subscriptions = value;
     }
 

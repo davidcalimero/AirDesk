@@ -60,7 +60,6 @@ public class Workspace implements Serializable {
 
     public void setUserList(ArrayList<CharSequence> users) {
         Log.e("Workspace", "User List Updated: " + getName());
-        _users.clear();
         _users = users;
     }
 
@@ -84,7 +83,6 @@ public class Workspace implements Serializable {
 
     public void setTagList(ArrayList<CharSequence> tags) {
         Log.e("Workspace", "public profile changed: " + getName());
-        _tags.clear();
         _tags = tags;
     }
 
