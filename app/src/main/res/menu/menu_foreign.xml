@@ -4,9 +4,16 @@
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.fragment.ForeignFragment">
 
     <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_action_refresh"
+        android:title="@string/refresh"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_subscriptions"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/subscriptions"
-        app:showAsAction="always" />
+        android:orderInCategory="1"
+        app:showAsAction="never" />
 
 </menu>

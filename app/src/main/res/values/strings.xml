@@ -12,6 +12,7 @@
     <string name="logout">Logout</string>
     <string name="new_workspace">New Workspace</string>
     <string name="subscriptions">Subscriptions</string>
+    <string name="refresh">Refresh</string>
     <string name="delete">Delete</string>
 
     <!-- Hints -->
