@@ -13,7 +13,7 @@ public class User implements Serializable {
 
     /*********************************/
     /*********** VARIABLES ***********/
-    /** ******************************/
+    /*********************************/
 
     /* E-mail. Used as ID. */
     private String _email;
@@ -98,7 +98,6 @@ public class User implements Serializable {
 
     /* Workspace List */
     public void removeWorkspace(String name, Context context) {
-        Log.e("User", "workspace removed: " + name);
         _workspaceList.remove(name).delete(context);
     }
 }

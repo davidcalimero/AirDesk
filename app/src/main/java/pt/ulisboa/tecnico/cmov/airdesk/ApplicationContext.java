@@ -18,7 +18,7 @@ public class ApplicationContext extends Application {
         return activeUser;
     }
 
-    public void setActiveUser(String email, String nickName) throws InvalidInputException {
+    public void loadUser(String email, String nickName) throws InvalidInputException {
         if (!Utils.isSingleWord(nickName) || !Utils.isSingleWord(email))
             throw new InvalidInputException();
 

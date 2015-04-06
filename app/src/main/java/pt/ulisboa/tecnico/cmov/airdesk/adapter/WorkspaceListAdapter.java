@@ -10,17 +10,27 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 
 public class WorkspaceListAdapter extends BaseExpandableListAdapter {
 
+    private class Item{
+        public String tag;
+        public String group;
+        public ArrayList<String> files;
+
+        public Item(String tag, String group){
+            this.tag = tag;
+            this.group = group;
+            this.files = new ArrayList<>();
+        }
+    }
+
     private Context context;
     private int group_xml;
     private int item_xml;
-    private ArrayList<String> groupHeaders = new ArrayList<>();
-    private HashMap<String, ArrayList<String>> childHeaders = new HashMap<>(); //Format (groupTitle, childTitle)
+    private ArrayList<Item> items = new ArrayList<>();
 
     public WorkspaceListAdapter(Context context, int group_xml, int item_xml) {
         this.context = context;
@@ -30,12 +40,16 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return this.childHeaders.get(groupHeaders.get(groupPosition)).get(childPosition);
+        return items.get(groupPosition).files.get(childPosition);
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return this.groupHeaders.get(groupPosition);
+        return items.get(groupPosition).group;
+    }
+
+    public Object getTag(int groupPosition) {
+        return items.get(groupPosition).tag;
     }
 
     @Override
@@ -50,12 +64,12 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return childHeaders.get(groupHeaders.get(groupPosition)).size();
+        return items.get(groupPosition).files.size();
     }
 
     @Override
     public int getGroupCount() {
-        return groupHeaders.size();
+        return items.size();
     }
 
     @Override
@@ -75,37 +89,59 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String groupTitle = (String) getGroup(groupPosition);
+        String tagTitle = (String) getTag(groupPosition);
+
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(group_xml, null);
         }
 
-        TextView textView = (TextView) convertView.findViewById(R.id.groupHeader);
-        textView.setTypeface(null, Typeface.BOLD);
-        textView.setText(groupTitle);
+        //Tag Header
+        TextView tagView = (TextView) convertView.findViewById(R.id.tagHeader);
+        tagView.setTypeface(null, Typeface.BOLD);
+        tagView.setText(tagTitle);
+
+        //Group Header
+        TextView groupView = (TextView) convertView.findViewById(R.id.groupHeader);
+        groupView.setTypeface(null, Typeface.BOLD);
+        groupView.setText(groupTitle);
         return convertView;
     }
 
-    public void addGroup(String title) {
-        Log.e("WorkspaceListAdapter", "addGroup: " + title);
-        groupHeaders.add(title);
-        childHeaders.put(title, new ArrayList<String>());
+    public void addGroup(String tag, String title) {
+        Log.e("WorkspaceListAdapter", "addGroup: " + tag + " "  + title);
+        items.add(new Item(tag, title));
     }
 
-    public boolean removeGroup(String title) {
-        Log.e("WorkspaceListAdapter", "removeGroup: " + title);
-        childHeaders.remove(title).clear();
-        return groupHeaders.remove(title);
+    public void removeGroup(String tag, String title) {
+        Log.e("WorkspaceListAdapter", "removeGroup: " + tag + " " + title);
+        for(int i = 0; i < items.size(); i++){
+            Item item = items.get(i);
+            if(item.tag.equals(tag) && item.group.equals(title)){
+                items.remove(i).files.clear();
+                return;
+            }
+        }
     }
 
-    public void addChild(String groupTitle, String childTitle) {
-        Log.e("WorkspaceListAdapter", "addChild: " + childTitle);
-        childHeaders.get(groupTitle).add(childTitle);
+    public void addChild(String tag, String groupTitle, String childTitle) {
+        Log.e("WorkspaceListAdapter", "addChild: " + tag + " " + groupTitle + " " + childTitle);
+        for(Item item : items){
+            if(item.tag.equals(tag) && item.group.equals(groupTitle)){
+                item.files.add(childTitle);
+                return;
+            }
+        }
     }
 
-    public boolean removeChild(String groupTitle, String childTitle) {
-        Log.e("WorkspaceListAdapter", "removeChild: " + childTitle);
-        return childHeaders.get(groupTitle).remove(childTitle);
+    public void removeChild(String tag, String groupTitle, String childTitle) {
+        Log.e("WorkspaceListAdapter", "removeChild: " + tag + " " + groupTitle + " " + childTitle);
+        for(Item item : items){
+            if(item.tag.equals(tag) && item.group.equals(groupTitle)){
+                item.files.remove(childTitle);
+                return;
+            }
+        }
     }
 
     @Override

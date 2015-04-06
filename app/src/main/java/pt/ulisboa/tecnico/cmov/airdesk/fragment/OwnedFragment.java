@@ -19,37 +19,48 @@ import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 
 public class OwnedFragment extends ExpandableListFragment {
 
+    private String userId;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_owned, container, false);
         makeAdapter((ExpandableListView) view.findViewById(R.id.ownedListView), R.layout.list_group_owner, R.layout.list_item);
         setHasOptionsMenu(true);
+        userId = FlowManager.getActiveUserID(getActivity().getApplicationContext());
         populateView();
 
-        FlowManager.addWorkspacesChangeListener(new WorkspacesChangeListener() {
+        setListener(new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceCreated(String name) {
-                getAdapter().addGroup(name);
-                getAdapter().notifyDataSetChanged();
+            public void onWorkspaceAdded(String owner, String name) {
+                if(userId.equals(owner)){
+                    getAdapter().addGroup(owner, name);
+                    updateAdapter();
+                }
             }
 
             @Override
-            public void onWorkspaceRemoved(String name) {
-                getAdapter().removeGroup(name);
-                getAdapter().notifyDataSetChanged();
+            public void onWorkspaceRemoved(String owner, String name) {
+                if(userId.equals(owner)){
+                    getAdapter().removeGroup(owner, name);
+                    updateAdapter();
+                }
             }
 
             @Override
-            public void onFileCreated(String workspaceName, String fileName) {
-                getAdapter().addChild(workspaceName, fileName);
-                getAdapter().notifyDataSetChanged();
+            public void onFileAdded(String owner, String workspaceName, String fileName) {
+                if(userId.equals(owner)){
+                    getAdapter().addChild(owner, workspaceName, fileName);
+                    updateAdapter();
+                }
             }
 
             @Override
-            public void onFileRemoved(String workspaceName, String fileName) {
-                getAdapter().removeChild(workspaceName, fileName);
-                getAdapter().notifyDataSetChanged();
+            public void onFileRemoved(String owner, String workspaceName, String fileName) {
+                if(userId.equals(owner)){
+                    getAdapter().removeChild(owner, workspaceName, fileName);
+                    updateAdapter();
+                }
             }
 
             @Override
@@ -59,7 +70,7 @@ public class OwnedFragment extends ExpandableListFragment {
             public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
 
             @Override
-            public void onFileContentChange(String workspaceName, String filename, String content) {}
+            public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
         });
 
         return view;
@@ -79,6 +90,7 @@ public class OwnedFragment extends ExpandableListFragment {
                 Intent intent = new Intent(getActivity().getApplicationContext(), CreateEditWorkspaceActivity.class);
                 intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_MODE, CreateEditWorkspaceActivity.MODE.CREATE);
                 intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_TITLE, getString(R.string.create_new_workspace));
+                intent.putExtra(CreateEditWorkspaceActivity.OWNER_NAME, userId);
                 startActivity(intent);
                 break;
             default:
@@ -90,9 +102,9 @@ public class OwnedFragment extends ExpandableListFragment {
     //Adds workspace views to the list view
     private void populateView() {
         for (String w : FlowManager.getWorkspaces(getActivity().getApplicationContext())) {
-            getAdapter().addGroup(w);
+            getAdapter().addGroup(userId, w);
             for (String t : FlowManager.getFiles(getActivity().getApplicationContext(), w))
-                getAdapter().addChild(w, t);
+                getAdapter().addChild(userId, w, t);
         }
     }
 }

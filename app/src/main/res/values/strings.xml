@@ -63,6 +63,7 @@
     <string name="dialog_no">No</string>
     <string name="dialog_please_wait">Please Wait</string>
     <string name="dialog_loading_user">Loading User...</string>
+    <string name="applying_changes">Applying Changes...</string>
 
     <!-- Settings -->
     <string name="change_users">Change Users</string>

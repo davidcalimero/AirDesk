@@ -84,18 +84,16 @@ public class LogInActivity extends ActionBarActivity {
 
     private void loadUser(String nickname, String email) {
         //load user to application context
-        ProgressDialog dialog = ProgressDialog.show(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_user), false, false);
-        dialog.show();
+        ProgressDialog loading = ProgressDialog.show(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_user), false, false);
 
         try {
-            appState.setActiveUser(email, nickname);
+            appState.loadUser(email, nickname);
         } catch (InvalidInputException e) {
             Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
+            loading.dismiss();
             return;
         }
-
-        dialog.dismiss();
+        loading.dismiss();
 
         //Change activity
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);

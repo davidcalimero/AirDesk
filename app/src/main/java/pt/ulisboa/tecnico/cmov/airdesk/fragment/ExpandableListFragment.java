@@ -8,11 +8,15 @@ import android.widget.ExpandableListView;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ShowFileActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
+import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 
 
 public class ExpandableListFragment extends Fragment {
 
     private WorkspaceListAdapter adapter;
+    private WorkspacesChangeListener listener = null;
+    private boolean wasChanged = false;
 
     protected void makeAdapter(ExpandableListView view, int groupLayout, int childLayout) {
         this.adapter = new WorkspaceListAdapter(getActivity(), groupLayout, childLayout);
@@ -23,17 +27,50 @@ public class ExpandableListFragment extends Fragment {
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 String workspaceName = adapter.getGroup(groupPosition).toString();
                 String filename = adapter.getChild(groupPosition, childPosition).toString();
+                String owner = adapter.getTag(groupPosition).toString();
 
                 Intent intent = new Intent(getActivity().getApplicationContext(), ShowFileActivity.class);
                 intent.putExtra(ShowFileActivity.WORKSPACE, workspaceName);
                 intent.putExtra(ShowFileActivity.TITLE, filename);
+                intent.putExtra(ShowFileActivity.OWNER_NAME, owner);
                 startActivity(intent);
                 return false;
             }
         });
     }
 
-    public WorkspaceListAdapter getAdapter() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(wasChanged) {
+            adapter.notifyDataSetChanged();
+            wasChanged = false;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if(listener != null)
+            FlowManager.removeWorkspacesChangeListener(listener);
+        super.onDestroy();
+    }
+
+    protected void setListener(WorkspacesChangeListener listener){
+        if(listener != null)
+            FlowManager.removeWorkspacesChangeListener(listener);
+        this.listener = listener;
+        FlowManager.addWorkspacesChangeListener(listener);
+    }
+
+    //Should be only called if you are shore the adapter was changed
+    protected void updateAdapter(){
+        if(isVisible())
+            getAdapter().notifyDataSetChanged();
+        else
+            wasChanged = true;
+    }
+
+    protected WorkspaceListAdapter getAdapter() {
         return adapter;
     }
 }

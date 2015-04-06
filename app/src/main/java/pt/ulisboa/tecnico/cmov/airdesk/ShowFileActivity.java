@@ -22,10 +22,14 @@ public class ShowFileActivity extends ActionBarActivity {
 
     public static final String WORKSPACE = "workspace";
     public static final String TITLE = "title";
+    public static final String OWNER_NAME = "ownerName";
 
     private String workspace;
     private String title;
     private String text;
+    private String owner;
+
+    private WorkspacesChangeListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,29 +40,32 @@ public class ShowFileActivity extends ActionBarActivity {
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
         workspace = bundle.getString(WORKSPACE);
         title = bundle.getString(TITLE);
+        owner = bundle.getString(OWNER_NAME);
         text = FlowManager.getFileContent(getApplicationContext(), workspace, title);
+
+        Log.e("ShowFileActivity", owner + " " + workspace + " " + title);
 
         //Init
         final TextView showText = (TextView) findViewById(R.id.textView);
         showText.setText(text);
         setTitle(title);
 
-        FlowManager.addWorkspacesChangeListener( new WorkspacesChangeListener() {
+        listener = new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceCreated(String name) {}
+            public void onWorkspaceAdded(String ownerName, String name) {}
 
             @Override
-            public void onWorkspaceRemoved(String name) {
-                if(workspace.equals(name))
+            public void onWorkspaceRemoved(String ownerName, String name) {
+                if(owner.equals(ownerName) && workspace.equals(name))
                     finish();
             }
 
             @Override
-            public void onFileCreated(String workspaceName, String fileName) {}
+            public void onFileAdded(String ownerName, String workspaceName, String fileName) {}
 
             @Override
-            public void onFileRemoved(String workspaceName, String fileName) {
-                if(workspace.equals(workspaceName) && text.equals(fileName))
+            public void onFileRemoved(String ownerName, String workspaceName, String fileName) {
+                if(owner.equals(ownerName) && workspace.equals(workspaceName) && text.equals(fileName))
                     finish();
             }
 
@@ -71,17 +78,25 @@ public class ShowFileActivity extends ActionBarActivity {
             public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
 
             @Override
-            public void onFileContentChange(String workspaceName, String filename, String content) {
-                if(workspace.equals(workspaceName) && text.equals(filename))
+            public void onFileContentChange(String ownerName, String workspaceName, String filename, String content) {
+                if(owner.equals(ownerName) && workspace.equals(workspaceName) && text.equals(filename))
                     showText.setText(content);
             }
-        });
+        };
+        FlowManager.addWorkspacesChangeListener(listener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        FlowManager.removeWorkspacesChangeListener(listener);
+        super.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(WORKSPACE, workspace);
         outState.putString(TITLE, title);
+        outState.putString(OWNER_NAME, owner);
         Log.e("ShowFileActivity", "state saved: " + title);
         super.onSaveInstanceState(outState);
     }
@@ -104,7 +119,7 @@ public class ShowFileActivity extends ActionBarActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowManager.notifyRemoveFile(getApplicationContext(), workspace, title);
+                                FlowManager.notifyRemoveFile(getApplicationContext(), owner, workspace, title);
                                 Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
                                 finish();
                             }
@@ -122,13 +137,14 @@ public class ShowFileActivity extends ActionBarActivity {
     }
 
     public void editButtonPressed(View view) {
-        if (FlowManager.canPermissionToEditFile(getApplicationContext(), workspace, title)) {
+        if (FlowManager.havePermissionToEditFile(getApplicationContext(), workspace, title)) {
             Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, title);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);
             intent.putExtra(CreateEditFileActivity.FILE_WORKSPACE, workspace);
             intent.putExtra(CreateEditFileActivity.FILE_TITLE, title);
             intent.putExtra(CreateEditFileActivity.FILE_CONTENT, text);
+            intent.putExtra(CreateEditFileActivity.OWNER_NAME, owner);
             startActivity(intent);
             finish();
         } else

@@ -30,7 +30,8 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
 
     public static final String WORKSPACE_NAME = "workspaceName";
     public static final String ACTIVITY_MODE = "mode";
-    public static final String ACTIVITY_TITLE = "tilte";
+    public static final String ACTIVITY_TITLE = "title";
+    public static final String OWNER_NAME = "ownerName";
     public static final int USERS = 1;
     public static final int TAGS = 2;
     private static final String TAGS_LIST = "tagsList";
@@ -39,6 +40,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     private static final String PRIVACY = "privacy";
     private String workspaceName;
     private String title;
+    private String owner;
     private MODE mode;
     private ArrayList<CharSequence> tags;
     private ArrayList<CharSequence> users;
@@ -57,6 +59,10 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         workspaceName = bundle.getString(WORKSPACE_NAME);
         mode = (MODE) bundle.getSerializable(ACTIVITY_MODE);
         title = bundle.getString(ACTIVITY_TITLE);
+        owner = bundle.getString(OWNER_NAME);
+
+        Log.e("CreateEditWorkspace", owner + " " + workspaceName);
+
         if (savedInstanceState != null) {
             users = savedInstanceState.getCharSequenceArrayList(USERS_LIST);
             tags = savedInstanceState.getCharSequenceArrayList(TAGS_LIST);
@@ -136,6 +142,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         outState.putLong(MAX_QUOTA, quota);
         outState.putBoolean(PRIVACY, isPrivate);
         outState.putString(ACTIVITY_TITLE, title);
+        outState.putString(OWNER_NAME, owner);
         super.onSaveInstanceState(outState);
     }
 
@@ -187,7 +194,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         } else {
             try {
                 workspaceName = ((EditText)findViewById(R.id.settingsWorkspaceName)).getText().toString();
-                FlowManager.notifyAddWorkspace(getApplicationContext(), workspaceName, isPrivate, users, tags, quota);
+                FlowManager.notifyAddWorkspace(getApplicationContext(), owner, workspaceName, isPrivate, users, tags, quota);
                 Toast.makeText(getApplicationContext(), getString(R.string.workspace_created_successfully), Toast.LENGTH_SHORT).show();
                 finish();
             } catch (AlreadyExistsException e) {
@@ -221,7 +228,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowManager.notifyRemoveWorkspace(getApplicationContext(), workspaceName);
+                                FlowManager.notifyRemoveWorkspace(getApplicationContext(), owner, workspaceName);
                                 Toast.makeText(getApplicationContext(), getString(R.string.workspace_removed_successfully), Toast.LENGTH_SHORT).show();
                                 finish();
                             }

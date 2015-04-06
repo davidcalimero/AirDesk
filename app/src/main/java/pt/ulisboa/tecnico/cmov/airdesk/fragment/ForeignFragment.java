@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import pt.ulisboa.tecnico.cmov.airdesk.ListActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.MainMenu;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 
 public class ForeignFragment extends ExpandableListFragment {
@@ -24,6 +25,30 @@ public class ForeignFragment extends ExpandableListFragment {
         View view = inflater.inflate(R.layout.fragment_foreign, container, false);
         makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
         setHasOptionsMenu(true);
+
+        setListener(new WorkspacesChangeListener() {
+            @Override
+            public void onWorkspaceAdded(String owner, String name) {}
+
+            @Override
+            public void onWorkspaceRemoved(String owner, String name) {}
+
+            @Override
+            public void onFileAdded(String owner, String workspaceName, String fileName) {}
+
+            @Override
+            public void onFileRemoved(String owner, String workspaceName, String fileName) {}
+
+            @Override
+            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {}
+
+            @Override
+            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
+
+            @Override
+            public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
+        });
+
         return view;
     }
 
