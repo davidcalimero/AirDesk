@@ -58,11 +58,6 @@ public class Workspace implements Serializable {
         return _users;
     }
 
-    public void setUserList(ArrayList<CharSequence> users) {
-        Log.e("Workspace", "User List Updated: " + getName());
-        _users = users;
-    }
-
     public void addUser(String id) throws AlreadyExistsException {
         if(_users.contains(id))
             throw new AlreadyExistsException();
@@ -84,19 +79,6 @@ public class Workspace implements Serializable {
     public void setTagList(ArrayList<CharSequence> tags) {
         Log.e("Workspace", "public profile changed: " + getName());
         _tags = tags;
-    }
-
-    public void addTag(String tag) throws AlreadyExistsException {
-        if(_users.contains(tag))
-            throw new AlreadyExistsException();
-
-        Log.e("Workspace", "Tag added: " + tag);
-        _tags.add(tag);
-    }
-
-    public void removeTag(String tag){
-        Log.e("Workspace", "Tag removed: " + tag);
-        _tags.remove(tag);
     }
 
     /* Files List */
@@ -136,17 +118,6 @@ public class Workspace implements Serializable {
     private void decrementMemorySize(long amount) {
         _currentSize -= amount;
     }
-
-    /* Equals */
-    /*@Override
-    public boolean equals(Object object) {
-        if (object instanceof Workspace) {
-            Workspace workspace = (Workspace) object;
-            if (this.getOwnerID().equals((workspace.getOwnerID())) && this.getName().equals(workspace.getName()))
-                return true;
-        }
-        return false;
-    }*/
 
     /*********************************/
     /******** FILE MANAGEMENT ********/

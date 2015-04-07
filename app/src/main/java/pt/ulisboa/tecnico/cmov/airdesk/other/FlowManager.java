@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
@@ -102,13 +103,20 @@ public class FlowManager {
         //send information to users
     }
 
-    public static void notifyAddWorkspaceUser(Context context, String workspaceName, String user) throws AlreadyExistsException {
-        ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).addUser(user);
+    public static void notifyAddWorkspaceUser(Context context, String workspaceName, String user) {
+        try {
+            ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).addUser(user);
+        } catch (AlreadyExistsException e) {}
         ((ApplicationContext) context).commit();
 
         //send information to users
-        for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceAddedForeign(((ApplicationContext) context).getActiveUser().getID(), workspaceName);
+        if(user.equals(getActiveUserID(context))) {
+            for (WorkspacesChangeListener l : getInstance().listeners) {
+                l.onWorkspaceAddedForeign(getActiveUserID(context), workspaceName);
+                for (String fileName : getFiles(context, workspaceName))
+                    l.onFileAdded(((ApplicationContext) context).getActiveUser().getID(), workspaceName, fileName);
+            }
+        }
     }
 
     public static void notifyRemoveWorkspaceUser(Context context, String owner, String workspaceName, String user) {
@@ -116,8 +124,10 @@ public class FlowManager {
         ((ApplicationContext) context).commit();
 
         //send information to users
-        for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceRemovedForeign(owner, workspaceName);
+        if(user.equals(getActiveUserID(context))) {
+            for (WorkspacesChangeListener l : getInstance().listeners)
+                l.onWorkspaceRemovedForeign(owner, workspaceName);
+        }
     }
 
     //----------------------------------------------------------------------------------------------
@@ -142,10 +152,7 @@ public class FlowManager {
             if(getWorkspaceUserList(context, w).contains(getActiveUserID(context)) ||
                     (!isWorkspacePrivate(context, w) && Utils.haveElementsInCommon(getWorkspaceTagList(context, w), tags))) {
                 // Add user to the list (if not already there)
-                try {
-                    notifyAddWorkspaceUser(context, w, getActiveUserID(context));
-                } catch (AlreadyExistsException e) {
-                }
+                notifyAddWorkspaceUser(context, w, getActiveUserID(context));
                 for (WorkspacesChangeListener l : getInstance().listeners) {
                     // Warn Foreign Fragment
                     l.onWorkspaceAddedForeign(((ApplicationContext) context).getActiveUser().getID(), w);
@@ -187,7 +194,6 @@ public class FlowManager {
         if(user.getID().equals(owner)) {
             Workspace workspace = new Workspace(name, isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC, quota);
             workspace.setTagList(tags);
-            workspace.setUserList(users);
             user.addWorkspace(workspace);
             ((ApplicationContext) context).commit();
         }
@@ -195,12 +201,21 @@ public class FlowManager {
         //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onWorkspaceAdded(owner, name);
+
+        //send information to users
+        for(CharSequence u : users)
+            notifyAddWorkspaceUser(context, name, u.toString());
     }
 
-    public static void editWorkspace(Context context, String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) {
+    public static void editWorkspace(Context context, String workspaceName, boolean isPrivate, HashMap<CharSequence, Boolean> usersChanges, ArrayList<CharSequence> tags, long quota) {
         //TODO add and remove methods
         Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName);
-        workspace.setUserList(users);
+        for(CharSequence item : usersChanges.keySet()) {
+            if (usersChanges.get(item))
+                notifyAddWorkspaceUser(context, workspaceName, item.toString());
+            else
+                notifyRemoveWorkspaceUser(context, getActiveUserID(context), workspaceName, item.toString());
+        }
         workspace.setTagList(tags);
         workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
         workspace.setMaximumQuota(quota);

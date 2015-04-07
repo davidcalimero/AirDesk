@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
@@ -32,6 +33,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     public static final String ACTIVITY_MODE = "mode";
     public static final String ACTIVITY_TITLE = "title";
     public static final String OWNER_NAME = "ownerName";
+    public static final String MAP = "map";
     public static final int USERS = 1;
     public static final int TAGS = 2;
     private static final String TAGS_LIST = "tagsList";
@@ -44,6 +46,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     private MODE mode;
     private ArrayList<CharSequence> tags;
     private ArrayList<CharSequence> users;
+    private HashMap<CharSequence, Boolean> usersMap;
     private boolean isPrivate;
     private long quota;
     private long freeMemory;
@@ -62,12 +65,14 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         owner = bundle.getString(OWNER_NAME);
 
         Log.e("CreateEditWorkspace", owner + " " + workspaceName);
+        usersMap = new HashMap<>();
 
         if (savedInstanceState != null) {
             users = savedInstanceState.getCharSequenceArrayList(USERS_LIST);
             tags = savedInstanceState.getCharSequenceArrayList(TAGS_LIST);
             quota = savedInstanceState.getLong(MAX_QUOTA);
             isPrivate = savedInstanceState.getBoolean(PRIVACY);
+            usersMap = (HashMap<CharSequence, Boolean>) savedInstanceState.getSerializable(MAP);
         } else if (mode == MODE.EDIT) {
             users = FlowManager.getWorkspaceUserList(getApplicationContext(), workspaceName);
             tags = FlowManager.getWorkspaceTagList(getApplicationContext(), workspaceName);
@@ -143,6 +148,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         outState.putBoolean(PRIVACY, isPrivate);
         outState.putString(ACTIVITY_TITLE, title);
         outState.putString(OWNER_NAME, owner);
+        outState.putSerializable(MAP, usersMap);
         super.onSaveInstanceState(outState);
     }
 
@@ -152,6 +158,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         intent.putCharSequenceArrayListExtra(ListActivity.LIST, users);
         String name = mode == MODE.EDIT ? workspaceName : getString(R.string.new_workspace);
         intent.putExtra(ListActivity.TITLE, getString(R.string.users_of) + " " + name);
+        intent.putExtra(ListActivity.MAP, usersMap);
         startActivityForResult(intent, USERS);
     }
 
@@ -169,7 +176,14 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         if (data != null && resultCode == RESULT_OK)
             switch (requestCode) {
                 case USERS:
-                    users = data.getCharSequenceArrayListExtra(ListActivity.LIST);
+                    usersMap = (HashMap<CharSequence, Boolean>) data.getSerializableExtra(ListActivity.MAP);
+                    for(CharSequence item : usersMap.keySet()){
+                        if(usersMap.get(item))
+                            users.add(item);
+                        else
+                            users.remove(item);
+                    }
+
                     Log.e("CreateEditWorkspace", "User List loaded");
                     break;
 
@@ -188,7 +202,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     // Final Buttons
     public void confirm(View v) {
         if (mode == MODE.EDIT) {
-            FlowManager.editWorkspace(getApplicationContext(), workspaceName, isPrivate, users, tags, quota);
+            FlowManager.editWorkspace(getApplicationContext(), workspaceName, isPrivate, usersMap, tags, quota);
             Toast.makeText(getApplicationContext(), getString(R.string.workspace_edited_successfully), Toast.LENGTH_SHORT).show();
             finish();
         } else {

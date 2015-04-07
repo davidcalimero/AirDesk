@@ -9,9 +9,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
@@ -22,12 +24,14 @@ public class ListActivity extends ActionBarActivity {
 
     public static final String LIST = "list";
     public static final String TITLE = "title";
+    public static final String MAP = "map";
 
     private static final String TEXT = "text";
 
     private String title;
     private String text;
     private ArrayList<CharSequence> list;
+    private HashMap<CharSequence, Boolean> map;
     private ArrayAdapter<String> adapter;
 
     private EditText writer;
@@ -42,6 +46,10 @@ public class ListActivity extends ActionBarActivity {
         list = bundle.getCharSequenceArrayList(LIST);
         title = bundle.getString(TITLE);
         text = bundle.getString(TEXT);
+        map = (HashMap<CharSequence, Boolean>) bundle.getSerializable(MAP);
+
+        if(map == null)
+            map = new HashMap<>();
 
         //ListView inicialization
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -50,8 +58,12 @@ public class ListActivity extends ActionBarActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                adapter.remove(list.get(position).toString());
-                list.remove(position);
+                String item = ((TextView) view).getText().toString();
+                adapter.remove(item);
+                list.remove(item);
+                Boolean ret = map.remove(item);
+                if(ret == null)
+                    map.put(item, false);
             }
         });
 
@@ -64,6 +76,7 @@ public class ListActivity extends ActionBarActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(MAP, map);
         outState.putCharSequenceArrayList(LIST, list);
         outState.putString(TITLE, title);
         outState.putString(TEXT, writer.getText().toString());
@@ -73,7 +86,8 @@ public class ListActivity extends ActionBarActivity {
 
     public void onConfirmButtonPressed(View view) {
         Intent intent = new Intent();
-        intent.putCharSequenceArrayListExtra(LIST, list);
+        intent.putExtra(MAP, map);
+        intent.putExtra(LIST, list);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -94,6 +108,9 @@ public class ListActivity extends ActionBarActivity {
         writer.getText().clear();
         adapter.add(item);
         list.add(item);
+        Boolean ret = map.remove(item);
+        if(ret == null)
+            map.put(item, true);
     }
 
     //ListView population

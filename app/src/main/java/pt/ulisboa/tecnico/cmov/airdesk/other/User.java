@@ -45,16 +45,6 @@ public class User implements Serializable {
         return _email;
     }
 
-    /* Client Email */
-    public String getEmail() {
-        return _email;
-    }
-
-    /* Client Nickname */
-    public String getNickname() {
-        return _nickname;
-    }
-
     /* Client Owned Workspace List */
     public HashMap<String, Workspace> getWorkspaceList() {
         return _workspaceList;
@@ -73,19 +63,6 @@ public class User implements Serializable {
     /*********************************/
     /******** LIST MANAGEMENT ********/
     /*********************************/
-
-    public void addSubscription(String subscription) throws AlreadyExistsException {
-        if(_subscriptions.contains(subscription))
-            throw new AlreadyExistsException();
-
-        Log.e("User", "subscriptions add: " + subscription);
-        _subscriptions.add(subscription);
-    }
-
-    public void removeSubscription(String subscription) {
-        Log.e("User", "subscriptions removed: " + subscription);
-        _subscriptions.remove(subscription);
-    }
 
     public void addWorkspace(Workspace workspace) throws AlreadyExistsException {
         if (_workspaceList.containsKey(workspace.getName()))
