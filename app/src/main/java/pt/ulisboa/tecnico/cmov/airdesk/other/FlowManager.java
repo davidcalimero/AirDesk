@@ -112,20 +112,23 @@ public class FlowManager {
         ((ApplicationContext) context).commit();
     }
 
-    public static void updateForeignList(Context context, ArrayList<CharSequence> tags){
+    public static void updateForeignList(Context context, ArrayList<CharSequence> tags) {
         // N-Version TODO
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
 
         // S-Version
-        ArrayList<String> workspaces = getWorkspaces(context);
-        for(String w : workspaces){
-            ArrayList<CharSequence> tagList = getWorkspaceTagList(context, w);
-            if(Utils.haveElementsInCommon(tagList, tags)){
-                for(WorkspacesChangeListener l : getInstance().listeners){
-                    // Warn Foreign Fragment
-                    l.onWorkspaceAdded(((ApplicationContext) context).getActiveUser().getID(), w);
-                }
+        for(String w : getWorkspaces(context)){
+            if(getWorkspaceUserList(context, w).contains(getActiveUserID(context)) ||
+                    (!isWorkspacePrivate(context, w) && Utils.haveElementsInCommon(getWorkspaceTagList(context, w), tags))) {
+                // Add user to the list (if not already there)
+                try {
+                    addWorkspaceUser(context, w, getActiveUserID(context));
+                    for (WorkspacesChangeListener l : getInstance().listeners) {
+                        // Warn Foreign Fragment
+                        l.onWorkspaceAddedForeign(((ApplicationContext) context).getActiveUser().getID(), w);
+                    }
+                } catch (AlreadyExistsException e) {}
             }
         }
     }
@@ -183,6 +186,16 @@ public class FlowManager {
         return ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).getUserList();
     }
 
+    public static void addWorkspaceUser(Context context, String workspace, String userID) throws AlreadyExistsException{
+        ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspace).addUser(userID);
+        ((ApplicationContext) context).commit();
+    }
+
+    public static void removeWorkspaceUser(Context context, String workspace, String userID){
+        ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspace).removeUser(userID);
+        ((ApplicationContext) context).commit();
+    }
+
     public static ArrayList<CharSequence> getWorkspaceTagList(Context context, String workspaceName) {
         return ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).getTagList();
     }
@@ -215,4 +228,5 @@ public class FlowManager {
     public static String getActiveUserID(Context context){
         return ((ApplicationContext) context).getActiveUser().getID();
     }
+
 }
