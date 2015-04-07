@@ -26,7 +26,7 @@ public class TextFile implements Serializable {
         try {
             content = (String) FileManager.fileToObject(filename, context);
         } catch (FileNotFoundException e) {
-            Log.e("TextFile", "File " + title + "not found");
+            Log.e("TextFile", "File " + title + " not found");
         }
         return content;
     }

@@ -5,10 +5,8 @@ import android.util.Log;
 
 import java.io.FileNotFoundException;
 
-import pt.ulisboa.tecnico.cmov.airdesk.exception.InvalidInputException;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FileManager;
 import pt.ulisboa.tecnico.cmov.airdesk.other.User;
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 public class ApplicationContext extends Application {
 
@@ -18,10 +16,7 @@ public class ApplicationContext extends Application {
         return activeUser;
     }
 
-    public void loadUser(String email, String nickName) throws InvalidInputException {
-        if (!Utils.isSingleWord(nickName) || !Utils.isSingleWord(email))
-            throw new InvalidInputException();
-
+    public void loadUser(String email, String nickName) {
         try {
             activeUser = (User) FileManager.fileToObject(email, getApplicationContext());
             Log.e("ApplicationContext", "user loaded: " + email + "," + nickName + ".");

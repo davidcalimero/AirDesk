@@ -26,8 +26,12 @@ public class ForeignFragment extends ExpandableListFragment {
         setHasOptionsMenu(true);
         setListener(new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceAdded(String owner, String name) {
+            public void onWorkspaceAdded(String owner, String name) {}
+
+            @Override
+            public void onWorkspaceAddedForeign(String owner, String name) {
                 // In N-Version it will check if user is the same
+                //TODO remove this method in version N
                 getAdapter().addGroup(owner, name);
                 updateAdapter();
             }
@@ -40,12 +44,6 @@ public class ForeignFragment extends ExpandableListFragment {
 
             @Override
             public void onFileRemoved(String owner, String workspaceName, String fileName) {}
-
-            @Override
-            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {}
-
-            @Override
-            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}

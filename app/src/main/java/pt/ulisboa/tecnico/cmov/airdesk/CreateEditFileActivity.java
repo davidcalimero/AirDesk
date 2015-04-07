@@ -13,10 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
-import pt.ulisboa.tecnico.cmov.airdesk.exception.InvalidInputException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
@@ -78,6 +75,11 @@ public class CreateEditFileActivity extends ActionBarActivity {
             public void onWorkspaceAdded(String owner, String name) {}
 
             @Override
+            public void onWorkspaceAddedForeign(String owner, String name) {
+                //TODO remove this method in version N
+            }
+
+            @Override
             public void onWorkspaceRemoved(String ownerName, String name) {
                 if(owner.equals(ownerName) && workspaceName.equals(name))
                     finish();
@@ -91,14 +93,6 @@ public class CreateEditFileActivity extends ActionBarActivity {
                 if(mode == MODE.EDIT && owner.equals(ownerName) && workspaceName.equals(workspace) && title.equals(fileName))
                     finish();
             }
-
-            @Override
-            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {
-                //TODO finish activity if needed
-            }
-
-            @Override
-            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
@@ -162,6 +156,10 @@ public class CreateEditFileActivity extends ActionBarActivity {
     public void onCreateFileButtonPressed(View view) {
         String newTitle = Utils.trim(titleView.getText().toString());
         String newContent = contentView.getText().toString();
+        if(newTitle.length() == 0){
+            Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         try {
             if (mode.equals(MODE.CREATE)) {
@@ -176,8 +174,6 @@ public class CreateEditFileActivity extends ActionBarActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.not_enough_memory_available), Toast.LENGTH_SHORT).show();
         } catch (AlreadyExistsException e) {
             Toast.makeText(getApplicationContext(), "\"" + newTitle + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
-        } catch (InvalidInputException e) {
-            Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
         }
     }
 

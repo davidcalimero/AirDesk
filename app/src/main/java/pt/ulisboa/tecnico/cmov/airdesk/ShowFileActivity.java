@@ -12,8 +12,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 
@@ -55,6 +53,11 @@ public class ShowFileActivity extends ActionBarActivity {
             public void onWorkspaceAdded(String ownerName, String name) {}
 
             @Override
+            public void onWorkspaceAddedForeign(String owner, String name) {
+                //TODO remove this method in version N
+            }
+
+            @Override
             public void onWorkspaceRemoved(String ownerName, String name) {
                 if(owner.equals(ownerName) && workspace.equals(name))
                     finish();
@@ -68,14 +71,6 @@ public class ShowFileActivity extends ActionBarActivity {
                 if(owner.equals(ownerName) && workspace.equals(workspaceName) && text.equals(fileName))
                     finish();
             }
-
-            @Override
-            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {
-                //TODO finish activity if needed
-            }
-
-            @Override
-            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
 
             @Override
             public void onFileContentChange(String ownerName, String workspaceName, String filename, String content) {

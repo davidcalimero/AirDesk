@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
-import pt.ulisboa.tecnico.cmov.airdesk.exception.InvalidInputException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 
@@ -25,6 +24,8 @@ public class FlowManager {
     }
 
     //----------------------------------------------------------------------------------------------
+    // FLOW MANAGER UPDATERS  ----------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
 
     public static void addWorkspacesChangeListener(WorkspacesChangeListener listener) {
         getInstance().listeners.add(listener);
@@ -37,16 +38,14 @@ public class FlowManager {
     }
 
     //----------------------------------------------------------------------------------------------
+    // METHODS TO NOTIFY OWNER  --------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
 
-    public static void notifyAddWorkspace(Context context, String owner, String name, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) throws AlreadyExistsException, InvalidInputException {
-        String newName = Utils.trim(name);
-        if(newName.length() == 0)
-            throw new InvalidInputException();
-
+    public static void notifyAddWorkspace(Context context, String owner, String name, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) throws AlreadyExistsException {
         //Only updates the user workspace list if he is the owner
         User user = ((ApplicationContext) context).getActiveUser();
         if(user.getID().equals(owner)) {
-            Workspace workspace = new Workspace(newName, isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC, quota);
+            Workspace workspace = new Workspace(name, isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC, quota);
             workspace.setTagList(tags);
             workspace.setUserList(users);
             user.addWorkspace(workspace);
@@ -55,7 +54,7 @@ public class FlowManager {
 
         //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceAdded(owner, newName);
+            l.onWorkspaceAdded(owner, name);
     }
 
     public static void notifyRemoveWorkspace(Context context, String owner, String name) {
@@ -71,22 +70,28 @@ public class FlowManager {
             l.onWorkspaceRemoved(owner, name);
     }
 
-    public static void notifyAddFile(Context context, String owner, String workspaceName, String fileName, String content) throws AlreadyExistsException, OutOfMemoryException, InvalidInputException {
-        String newFileName = Utils.trim(fileName);
-        if(newFileName.length() == 0)
-            throw new InvalidInputException();
+    public static void notifyEditWorkspace(Context context, String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) {
+        //TODO add and remove methods
+        Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName);
+        workspace.setUserList(users);
+        workspace.setTagList(tags);
+        workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
+        workspace.setMaximumQuota(quota);
+        ((ApplicationContext) context).commit();
+    }
 
+    public static void notifyAddFile(Context context, String owner, String workspaceName, String fileName, String content) throws AlreadyExistsException, OutOfMemoryException {
         //Only updates the user files list if he is the owner
         User user = ((ApplicationContext) context).getActiveUser();
         if(user.getID().equals(owner)) {
-            String id = user.getID() + "-" + workspaceName + "-" + newFileName;
-            user.getWorkspaceList().get(workspaceName).addFile(context, id, newFileName, content);
+            String id = user.getID() + "-" + workspaceName + "-" + fileName;
+            user.getWorkspaceList().get(workspaceName).addFile(context, id, fileName, content);
             ((ApplicationContext) context).commit();
         }
 
         //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onFileAdded(owner, workspaceName, newFileName);
+            l.onFileAdded(owner, workspaceName, fileName);
     }
 
     public static void notifyRemoveFile(Context context, String owner, String workspaceName, String fileName) {
@@ -102,17 +107,30 @@ public class FlowManager {
             l.onFileRemoved(owner, workspaceName, fileName);
     }
 
-    public static void notifySubscriptionsChange(Context context, ArrayList<CharSequence> tags) {
-        //TODO check input add and remove methods
-        ((ApplicationContext) context).getActiveUser().setSubscriptions(tags);
+    public static void notifyEditFile(Context context, String owner, String workspaceName, String fileName, String content) throws OutOfMemoryException {
+        //Only updates the user file if he is the owner
+        User user = ((ApplicationContext) context).getActiveUser();
+        if(user.getID().equals(owner))
+            user.getWorkspaceList().get(workspaceName).editFile(context, fileName, content);
 
+        //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onSubscriptionsChange(tags);
-
-        ((ApplicationContext) context).commit();
+            l.onFileContentChange(owner, workspaceName, fileName, content);
     }
 
-    public static void updateForeignList(Context context, ArrayList<CharSequence> tags) {
+    //----------------------------------------------------------------------------------------------
+    // METHODS TO ASK OWNER  -----------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
+
+    public static boolean havePermissionToEditFile(Context context, String workspaceName, String fileName) {
+        return true;
+    }
+
+    public static String getFileContent(Context context, String workspaceName, String fileName) {
+        return ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).getFiles().get(fileName).getContent(context);
+    }
+
+    public static void updateForeignList(Context context, ArrayList<CharSequence> tags){
         // N-Version TODO
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
@@ -133,45 +151,21 @@ public class FlowManager {
         }
     }
 
-    public static void notifyEditWorkspace(Context context, String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) {
-        //TODO verify input and and remove methods
-        Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName);
-        workspace.setUserList(users);
-        workspace.setTagList(tags);
-        workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
-        workspace.setMaximumQuota(quota);
-
-        for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceEdited(workspaceName, isPrivate, users, tags);
-
-        ((ApplicationContext) context).commit();
-    }
-
-    public static void notifyEditFile(Context context, String owner, String workspaceName, String fileName, String content) throws OutOfMemoryException {
-        //Only updates the user file if he is the owner
-        User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(owner))
-            user.getWorkspaceList().get(workspaceName).editFile(context, fileName, content);
-
-        //Updates interface
-        for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onFileContentChange(owner, workspaceName, fileName, content);
-    }
-
+    //----------------------------------------------------------------------------------------------
+    // LOCAL METHODS -------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
 
-    public static boolean havePermissionToEditFile(Context context, String workspaceName, String fileName) {
-        return true;
+    public static String getActiveUserID(Context context){
+        return ((ApplicationContext) context).getActiveUser().getID();
     }
-
-    public static String getFileContent(Context context, String workspaceName, String fileName) {
-        return ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).getFiles().get(fileName).getContent(context);
-    }
-
-    //----------------------------------------------------------------------------------------------
 
     public static ArrayList<CharSequence> getSubscriptions(Context context) {
         return ((ApplicationContext) context).getActiveUser().getSubscriptions();
+    }
+
+    public static void setSubscriptions(Context context, ArrayList<CharSequence> tags) {
+        ((ApplicationContext) context).getActiveUser().setSubscriptions(tags);
+        ((ApplicationContext) context).commit();
     }
 
     public static ArrayList<String> getWorkspaces(Context context) {
@@ -224,9 +218,4 @@ public class FlowManager {
         }
         return files;
     }
-
-    public static String getActiveUserID(Context context){
-        return ((ApplicationContext) context).getActiveUser().getID();
-    }
-
 }

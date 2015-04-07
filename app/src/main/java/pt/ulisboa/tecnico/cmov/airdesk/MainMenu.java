@@ -88,7 +88,7 @@ public class MainMenu extends ActionBarActivity {
         if (data != null && resultCode == RESULT_OK) {
             if (requestCode == SUBSCRIPTIONS) {
                 //TODO add and remove one by one
-                FlowManager.notifySubscriptionsChange(getApplicationContext(), data.getCharSequenceArrayListExtra(ListActivity.LIST));
+                FlowManager.setSubscriptions(getApplicationContext(), data.getCharSequenceArrayListExtra(ListActivity.LIST));
                 Toast.makeText(getApplicationContext(), getString(R.string.subscriptions_changed_successfully), Toast.LENGTH_SHORT).show();
             }
         }

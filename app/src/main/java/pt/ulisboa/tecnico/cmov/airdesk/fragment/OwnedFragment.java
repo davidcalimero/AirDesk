@@ -10,8 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
-import java.util.ArrayList;
-
 import pt.ulisboa.tecnico.cmov.airdesk.CreateEditWorkspaceActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
@@ -40,6 +38,11 @@ public class OwnedFragment extends ExpandableListFragment {
             }
 
             @Override
+            public void onWorkspaceAddedForeign(String owner, String name) {
+                //TODO remove this method in version N
+            }
+
+            @Override
             public void onWorkspaceRemoved(String owner, String name) {
                 if(userId.equals(owner)){
                     getAdapter().removeGroup(owner, name);
@@ -62,12 +65,6 @@ public class OwnedFragment extends ExpandableListFragment {
                     updateAdapter();
                 }
             }
-
-            @Override
-            public void onWorkspaceEdited(String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags) {}
-
-            @Override
-            public void onSubscriptionsChange(ArrayList<CharSequence> subscriptions) {}
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}

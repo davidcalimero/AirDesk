@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import pt.ulisboa.tecnico.cmov.airdesk.exception.InvalidInputException;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 
 public class LogInActivity extends ActionBarActivity {
@@ -73,7 +73,8 @@ public class LogInActivity extends ActionBarActivity {
         String nickname = nicknameView.getText().toString().trim();
         String email = emailView.getText().toString().trim();
 
-        loadUser(nickname, email);
+        if(!loadUser(nickname, email))
+            return;
 
         //Save views content
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -82,17 +83,15 @@ public class LogInActivity extends ActionBarActivity {
         editor.commit();
     }
 
-    private void loadUser(String nickname, String email) {
+    private boolean loadUser(String nickname, String email) {
+        if (!Utils.isSingleWord(nickname) || !Utils.isSingleWord(email)) {
+            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         //load user to application context
         ProgressDialog loading = ProgressDialog.show(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_user), false, false);
-
-        try {
-            appState.loadUser(email, nickname);
-        } catch (InvalidInputException e) {
-            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
-            loading.dismiss();
-            return;
-        }
+        appState.loadUser(email, nickname);
         loading.dismiss();
 
         //Change activity
@@ -101,5 +100,6 @@ public class LogInActivity extends ActionBarActivity {
         intent.putExtra(MainMenu.EMAIL, email);
         startActivity(intent);
         finish();
+        return true;
     }
 }

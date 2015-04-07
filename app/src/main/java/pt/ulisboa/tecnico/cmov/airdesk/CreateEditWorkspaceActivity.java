@@ -21,8 +21,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
-import pt.ulisboa.tecnico.cmov.airdesk.exception.InvalidInputException;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 public class CreateEditWorkspaceActivity extends ActionBarActivity {
 
@@ -192,15 +192,17 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.workspace_edited_successfully), Toast.LENGTH_SHORT).show();
             finish();
         } else {
+            workspaceName = Utils.trim(((EditText) findViewById(R.id.settingsWorkspaceName)).getText().toString());
+            if(workspaceName.length() == 0){
+                Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
+                return;
+            }
             try {
-                workspaceName = ((EditText)findViewById(R.id.settingsWorkspaceName)).getText().toString();
                 FlowManager.notifyAddWorkspace(getApplicationContext(), owner, workspaceName, isPrivate, users, tags, quota);
                 Toast.makeText(getApplicationContext(), getString(R.string.workspace_created_successfully), Toast.LENGTH_SHORT).show();
                 finish();
             } catch (AlreadyExistsException e) {
                 Toast.makeText(getApplicationContext(), "\"" + workspaceName + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
-            } catch (InvalidInputException e) {
-                Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
             }
         }
     }
