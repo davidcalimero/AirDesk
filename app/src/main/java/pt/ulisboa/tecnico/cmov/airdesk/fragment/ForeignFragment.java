@@ -48,10 +48,16 @@ public class ForeignFragment extends ExpandableListFragment {
             public void onWorkspaceRemoved(String owner, String name) {}
 
             @Override
-            public void onFileAdded(String owner, String workspaceName, String fileName) {}
+            public void onFileAdded(String owner, String workspaceName, String fileName) {
+                getAdapter().addChild(owner, workspaceName, fileName);
+                updateAdapter();
+            }
 
             @Override
-            public void onFileRemoved(String owner, String workspaceName, String fileName) {}
+            public void onFileRemoved(String owner, String workspaceName, String fileName) {
+                getAdapter().removeChild(owner, workspaceName, fileName);
+                updateAdapter();
+            }
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}

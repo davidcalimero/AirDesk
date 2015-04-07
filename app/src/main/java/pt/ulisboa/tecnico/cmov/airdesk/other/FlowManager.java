@@ -147,6 +147,8 @@ public class FlowManager {
                 for (WorkspacesChangeListener l : getInstance().listeners) {
                     // Warn Foreign Fragment
                     l.onWorkspaceAddedForeign(((ApplicationContext) context).getActiveUser().getID(), w);
+                    for(String f : getFiles(context, w))
+                        l.onFileAdded(((ApplicationContext) context).getActiveUser().getID(), w, f);
                 }
             }
         }

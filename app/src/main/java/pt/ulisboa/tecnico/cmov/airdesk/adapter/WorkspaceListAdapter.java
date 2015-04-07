@@ -133,9 +133,11 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
     public void addChild(String tag, String groupTitle, String childTitle) {
         for(Item item : items){
             if(item.equals(new Item(tag, groupTitle))){
-                Log.e("WorkspaceListAdapter", "addChild: " + tag + " " + groupTitle + " " + childTitle);
-                item.files.add(childTitle);
-                return;
+                if(!item.files.contains(childTitle)) {
+                    Log.e("WorkspaceListAdapter", "addChild: " + tag + " " + groupTitle + " " + childTitle);
+                    item.files.add(childTitle);
+                    return;
+                }
             }
         }
     }
