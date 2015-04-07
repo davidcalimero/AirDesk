@@ -37,7 +37,7 @@ public class ForeignFragment extends ExpandableListFragment {
             public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
                 // In N-Version it will check if user is the same
                 //TODO remove this method in version N
-                getAdapter().addGroup(owner, workspaceName);
+                getAdapter().removeGroup(owner, workspaceName);
                 updateAdapter();
             }
 

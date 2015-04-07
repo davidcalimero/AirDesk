@@ -116,6 +116,12 @@ public class MainMenu extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void onRemoveWorkspaceButtonPressed(View view){
+        String workspaceName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.groupHeader)).getText().toString();
+        String owner = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.tagHeader)).getText().toString();
+        FlowManager.notifyRemoveWorkspaceUser(getApplicationContext(), owner, workspaceName, FlowManager.getActiveUserID(getApplicationContext()));
+    }
+
     //Force overflow menu on actionBar
     private void forceMenuOverflow() {
         try {

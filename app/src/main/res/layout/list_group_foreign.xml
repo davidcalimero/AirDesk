@@ -36,4 +36,13 @@
         android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
         android:src="@drawable/ic_action_new_dark" />
 
+    <ImageButton
+        android:id="@+id/unmountWorkspace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/add_file_icon"
+        android:onClick="onRemoveWorkspaceButtonPressed"
+        android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
+        android:src="@drawable/abc_ic_clear_mtrl_alpha" />
+
 </LinearLayout>
