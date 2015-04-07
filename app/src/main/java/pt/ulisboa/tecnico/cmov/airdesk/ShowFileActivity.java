@@ -77,6 +77,12 @@ public class ShowFileActivity extends ActionBarActivity {
                 if(owner.equals(ownerName) && workspace.equals(workspaceName) && text.equals(filename))
                     showText.setText(content);
             }
+
+            @Override
+            public void onWorkspaceUserRemoved(String ownerName, String workspaceName) {
+                if(owner.equals(ownerName) && workspace.equals(workspaceName))
+                    finish();
+            }
         };
         FlowManager.addWorkspacesChangeListener(listener);
     }

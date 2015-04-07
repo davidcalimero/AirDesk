@@ -14,4 +14,6 @@ public interface WorkspacesChangeListener {
     public void onFileRemoved(String owner, String workspaceName, String fileName);
 
     public void onFileContentChange(String owner, String workspaceName, String filename, String content);
+
+    public void onWorkspaceUserRemoved(String owner, String workspaceName);
 }

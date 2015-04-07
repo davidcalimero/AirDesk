@@ -188,7 +188,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     // Final Buttons
     public void confirm(View v) {
         if (mode == MODE.EDIT) {
-            FlowManager.notifyEditWorkspace(getApplicationContext(), workspaceName, isPrivate, users, tags, quota);
+            FlowManager.editWorkspace(getApplicationContext(), workspaceName, isPrivate, users, tags, quota);
             Toast.makeText(getApplicationContext(), getString(R.string.workspace_edited_successfully), Toast.LENGTH_SHORT).show();
             finish();
         } else {

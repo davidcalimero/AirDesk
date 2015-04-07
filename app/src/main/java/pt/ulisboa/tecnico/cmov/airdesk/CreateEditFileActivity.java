@@ -96,6 +96,12 @@ public class CreateEditFileActivity extends ActionBarActivity {
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
+
+            @Override
+            public void onWorkspaceUserRemoved(String ownerName, String name) {
+                if(owner.equals(ownerName) && workspaceName.equals(name))
+                    finish();
+            }
         };
         FlowManager.addWorkspacesChangeListener(listener);
     }

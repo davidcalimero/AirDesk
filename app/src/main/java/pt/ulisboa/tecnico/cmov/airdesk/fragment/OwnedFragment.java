@@ -68,6 +68,9 @@ public class OwnedFragment extends ExpandableListFragment {
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
+
+            @Override
+            public void onWorkspaceUserRemoved(String owner, String workspaceName) {}
         });
 
         return view;

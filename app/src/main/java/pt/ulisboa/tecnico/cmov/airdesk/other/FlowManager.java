@@ -70,16 +70,6 @@ public class FlowManager {
             l.onWorkspaceRemoved(owner, name);
     }
 
-    public static void notifyEditWorkspace(Context context, String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) {
-        //TODO add and remove methods
-        Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName);
-        workspace.setUserList(users);
-        workspace.setTagList(tags);
-        workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
-        workspace.setMaximumQuota(quota);
-        ((ApplicationContext) context).commit();
-    }
-
     public static void notifyAddFile(Context context, String owner, String workspaceName, String fileName, String content) throws AlreadyExistsException, OutOfMemoryException {
         //Only updates the user files list if he is the owner
         User user = ((ApplicationContext) context).getActiveUser();
@@ -118,6 +108,19 @@ public class FlowManager {
             l.onFileContentChange(owner, workspaceName, fileName, content);
     }
 
+    public static void notifyAddWorkspaceUser(Context context, String workspaceName, String user) throws AlreadyExistsException {
+        ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).addUser(user);
+        ((ApplicationContext) context).commit();
+    }
+
+    public static void notifyRemoveWorkspaceUser(Context context, String owner, String workspaceName, String user) {
+        ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).removeUser(user);
+        ((ApplicationContext) context).commit();
+        //Updates interface
+        for (WorkspacesChangeListener l : getInstance().listeners)
+            l.onWorkspaceUserRemoved(owner, workspaceName);
+    }
+
     //----------------------------------------------------------------------------------------------
     // METHODS TO ASK OWNER  -----------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
@@ -141,7 +144,7 @@ public class FlowManager {
                     (!isWorkspacePrivate(context, w) && Utils.haveElementsInCommon(getWorkspaceTagList(context, w), tags))) {
                 // Add user to the list (if not already there)
                 try {
-                    addWorkspaceUser(context, w, getActiveUserID(context));
+                    notifyAddWorkspaceUser(context, w, getActiveUserID(context));
                     for (WorkspacesChangeListener l : getInstance().listeners) {
                         // Warn Foreign Fragment
                         l.onWorkspaceAddedForeign(((ApplicationContext) context).getActiveUser().getID(), w);
@@ -176,18 +179,18 @@ public class FlowManager {
         return workspaces;
     }
 
+    public static void editWorkspace(Context context, String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) {
+        //TODO add and remove methods
+        Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName);
+        workspace.setUserList(users);
+        workspace.setTagList(tags);
+        workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
+        workspace.setMaximumQuota(quota);
+        ((ApplicationContext) context).commit();
+    }
+
     public static ArrayList<CharSequence> getWorkspaceUserList(Context context, String workspaceName) {
         return ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).getUserList();
-    }
-
-    public static void addWorkspaceUser(Context context, String workspace, String userID) throws AlreadyExistsException{
-        ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspace).addUser(userID);
-        ((ApplicationContext) context).commit();
-    }
-
-    public static void removeWorkspaceUser(Context context, String workspace, String userID){
-        ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspace).removeUser(userID);
-        ((ApplicationContext) context).commit();
     }
 
     public static ArrayList<CharSequence> getWorkspaceTagList(Context context, String workspaceName) {

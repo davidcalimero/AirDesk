@@ -47,6 +47,12 @@ public class ForeignFragment extends ExpandableListFragment {
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
+
+            @Override
+            public void onWorkspaceUserRemoved(String owner, String workspaceName) {
+                getAdapter().addGroup(owner, workspaceName);
+                updateAdapter();
+            }
         });
 
         refreshView(view);
