@@ -43,6 +43,9 @@ public class OwnedFragment extends ExpandableListFragment {
             }
 
             @Override
+            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {  }
+
+            @Override
             public void onWorkspaceRemoved(String owner, String name) {
                 if(userId.equals(owner)){
                     getAdapter().removeGroup(owner, name);

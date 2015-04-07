@@ -41,33 +41,19 @@ public class FlowManager {
     // METHODS TO NOTIFY OWNER  --------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
 
-    public static void notifyAddWorkspace(Context context, String owner, String name, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) throws AlreadyExistsException {
+    public static void notifyRemoveWorkspace(Context context, String owner, String workspaceName) {
         //Only updates the user workspace list if he is the owner
         User user = ((ApplicationContext) context).getActiveUser();
         if(user.getID().equals(owner)) {
-            Workspace workspace = new Workspace(name, isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC, quota);
-            workspace.setTagList(tags);
-            workspace.setUserList(users);
-            user.addWorkspace(workspace);
+            user.removeWorkspace(workspaceName, context);
             ((ApplicationContext) context).commit();
         }
 
         //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceAdded(owner, name);
-    }
+            l.onWorkspaceRemoved(owner, workspaceName);
 
-    public static void notifyRemoveWorkspace(Context context, String owner, String name) {
-        //Only updates the user workspace list if he is the owner
-        User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(owner)) {
-            user.removeWorkspace(name, context);
-            ((ApplicationContext) context).commit();
-        }
-
-        //Updates interface
-        for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceRemoved(owner, name);
+        //send information to users
     }
 
     public static void notifyAddFile(Context context, String owner, String workspaceName, String fileName, String content) throws AlreadyExistsException, OutOfMemoryException {
@@ -82,6 +68,8 @@ public class FlowManager {
         //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onFileAdded(owner, workspaceName, fileName);
+
+        //send information to users
     }
 
     public static void notifyRemoveFile(Context context, String owner, String workspaceName, String fileName) {
@@ -95,6 +83,8 @@ public class FlowManager {
         //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onFileRemoved(owner, workspaceName, fileName);
+
+        //send information to users
     }
 
     public static void notifyEditFile(Context context, String owner, String workspaceName, String fileName, String content) throws OutOfMemoryException {
@@ -106,19 +96,26 @@ public class FlowManager {
         //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onFileContentChange(owner, workspaceName, fileName, content);
+
+        //send information to users
     }
 
     public static void notifyAddWorkspaceUser(Context context, String workspaceName, String user) throws AlreadyExistsException {
         ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).addUser(user);
         ((ApplicationContext) context).commit();
+
+        //send information to users
+        for (WorkspacesChangeListener l : getInstance().listeners)
+            l.onWorkspaceAddedForeign(((ApplicationContext) context).getActiveUser().getID(), workspaceName);
     }
 
     public static void notifyRemoveWorkspaceUser(Context context, String owner, String workspaceName, String user) {
         ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).removeUser(user);
         ((ApplicationContext) context).commit();
-        //Updates interface
+
+        //send information to users
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceUserRemoved(owner, workspaceName);
+            l.onWorkspaceRemovedForeign(owner, workspaceName);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -179,6 +176,22 @@ public class FlowManager {
         return workspaces;
     }
 
+    public static void addWorkspace(Context context, String owner, String name, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) throws AlreadyExistsException {
+        //Only updates the user workspace list if he is the owner
+        User user = ((ApplicationContext) context).getActiveUser();
+        if(user.getID().equals(owner)) {
+            Workspace workspace = new Workspace(name, isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC, quota);
+            workspace.setTagList(tags);
+            workspace.setUserList(users);
+            user.addWorkspace(workspace);
+            ((ApplicationContext) context).commit();
+        }
+
+        //Updates interface
+        for (WorkspacesChangeListener l : getInstance().listeners)
+            l.onWorkspaceAdded(owner, name);
+    }
+
     public static void editWorkspace(Context context, String workspaceName, boolean isPrivate, ArrayList<CharSequence> users, ArrayList<CharSequence> tags, long quota) {
         //TODO add and remove methods
         Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName);
@@ -216,9 +229,8 @@ public class FlowManager {
 
     public static ArrayList<String> getFiles(Context context, String workspaceName) {
         ArrayList<String> files = new ArrayList<>();
-        for (TextFile f : ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).getFiles().values()) {
+        for (TextFile f : ((ApplicationContext) context).getActiveUser().getWorkspaceList().get(workspaceName).getFiles().values())
             files.add(f.getTitle());
-        }
         return files;
     }
 }

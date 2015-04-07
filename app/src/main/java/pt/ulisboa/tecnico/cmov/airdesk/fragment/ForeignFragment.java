@@ -26,15 +26,23 @@ public class ForeignFragment extends ExpandableListFragment {
         setHasOptionsMenu(true);
         setListener(new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceAdded(String owner, String name) {}
-
-            @Override
             public void onWorkspaceAddedForeign(String owner, String name) {
                 // In N-Version it will check if user is the same
                 //TODO remove this method in version N
                 getAdapter().addGroup(owner, name);
                 updateAdapter();
             }
+
+            @Override
+            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
+                // In N-Version it will check if user is the same
+                //TODO remove this method in version N
+                getAdapter().addGroup(owner, workspaceName);
+                updateAdapter();
+            }
+
+            @Override
+            public void onWorkspaceAdded(String owner, String name) {}
 
             @Override
             public void onWorkspaceRemoved(String owner, String name) {}
@@ -49,10 +57,7 @@ public class ForeignFragment extends ExpandableListFragment {
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
 
             @Override
-            public void onWorkspaceUserRemoved(String owner, String workspaceName) {
-                getAdapter().addGroup(owner, workspaceName);
-                updateAdapter();
-            }
+            public void onWorkspaceUserRemoved(String owner, String workspaceName) {}
         });
 
         refreshView(view);

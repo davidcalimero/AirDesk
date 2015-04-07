@@ -58,6 +58,9 @@ public class ShowFileActivity extends ActionBarActivity {
             }
 
             @Override
+            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {}
+
+            @Override
             public void onWorkspaceRemoved(String ownerName, String name) {
                 if(owner.equals(ownerName) && workspace.equals(name))
                     finish();

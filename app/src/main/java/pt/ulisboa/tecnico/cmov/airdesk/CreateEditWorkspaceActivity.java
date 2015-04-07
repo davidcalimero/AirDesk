@@ -198,7 +198,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
                 return;
             }
             try {
-                FlowManager.notifyAddWorkspace(getApplicationContext(), owner, workspaceName, isPrivate, users, tags, quota);
+                FlowManager.addWorkspace(getApplicationContext(), owner, workspaceName, isPrivate, users, tags, quota);
                 Toast.makeText(getApplicationContext(), getString(R.string.workspace_created_successfully), Toast.LENGTH_SHORT).show();
                 finish();
             } catch (AlreadyExistsException e) {
