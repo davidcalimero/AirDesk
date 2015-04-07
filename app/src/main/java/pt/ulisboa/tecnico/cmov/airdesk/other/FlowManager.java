@@ -142,11 +142,12 @@ public class FlowManager {
                 // Add user to the list (if not already there)
                 try {
                     notifyAddWorkspaceUser(context, w, getActiveUserID(context));
-                    for (WorkspacesChangeListener l : getInstance().listeners) {
-                        // Warn Foreign Fragment
-                        l.onWorkspaceAddedForeign(((ApplicationContext) context).getActiveUser().getID(), w);
-                    }
-                } catch (AlreadyExistsException e) {}
+                } catch (AlreadyExistsException e) {
+                }
+                for (WorkspacesChangeListener l : getInstance().listeners) {
+                    // Warn Foreign Fragment
+                    l.onWorkspaceAddedForeign(((ApplicationContext) context).getActiveUser().getID(), w);
+                }
             }
         }
     }
