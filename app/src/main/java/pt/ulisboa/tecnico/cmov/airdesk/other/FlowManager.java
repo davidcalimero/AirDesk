@@ -54,6 +54,8 @@ public class FlowManager {
             l.onWorkspaceRemoved(owner, workspaceName);
 
         //send information to users
+        for (WorkspacesChangeListener l : getInstance().listeners)
+            l.onWorkspaceRemovedForeign(owner, workspaceName);
     }
 
     public static void notifyAddFile(Context context, String owner, String workspaceName, String fileName, String content) throws AlreadyExistsException, OutOfMemoryException {
