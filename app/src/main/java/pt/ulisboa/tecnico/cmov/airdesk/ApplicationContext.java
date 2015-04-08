@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
@@ -13,6 +15,11 @@ public class ApplicationContext extends Application {
     private User activeUser;
 
     public User getActiveUser() {
+        if(activeUser == null) {
+            Log.e("ApplicationContext", "User missing: reloading");
+            SharedPreferences prefs = getSharedPreferences(LogInActivity.PREFERENCES, Context.MODE_PRIVATE);
+            loadUser(prefs.getString(MainMenu.EMAIL, ""), prefs.getString(MainMenu.NICKNAME, ""));
+        }
         return activeUser;
     }
 
