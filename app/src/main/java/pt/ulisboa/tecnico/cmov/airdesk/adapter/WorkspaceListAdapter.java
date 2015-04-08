@@ -6,14 +6,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.R;
+import pt.ulisboa.tecnico.cmov.airdesk.widgets.AnimatedExpandableListView;
 
-public class WorkspaceListAdapter extends BaseExpandableListAdapter {
+public class WorkspaceListAdapter extends AnimatedExpandableListView.AnimatedExpandableListAdapter {
 
     private class Item{
         public String tag;
@@ -73,17 +73,17 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public int getChildrenCount(int groupPosition) {
-        return items.get(groupPosition).files.size();
-    }
-
-    @Override
     public int getGroupCount() {
         return items.size();
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public int getRealChildrenCount(int groupPosition) {
+        return items.get(groupPosition).files.size();
+    }
+
+    @Override
+    public View getRealChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         String childTitle = (String) getChild(groupPosition, childPosition);
 
         if (convertView == null) {
@@ -154,7 +154,7 @@ public class WorkspaceListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public boolean hasStableIds() {
-        return false;
+        return true;
     }
 
     @Override

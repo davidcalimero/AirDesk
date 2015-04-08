@@ -70,6 +70,8 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         mode = (MODE) bundle.getSerializable(ACTIVITY_MODE);
         title = bundle.getString(ACTIVITY_TITLE);
 
+        Log.e("CreateEditWorkspace", workspaceName + " " + title);
+
         if (savedInstanceState != null) {
             users = (HashSet<CharSequence>) savedInstanceState.getSerializable(USERS_LIST);
             tags = (HashSet<CharSequence>) savedInstanceState.getSerializable(TAGS_LIST);

@@ -5,16 +5,15 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
+import pt.ulisboa.tecnico.cmov.airdesk.listener.SwipeDismissListViewTouchListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 
@@ -33,6 +32,7 @@ public class ListActivity extends ActionBarActivity {
     private ArrayAdapter<String> adapter;
 
     private EditText writer;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,23 +50,37 @@ public class ListActivity extends ActionBarActivity {
 
         //ListView inicialization
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        ListView listView = (ListView) findViewById(R.id.tagsView);
+        listView = (ListView) findViewById(R.id.tagsView);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                String item = ((TextView) view).getText().toString();
-                adapter.remove(item);
-                list.remove(item);
-                Boolean ret = map.remove(item);
-                if(ret == null)
-                    map.put(item, false);
-            }
-        });
+
+        //Swipe Listener Initialization
+        SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(listView,
+                new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                    @Override
+                    public boolean canDismiss(int position) {
+                        return true;
+                    }
+
+                    @Override
+                    public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                        for (int position : reverseSortedPositions) {
+                            //Remove item
+                            String item = adapter.getItem(position);
+                            adapter.remove(item);
+                            adapter.remove(item);
+                            list.remove(item);
+                            Boolean ret = map.remove(item);
+                            if(ret == null)
+                                map.put(item, false);
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+        listView.setOnTouchListener(touchListener);
+        listView.setOnScrollListener(touchListener.makeScrollListener());
 
         writer = (EditText) findViewById(R.id.tagWriteView);
         writer.setText(text);
-
         populateView();
         setTitle(title);
     }
@@ -109,6 +123,9 @@ public class ListActivity extends ActionBarActivity {
         Boolean ret = map.remove(item);
         if(ret == null)
             map.put(item, true);
+
+        //Focus last last added
+        listView.setSelection(listView.getAdapter().getCount() - 1);
     }
 
     //ListView population

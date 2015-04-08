@@ -10,6 +10,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.ShowFileActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.widgets.AnimatedExpandableListView;
 
 
 public class ExpandableListFragment extends Fragment {
@@ -35,6 +36,17 @@ public class ExpandableListFragment extends Fragment {
                 intent.putExtra(ShowFileActivity.OWNER_NAME, owner);
                 startActivity(intent);
                 return false;
+            }
+        });
+
+        view.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                if (parent.isGroupExpanded(groupPosition))
+                    ((AnimatedExpandableListView)parent).collapseGroupWithAnimation(groupPosition);
+                else
+                    ((AnimatedExpandableListView)parent).expandGroupWithAnimation(groupPosition);
+                return true;
             }
         });
     }

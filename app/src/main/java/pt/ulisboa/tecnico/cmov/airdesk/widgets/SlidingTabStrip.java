@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pt.ulisboa.tecnico.cmov.airdesk.slidingTab;
+package pt.ulisboa.tecnico.cmov.airdesk.widgets;
 
 import android.R;
 import android.content.Context;
