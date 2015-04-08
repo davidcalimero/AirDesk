@@ -42,6 +42,7 @@ public class LogInActivity extends ActionBarActivity {
         //Init variable
         appState = (ApplicationContext) getApplicationContext();
 
+
         //Logout if applicable
         if (getIntent().getBooleanExtra(LOGOUT, false)) {
             sharedPreferences.edit().clear().commit();
@@ -88,17 +89,23 @@ public class LogInActivity extends ActionBarActivity {
         editor.commit();
     }
 
-    private void loadUser(String nickname, String email) {
-        //load user to application context
-        ProgressDialog loading = ProgressDialog.show(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_user), false, false);
-        appState.loadUser(email, nickname);
-        loading.dismiss();
+    private void loadUser(final String nickname, final String email) {
+        final ProgressDialog loading = Utils.createProgressDialog(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_user));
+        loading.show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //load user to application context
+                appState.loadUser(email, nickname);
+                loading.dismiss();
 
-        //Change activity
-        Intent intent = new Intent(getApplicationContext(), MainMenu.class);
-        intent.putExtra(MainMenu.NICKNAME, nickname);
-        intent.putExtra(MainMenu.EMAIL, email);
-        startActivity(intent);
-        finish();
+                //Change activity
+                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                intent.putExtra(MainMenu.NICKNAME, nickname);
+                intent.putExtra(MainMenu.EMAIL, email);
+                startActivity(intent);
+                finish();
+            }
+        }, "LoadUser Thread").start();
     }
 }

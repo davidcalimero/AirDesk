@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -262,7 +261,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         titleView = (EditText) findViewById(R.id.settingsWorkspaceName);
         if (mode.equals(MODE.EDIT)) {
             titleView.setText(workspaceName);
-            ((ViewGroup) titleView.getParent()).removeView(titleView);
+            titleView.setVisibility(View.GONE);
         } else {
             ((Button) findViewById(R.id.confirmButton)).setText(getString(R.string.create));
         }

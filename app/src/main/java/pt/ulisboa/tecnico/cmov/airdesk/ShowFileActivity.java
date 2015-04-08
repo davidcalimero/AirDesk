@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 
 public class ShowFileActivity extends ActionBarActivity {
@@ -41,14 +43,24 @@ public class ShowFileActivity extends ActionBarActivity {
         workspace = bundle.getString(WORKSPACE);
         title = bundle.getString(TITLE);
         owner = bundle.getString(OWNER_NAME);
-        text = FlowManager.getFileContent(getApplicationContext(), owner, workspace, title);
 
         Log.e("ShowFileActivity", owner + " " + workspace + " " + title);
 
         //Init
         final TextView showText = (TextView) findViewById(R.id.textView);
-        showText.setText(text);
         setTitle(title);
+
+        //Get File content
+        final ProgressDialog loading = Utils.createProgressDialog(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_file));
+        loading.show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                text = FlowManager.getFileContent(getApplicationContext(), owner, workspace, title);
+                showText.setText(text);
+                loading.dismiss();
+            }
+        }).start();
 
         listener = new WorkspacesChangeListener() {
             @Override

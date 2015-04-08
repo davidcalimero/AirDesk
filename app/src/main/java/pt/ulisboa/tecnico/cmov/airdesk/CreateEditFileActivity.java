@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -66,7 +65,7 @@ public class CreateEditFileActivity extends ActionBarActivity {
 
         //Update Interface
         if (mode.equals(MODE.EDIT)) {
-            ((ViewGroup) titleView.getParent()).removeView(titleView);
+            titleView.setVisibility(View.GONE);
             ((Button) findViewById(R.id.createFileCreate)).setText(getString(R.string.confirm));
         }
 

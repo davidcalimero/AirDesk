@@ -62,7 +62,8 @@
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
     <string name="dialog_please_wait">Please Wait</string>
-    <string name="dialog_loading_user">Loading User...</string>
+    <string name="dialog_loading_user">Loading User…</string>
+    <string name="dialog_loading_file">Loading File…</string>
 
     <!-- Settings -->
     <string name="change_user_tags">Change Users/Tags</string>
