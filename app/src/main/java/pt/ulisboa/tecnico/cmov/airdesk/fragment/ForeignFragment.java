@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ListActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.MainMenu;
@@ -26,19 +27,17 @@ public class ForeignFragment extends ExpandableListFragment {
         setHasOptionsMenu(true);
         setListener(new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceAddedForeign(String owner, String name) {
-                // In N-Version it will check if user is the same
+            public void onWorkspaceAddedForeign(String owner, String workspaceName, ArrayList<String> files) {
                 //TODO remove this method in version N
-                getAdapter().addGroup(owner, name);
-                updateAdapter();
+                addWorkspace(owner, workspaceName);
+                for(String fileName : files)
+                    addFile(owner, workspaceName, fileName);
             }
 
             @Override
             public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
-                // In N-Version it will check if user is the same
                 //TODO remove this method in version N
-                getAdapter().removeGroup(owner, workspaceName);
-                updateAdapter();
+                removeWorkspace(owner, workspaceName);
             }
 
             @Override
@@ -49,21 +48,16 @@ public class ForeignFragment extends ExpandableListFragment {
 
             @Override
             public void onFileAdded(String owner, String workspaceName, String fileName) {
-                getAdapter().addChild(owner, workspaceName, fileName);
-                updateAdapter();
+                addFile(owner, workspaceName, fileName);
             }
 
             @Override
             public void onFileRemoved(String owner, String workspaceName, String fileName) {
-                getAdapter().removeChild(owner, workspaceName, fileName);
-                updateAdapter();
+                removeFile(owner, workspaceName, fileName);
             }
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
-
-            @Override
-            public void onWorkspaceUserRemoved(String owner, String workspaceName) {}
         });
 
         refreshView(view);
@@ -85,9 +79,9 @@ public class ForeignFragment extends ExpandableListFragment {
                 break;
 
             case R.id.action_subscriptions:
-                ArrayList<CharSequence> subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
+                HashSet<CharSequence> subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
                 Intent intent = new Intent(getActivity().getApplicationContext(), ListActivity.class);
-                intent.putCharSequenceArrayListExtra(ListActivity.LIST, subscriptions);
+                intent.putExtra(ListActivity.LIST, subscriptions);
                 intent.putExtra(ListActivity.TITLE, getString(R.string.subscriptions));
                 getActivity().startActivityForResult(intent, MainMenu.SUBSCRIPTIONS);
                 break;

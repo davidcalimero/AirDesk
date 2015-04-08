@@ -1,18 +1,14 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
-import java.util.List;
+import java.util.Collection;
 
 public class Utils {
 
     //Returns true if list1 has at least one element contained in list2
-    public static boolean haveElementsInCommon(List list1, List list2) {
-        for (Object object1 : list1) {
-            for (Object object2 : list2) {
-                if (object1.equals(object2)) {
-                    return true;
-                }
-            }
-        }
+    public static boolean haveElementsInCommon(Collection set1, Collection set2) {
+        for (Object object1 : set1)
+            if(set2.contains(object1))
+                return true;
         return false;
     }
 

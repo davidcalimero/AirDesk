@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
@@ -20,6 +22,8 @@ import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 public class CreateEditFileActivity extends ActionBarActivity {
+
+    public enum MODE {CREATE, EDIT}
 
     public static final String ACTIVITY_TITLE = "activity_title";
     public static final String ACTIVITY_MODE = "mode";
@@ -75,12 +79,14 @@ public class CreateEditFileActivity extends ActionBarActivity {
             public void onWorkspaceAdded(String owner, String name) {}
 
             @Override
-            public void onWorkspaceAddedForeign(String owner, String name) {
+            public void onWorkspaceAddedForeign(String owner, String name, ArrayList<String> files) {
                 //TODO remove this method in version N
             }
 
             @Override
-            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {}
+            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
+                //TODO remove this method in version N
+            }
 
             @Override
             public void onWorkspaceRemoved(String ownerName, String name) {
@@ -99,12 +105,6 @@ public class CreateEditFileActivity extends ActionBarActivity {
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
-
-            @Override
-            public void onWorkspaceUserRemoved(String ownerName, String name) {
-                if(owner.equals(ownerName) && workspaceName.equals(name))
-                    finish();
-            }
         };
         FlowManager.addWorkspacesChangeListener(listener);
     }
@@ -169,7 +169,6 @@ public class CreateEditFileActivity extends ActionBarActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
             return;
         }
-
         try {
             if (mode.equals(MODE.CREATE)) {
                 FlowManager.notifyAddFile(getApplicationContext(), owner, workspaceName, newTitle, newContent);
@@ -189,6 +188,4 @@ public class CreateEditFileActivity extends ActionBarActivity {
     public void onCancelCreateFileButtonPressed(View view) {
         finish();
     }
-
-    public enum MODE {CREATE, EDIT}
 }

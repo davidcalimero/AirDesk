@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
 
@@ -39,7 +41,7 @@ public class ShowFileActivity extends ActionBarActivity {
         workspace = bundle.getString(WORKSPACE);
         title = bundle.getString(TITLE);
         owner = bundle.getString(OWNER_NAME);
-        text = FlowManager.getFileContent(getApplicationContext(), workspace, title);
+        text = FlowManager.getFileContent(getApplicationContext(), owner, workspace, title);
 
         Log.e("ShowFileActivity", owner + " " + workspace + " " + title);
 
@@ -53,12 +55,14 @@ public class ShowFileActivity extends ActionBarActivity {
             public void onWorkspaceAdded(String ownerName, String name) {}
 
             @Override
-            public void onWorkspaceAddedForeign(String owner, String name) {
+            public void onWorkspaceAddedForeign(String owner, String name, ArrayList<String> files) {
                 //TODO remove this method in version N
             }
 
             @Override
-            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {}
+            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
+                //TODO remove this method in version N
+            }
 
             @Override
             public void onWorkspaceRemoved(String ownerName, String name) {
@@ -79,12 +83,6 @@ public class ShowFileActivity extends ActionBarActivity {
             public void onFileContentChange(String ownerName, String workspaceName, String filename, String content) {
                 if(owner.equals(ownerName) && workspace.equals(workspaceName) && text.equals(filename))
                     showText.setText(content);
-            }
-
-            @Override
-            public void onWorkspaceUserRemoved(String ownerName, String workspaceName) {
-                if(owner.equals(ownerName) && workspace.equals(workspaceName))
-                    finish();
             }
         };
         FlowManager.addWorkspacesChangeListener(listener);

@@ -18,8 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
@@ -44,8 +44,8 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     private String title;
     private String owner;
     private MODE mode;
-    private ArrayList<CharSequence> tags;
-    private ArrayList<CharSequence> users;
+    private HashSet<CharSequence> tags;
+    private HashSet<CharSequence> users;
     private HashMap<CharSequence, Boolean> usersMap;
     private boolean isPrivate;
     private long quota;
@@ -68,19 +68,19 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         usersMap = new HashMap<>();
 
         if (savedInstanceState != null) {
-            users = savedInstanceState.getCharSequenceArrayList(USERS_LIST);
-            tags = savedInstanceState.getCharSequenceArrayList(TAGS_LIST);
+            users = (HashSet<CharSequence>) savedInstanceState.getSerializable(USERS_LIST);
+            tags = (HashSet<CharSequence>) savedInstanceState.getSerializable(TAGS_LIST);
             quota = savedInstanceState.getLong(MAX_QUOTA);
             isPrivate = savedInstanceState.getBoolean(PRIVACY);
             usersMap = (HashMap<CharSequence, Boolean>) savedInstanceState.getSerializable(MAP);
         } else if (mode == MODE.EDIT) {
-            users = FlowManager.getWorkspaceUserList(getApplicationContext(), workspaceName);
-            tags = FlowManager.getWorkspaceTagList(getApplicationContext(), workspaceName);
+            users = FlowManager.getWorkspaceUsers(getApplicationContext(), workspaceName);
+            tags = FlowManager.getWorkspaceTags(getApplicationContext(), workspaceName);
             quota = FlowManager.getWorkspaceMaxQuota(getApplicationContext(), workspaceName);
             isPrivate = FlowManager.isWorkspacePrivate(getApplicationContext(), workspaceName);
         } else {
-            tags = new ArrayList<>();
-            users = new ArrayList<>();
+            tags = new HashSet<>();
+            users = new HashSet<>();
             quota = 0;
             isPrivate = false;
         }
@@ -141,8 +141,8 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(WORKSPACE_NAME, workspaceName);
-        outState.putCharSequenceArrayList(USERS_LIST, users);
-        outState.putCharSequenceArrayList(TAGS_LIST, tags);
+        outState.putSerializable(USERS_LIST, users);
+        outState.putSerializable(TAGS_LIST, tags);
         outState.putSerializable(ACTIVITY_MODE, mode);
         outState.putLong(MAX_QUOTA, quota);
         outState.putBoolean(PRIVACY, isPrivate);
@@ -155,7 +155,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     // User List
     public void addRemoveUsers(View v) {
         Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-        intent.putCharSequenceArrayListExtra(ListActivity.LIST, users);
+        intent.putExtra(ListActivity.LIST, users);
         String name = mode == MODE.EDIT ? workspaceName : getString(R.string.new_workspace);
         intent.putExtra(ListActivity.TITLE, getString(R.string.users_of) + " " + name);
         intent.putExtra(ListActivity.MAP, usersMap);
@@ -165,7 +165,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     // Tag List
     public void addRemoveTags(View v) {
         Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-        intent.putCharSequenceArrayListExtra(ListActivity.LIST, tags);
+        intent.putExtra(ListActivity.LIST, tags);
         String name = mode == MODE.EDIT ? workspaceName : getString(R.string.new_workspace);
         intent.putExtra(ListActivity.TITLE, getString(R.string.tags_of) + " " + name);
         startActivityForResult(intent, TAGS);
@@ -188,7 +188,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
                     break;
 
                 case TAGS:
-                    tags = data.getCharSequenceArrayListExtra(ListActivity.LIST);
+                    tags = (HashSet<CharSequence>) data.getSerializableExtra(ListActivity.LIST);
                     Log.e("CreateEditWorkspace", "Tag List loaded");
                     break;
             }
@@ -202,7 +202,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     // Final Buttons
     public void confirm(View v) {
         if (mode == MODE.EDIT) {
-            FlowManager.editWorkspace(getApplicationContext(), workspaceName, isPrivate, usersMap, tags, quota);
+            FlowManager.notifyEditWorkspace(getApplicationContext(), workspaceName, isPrivate, usersMap, tags, quota);
             Toast.makeText(getApplicationContext(), getString(R.string.workspace_edited_successfully), Toast.LENGTH_SHORT).show();
             finish();
         } else {
@@ -212,7 +212,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
                 return;
             }
             try {
-                FlowManager.addWorkspace(getApplicationContext(), owner, workspaceName, isPrivate, users, tags, quota);
+                FlowManager.notifyAddWorkspace(getApplicationContext(), workspaceName, isPrivate, users, tags, quota);
                 Toast.makeText(getApplicationContext(), getString(R.string.workspace_created_successfully), Toast.LENGTH_SHORT).show();
                 finish();
             } catch (AlreadyExistsException e) {
@@ -244,7 +244,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowManager.notifyRemoveWorkspace(getApplicationContext(), owner, workspaceName);
+                                FlowManager.notifyRemoveWorkspace(getApplicationContext(), workspaceName);
                                 Toast.makeText(getApplicationContext(), getString(R.string.workspace_removed_successfully), Toast.LENGTH_SHORT).show();
                                 finish();
                             }

@@ -12,15 +12,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 
 public class ListActivity extends ActionBarActivity {
-
-    //TODO remake to add and remove methods and verify input in flowmanager
 
     public static final String LIST = "list";
     public static final String TITLE = "title";
@@ -30,7 +28,7 @@ public class ListActivity extends ActionBarActivity {
 
     private String title;
     private String text;
-    private ArrayList<CharSequence> list;
+    private HashSet<CharSequence> list;
     private HashMap<CharSequence, Boolean> map;
     private ArrayAdapter<String> adapter;
 
@@ -43,11 +41,10 @@ public class ListActivity extends ActionBarActivity {
 
         //Restore data
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
-        list = bundle.getCharSequenceArrayList(LIST);
+        list = (HashSet<CharSequence>) bundle.getSerializable(LIST);
         title = bundle.getString(TITLE);
         text = bundle.getString(TEXT);
         map = (HashMap<CharSequence, Boolean>) bundle.getSerializable(MAP);
-
         if(map == null)
             map = new HashMap<>();
 
@@ -77,7 +74,7 @@ public class ListActivity extends ActionBarActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(MAP, map);
-        outState.putCharSequenceArrayList(LIST, list);
+        outState.putSerializable(LIST, list);
         outState.putString(TITLE, title);
         outState.putString(TEXT, writer.getText().toString());
         Log.e("ListActivity", "state saved: " + title);
@@ -105,6 +102,7 @@ public class ListActivity extends ActionBarActivity {
             return;
         }
 
+        //Update lists
         writer.getText().clear();
         adapter.add(item);
         list.add(item);
@@ -118,5 +116,9 @@ public class ListActivity extends ActionBarActivity {
         for (CharSequence item : list) {
             adapter.add(item.toString());
         }
+    }
+
+    public void cancel(View view){
+        finish();
     }
 }

@@ -51,6 +51,7 @@ public class LogInActivity extends ActionBarActivity {
         //If was not logout and have data to login autologin
         if (!nickname.equals("") && !email.equals("") && !getIntent().getBooleanExtra(LOGOUT, false)) {
             loadUser(nickname, email);
+            return;
         }
 
         //Restore data
@@ -73,8 +74,12 @@ public class LogInActivity extends ActionBarActivity {
         String nickname = nicknameView.getText().toString().trim();
         String email = emailView.getText().toString().trim();
 
-        if(!loadUser(nickname, email))
+        if (!Utils.isSingleWord(nickname) || !Utils.isSingleWord(email)) {
+            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        loadUser(nickname, email);
 
         //Save views content
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -83,12 +88,7 @@ public class LogInActivity extends ActionBarActivity {
         editor.commit();
     }
 
-    private boolean loadUser(String nickname, String email) {
-        if (!Utils.isSingleWord(nickname) || !Utils.isSingleWord(email)) {
-            Toast.makeText(getApplicationContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
+    private void loadUser(String nickname, String email) {
         //load user to application context
         ProgressDialog loading = ProgressDialog.show(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_user), false, false);
         appState.loadUser(email, nickname);
@@ -100,6 +100,5 @@ public class LogInActivity extends ActionBarActivity {
         intent.putExtra(MainMenu.EMAIL, email);
         startActivity(intent);
         finish();
-        return true;
     }
 }

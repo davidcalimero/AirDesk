@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 
@@ -25,7 +25,7 @@ public class User implements Serializable {
     private HashMap<String, Workspace> _workspaceList = new HashMap<>();
 
     /* Keywords List */
-    private ArrayList<CharSequence> _subscriptions = new ArrayList<>();
+    private HashSet<CharSequence> _subscriptions = new HashSet<>();
 
     /*********************************/
     /********** CONSTRUCTOR **********/
@@ -45,17 +45,21 @@ public class User implements Serializable {
         return _email;
     }
 
+    public String getNickname() {
+        return _nickname;
+    }
+
     /* Client Owned Workspace List */
-    public HashMap<String, Workspace> getWorkspaceList() {
+    public HashMap<String, Workspace> getWorkspaces() {
         return _workspaceList;
     }
 
     /* Client Keyword List */
-    public ArrayList<CharSequence> getSubscriptions() {
+    public HashSet<CharSequence> getSubscriptions() {
         return _subscriptions;
     }
 
-    public void setSubscriptions(ArrayList<CharSequence> value) {
+    public void setSubscriptions(HashSet<CharSequence> value) {
         Log.e("User", "subscriptions modified");
         _subscriptions = value;
     }

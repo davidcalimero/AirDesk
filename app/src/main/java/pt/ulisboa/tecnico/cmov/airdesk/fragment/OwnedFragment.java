@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import java.util.ArrayList;
+
 import pt.ulisboa.tecnico.cmov.airdesk.CreateEditWorkspaceActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
@@ -31,49 +33,40 @@ public class OwnedFragment extends ExpandableListFragment {
         setListener(new WorkspacesChangeListener() {
             @Override
             public void onWorkspaceAdded(String owner, String name) {
-                if(userId.equals(owner)){
-                    getAdapter().addGroup(owner, name);
-                    updateAdapter();
-                }
+                if(userId.equals(owner))
+                    addWorkspace(owner, name);
             }
 
             @Override
-            public void onWorkspaceAddedForeign(String owner, String name) {
+            public void onWorkspaceAddedForeign(String owner, String name, ArrayList<String> files) {
                 //TODO remove this method in version N
             }
 
             @Override
-            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {  }
+            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
+                //TODO remove this method in version N
+            }
 
             @Override
             public void onWorkspaceRemoved(String owner, String name) {
-                if(userId.equals(owner)){
-                    getAdapter().removeGroup(owner, name);
-                    updateAdapter();
-                }
+                if(userId.equals(owner))
+                    removeWorkspace(owner, name);
             }
 
             @Override
             public void onFileAdded(String owner, String workspaceName, String fileName) {
-                if(userId.equals(owner)){
-                    getAdapter().addChild(owner, workspaceName, fileName);
-                    updateAdapter();
-                }
+                if(userId.equals(owner))
+                    addFile(owner, workspaceName, fileName);
             }
 
             @Override
             public void onFileRemoved(String owner, String workspaceName, String fileName) {
-                if(userId.equals(owner)){
-                    getAdapter().removeChild(owner, workspaceName, fileName);
-                    updateAdapter();
-                }
+                if(userId.equals(owner))
+                    removeFile(owner, workspaceName, fileName);
             }
 
             @Override
             public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
-
-            @Override
-            public void onWorkspaceUserRemoved(String owner, String workspaceName) {}
         });
 
         return view;
@@ -105,9 +98,9 @@ public class OwnedFragment extends ExpandableListFragment {
     //Adds workspace views to the list view
     private void populateView() {
         for (String w : FlowManager.getWorkspaces(getActivity().getApplicationContext())) {
-            getAdapter().addGroup(userId, w);
+            addWorkspace(userId, w);
             for (String t : FlowManager.getFiles(getActivity().getApplicationContext(), w))
-                getAdapter().addChild(userId, w, t);
+                addFile(userId, w, t);
         }
     }
 }

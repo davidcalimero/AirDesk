@@ -41,15 +41,25 @@
 
     <Button
         android:id="@+id/tagsDone"
+        android:text="@string/confirm"
+        android:onClick="onConfirmButtonPressed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/addTag"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/addTag"
         android:layout_toEndOf="@+id/tagWriteView"
-        android:onClick="onConfirmButtonPressed"
-        android:text="@string/confirm" />
+        android:layout_alignLeft="@+id/addTag"
+        android:layout_alignStart="@+id/addTag" />
+
+    <Button
+        android:id="@+id/listCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        android:onClick="cancel"
+        android:layout_below="@+id/addTag"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

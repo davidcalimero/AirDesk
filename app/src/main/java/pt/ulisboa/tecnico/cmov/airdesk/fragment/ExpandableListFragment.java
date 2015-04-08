@@ -63,14 +63,30 @@ public class ExpandableListFragment extends Fragment {
     }
 
     //Should be only called if you are shore the adapter was changed
-    protected void updateAdapter(){
+    private void updateAdapter(){
         if(isVisible())
-            getAdapter().notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
         else
             wasChanged = true;
     }
 
-    protected WorkspaceListAdapter getAdapter() {
-        return adapter;
+    protected void addWorkspace(String owner, String workspaceName){
+        adapter.addGroup(owner, workspaceName);
+        updateAdapter();
+    }
+
+    protected void removeWorkspace(String owner, String workspaceName){
+        adapter.removeGroup(owner, workspaceName);
+        updateAdapter();
+    }
+
+    protected void addFile(String owner, String workspaceName, String fileName){
+        adapter.addChild(owner, workspaceName, fileName);
+        updateAdapter();
+    }
+
+    protected void removeFile(String owner, String workspaceName, String fileName){
+        adapter.removeChild(owner, workspaceName, fileName);
+        updateAdapter();
     }
 }

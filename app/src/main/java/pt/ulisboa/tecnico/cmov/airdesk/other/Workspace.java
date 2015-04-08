@@ -5,8 +5,8 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
@@ -22,9 +22,9 @@ public class Workspace implements Serializable {
     /* Name of the workspace. */
     private String _name = "";
     /* User List */
-    private ArrayList<CharSequence> _users = new ArrayList<>();
+    private HashSet<CharSequence> _users = new HashSet<>();
     /* Public Profile */
-    private ArrayList<CharSequence> _tags = new ArrayList<>();
+    private HashSet<CharSequence> _tags = new HashSet<>();
     /* File List */
     private HashMap<String, TextFile> _files = new HashMap<>();
     /* Privacy */
@@ -54,14 +54,11 @@ public class Workspace implements Serializable {
     }
 
     /* User List */
-    public ArrayList<CharSequence> getUserList() {
+    public HashSet<CharSequence> getUsers() {
         return _users;
     }
 
-    public void addUser(String id) throws AlreadyExistsException {
-        if(_users.contains(id))
-            throw new AlreadyExistsException();
-
+    public void addUser(String id)  {
         Log.e("Workspace", "User added: " + id);
         _users.add(id);
     }
@@ -72,11 +69,11 @@ public class Workspace implements Serializable {
     }
 
     /* Public Profile */
-    public ArrayList<CharSequence> getTagList() {
+    public HashSet<CharSequence> getTags() {
         return _tags;
     }
 
-    public void setTagList(ArrayList<CharSequence> tags) {
+    public void setTags(HashSet<CharSequence> tags) {
         Log.e("Workspace", "public profile changed: " + getName());
         _tags = tags;
     }

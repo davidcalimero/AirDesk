@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspacePagerAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
@@ -87,8 +88,7 @@ public class MainMenu extends ActionBarActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data != null && resultCode == RESULT_OK) {
             if (requestCode == SUBSCRIPTIONS) {
-                //TODO add and remove one by one
-                FlowManager.setSubscriptions(getApplicationContext(), data.getCharSequenceArrayListExtra(ListActivity.LIST));
+                FlowManager.setSubscriptions(getApplicationContext(), (HashSet <CharSequence>) data.getSerializableExtra(ListActivity.LIST));
                 Toast.makeText(getApplicationContext(), getString(R.string.subscriptions_changed_successfully), Toast.LENGTH_SHORT).show();
             }
         }
