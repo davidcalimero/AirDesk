@@ -97,11 +97,9 @@ public class MainMenu extends ActionBarActivity {
     public void onSettingsButtonPressed(View view) {
         Intent intent = new Intent(getApplicationContext(), CreateEditWorkspaceActivity.class);
         String workspaceName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.groupHeader)).getText().toString();
-        String ownerName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.tagHeader)).getText().toString();
         intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_TITLE, workspaceName);
         intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_MODE, CreateEditWorkspaceActivity.MODE.EDIT);
         intent.putExtra(CreateEditWorkspaceActivity.WORKSPACE_NAME, workspaceName);
-        intent.putExtra(CreateEditWorkspaceActivity.OWNER_NAME, ownerName);
         startActivity(intent);
     }
 

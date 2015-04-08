@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
+import java.text.DecimalFormat;
 import java.util.Collection;
 
 public class Utils {
@@ -21,5 +22,13 @@ public class Utils {
     public static boolean isSingleWord(String text) {
         String newText = text.trim();
         return newText.split(" ").length == 1 && newText.length() != 0;
+    }
+
+    public static long minMaxNormalization(long value, long min_old, long max_old, long min_new, long max_new){
+        return (value - min_old) * (max_new - min_new) / (max_old - min_old) + min_new;
+    }
+
+    public static String formatNumber(String format, float number){
+        return new DecimalFormat(format).format(number);
     }
 }

@@ -17,7 +17,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -27,30 +26,38 @@ import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
 
 public class CreateEditWorkspaceActivity extends ActionBarActivity {
 
-    //TODO verify this class
+    public enum MODE {CREATE, EDIT}
+    private EditText titleView;
 
+    //region INTENT MACROS
     public static final String WORKSPACE_NAME = "workspaceName";
     public static final String ACTIVITY_MODE = "mode";
     public static final String ACTIVITY_TITLE = "title";
-    public static final String OWNER_NAME = "ownerName";
     public static final String MAP = "map";
+    //endregion
+
+    //region INTENT REQUEST CODES
     public static final int USERS = 1;
     public static final int TAGS = 2;
+    //endregion
+
+    //region SAVE STATE MACROS
     private static final String TAGS_LIST = "tagsList";
     private static final String USERS_LIST = "usersList";
     private static final String MAX_QUOTA = "maxQuota";
     private static final String PRIVACY = "privacy";
+    //endregion
+
+    //region CLASS VARIABLES
     private String workspaceName;
     private String title;
-    private String owner;
     private MODE mode;
-    private HashSet<CharSequence> tags;
-    private HashSet<CharSequence> users;
-    private HashMap<CharSequence, Boolean> usersMap;
-    private boolean isPrivate;
-    private long quota;
-    private long freeMemory;
-    private long minQuota;
+    private HashSet<CharSequence> tags = new HashSet<>();
+    private HashSet<CharSequence> users = new HashSet<>();
+    private HashMap<CharSequence, Boolean> usersMap = new HashMap<>();
+    private boolean isPrivate = false;
+    private long quota = 0;
+    //endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +69,6 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         workspaceName = bundle.getString(WORKSPACE_NAME);
         mode = (MODE) bundle.getSerializable(ACTIVITY_MODE);
         title = bundle.getString(ACTIVITY_TITLE);
-        owner = bundle.getString(OWNER_NAME);
-
-        Log.e("CreateEditWorkspace", owner + " " + workspaceName);
-        usersMap = new HashMap<>();
 
         if (savedInstanceState != null) {
             users = (HashSet<CharSequence>) savedInstanceState.getSerializable(USERS_LIST);
@@ -78,77 +81,29 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
             tags = FlowManager.getWorkspaceTags(getApplicationContext(), workspaceName);
             quota = FlowManager.getWorkspaceMaxQuota(getApplicationContext(), workspaceName);
             isPrivate = FlowManager.isWorkspacePrivate(getApplicationContext(), workspaceName);
-        } else {
-            tags = new HashSet<>();
-            users = new HashSet<>();
-            quota = 0;
-            isPrivate = false;
         }
 
-        if (mode == MODE.EDIT)
-            minQuota = FlowManager.getWorkspaceMemorySize(getApplicationContext(), workspaceName);
-        else
-            minQuota = 0;
-
-        freeMemory = FlowManager.getUserFreeMemorySpace();
-
-        //////////////////////////////////////////////
         // Privacy
-        RadioButton publicButton = (RadioButton) findViewById(R.id.publicButton);
-        RadioButton privateButton = (RadioButton) findViewById(R.id.privateButton);
-        if (isPrivate) {
-            publicButton.setChecked(false);
-            privateButton.setChecked(true);
-        } else {
-            publicButton.setChecked(true);
-            privateButton.setChecked(false);
-        }
+        initializePrivacy();
 
-        //////////////////////////////////////////////
         // Quota
-        SeekBar quotaSeekBar = (SeekBar) findViewById(R.id.seekBar);
-        final TextView quotaText = (TextView) findViewById(R.id.quotaValue);
+        initializeQuota();
 
-        quotaSeekBar.setProgress((int) ((quota - minQuota) * quotaSeekBar.getMax() / (freeMemory - minQuota)));
-        quotaText.setText(new DecimalFormat("#.######").format(quota / (float) 1048576) + " MB");
-
-        quotaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                quota = minQuota + (progress * (freeMemory - minQuota) / seekBar.getMax());
-                quotaText.setText(new DecimalFormat("#.######").format(quota / (float) 1048576) + " MB");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-
-        if (mode.equals(MODE.EDIT)) {
-            EditText titleView = (EditText) findViewById(R.id.settingsWorkspaceName);
-            ((ViewGroup) titleView.getParent()).removeView(titleView);
-        } else {
-            ((Button) findViewById(R.id.confirmButton)).setText(getString(R.string.create));
-        }
-
-        setTitle(title);
+        // Format Layout
+        formatLayout();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(WORKSPACE_NAME, workspaceName);
+        outState.putString(WORKSPACE_NAME, titleView.getText().toString());
         outState.putSerializable(USERS_LIST, users);
         outState.putSerializable(TAGS_LIST, tags);
         outState.putSerializable(ACTIVITY_MODE, mode);
         outState.putLong(MAX_QUOTA, quota);
         outState.putBoolean(PRIVACY, isPrivate);
         outState.putString(ACTIVITY_TITLE, title);
-        outState.putString(OWNER_NAME, owner);
         outState.putSerializable(MAP, usersMap);
+        Log.e("CreateEditWorkspace", "state saved: " + titleView.getText().toString());
         super.onSaveInstanceState(outState);
     }
 
@@ -177,13 +132,7 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
             switch (requestCode) {
                 case USERS:
                     usersMap = (HashMap<CharSequence, Boolean>) data.getSerializableExtra(ListActivity.MAP);
-                    for(CharSequence item : usersMap.keySet()){
-                        if(usersMap.get(item))
-                            users.add(item);
-                        else
-                            users.remove(item);
-                    }
-
+                    users = (HashSet<CharSequence>) data.getSerializableExtra(ListActivity.LIST);
                     Log.e("CreateEditWorkspace", "User List loaded");
                     break;
 
@@ -195,8 +144,12 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
     }
 
     // Privacy
-    public void onRadioButtonPressed(View view) {
-        isPrivate = !isPrivate;
+    public void onPrivateButtonPressed(View view) {
+        isPrivate = true;
+    }
+
+    public void onPublicButtonPressed(View view) {
+        isPrivate = false;
     }
 
     // Final Buttons
@@ -261,5 +214,57 @@ public class CreateEditWorkspaceActivity extends ActionBarActivity {
         return true;
     }
 
-    public enum MODE {CREATE, EDIT}
+    // Layout Customization
+    private void initializeQuota(){
+        SeekBar quotaSeekBar = (SeekBar) findViewById(R.id.seekBar);
+        final TextView quotaText = (TextView) findViewById(R.id.quotaValue);
+
+        // Define Limits
+        final long minQuota = mode == MODE.EDIT ? FlowManager.getWorkspaceMemorySize(getApplicationContext(), workspaceName) : 0;
+        final long maxQuota = FlowManager.getUserFreeMemorySpace() + minQuota;
+
+        // Customize SeekBar
+        quotaSeekBar.setProgress((int) Utils.minMaxNormalization(quota, minQuota, maxQuota, 0, 100));
+        quotaText.setText(Utils.formatNumber("#.######", quota / (float) 1048576) + " MB");
+
+        quotaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                quota = Utils.minMaxNormalization(progress, 0, 100, minQuota, maxQuota) + minQuota;
+                quotaText.setText(Utils.formatNumber("#.######", quota / (float) 1048576) + " MB");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    private void initializePrivacy(){
+        RadioButton publicButton = (RadioButton) findViewById(R.id.publicButton);
+        RadioButton privateButton = (RadioButton) findViewById(R.id.privateButton);
+        if (isPrivate) {
+            publicButton.setChecked(false);
+            privateButton.setChecked(true);
+        } else {
+            publicButton.setChecked(true);
+            privateButton.setChecked(false);
+        }
+    }
+
+    private void formatLayout(){
+        titleView = (EditText) findViewById(R.id.settingsWorkspaceName);
+        if (mode.equals(MODE.EDIT)) {
+            titleView.setText(workspaceName);
+            ((ViewGroup) titleView.getParent()).removeView(titleView);
+        } else {
+            ((Button) findViewById(R.id.confirmButton)).setText(getString(R.string.create));
+        }
+
+        setTitle(title);
+    }
 }

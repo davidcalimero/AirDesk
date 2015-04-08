@@ -9,176 +9,181 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.CreateEditWorkspaceActivity">
 
-    <EditText
-        android:id="@+id/settingsWorkspaceName"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:hint="@string/name"
-        android:inputType="textShortMessage"
-        android:maxLength="40"
-        android:textSize="22sp" />
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/editPeopleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/editPeopleButton"
-            android:layout_alignEnd="@+id/editTagsText"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignRight="@+id/editTagsText"
-            android:layout_alignTop="@+id/editPeopleButton"
-            android:layout_toStartOf="@+id/editPeopleButton"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/change_users"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/editPeopleButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:onClick="addRemoveUsers"
-            android:text="@string/users" />
-
-        <TextView
-            android:id="@+id/editTagsText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/editTagsButton"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/editTagsButton"
-            android:layout_toLeftOf="@+id/radioGroup"
-            android:layout_toStartOf="@+id/radioGroup"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/change_tags"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/editTagsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/editPeopleButton"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:onClick="addRemoveTags"
-            android:text="@string/tags" />
-
-        <TextView
-            android:id="@+id/changePrivacyText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/radioGroup"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/radioGroup"
-            android:layout_toLeftOf="@+id/radioGroup"
-            android:layout_toStartOf="@+id/radioGroup"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/change_privacy"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/editTagsButton">
-
-            <RadioButton
-                android:id="@+id/publicButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onRadioButtonPressed"
-                android:text="@string/public_privacy"
-                android:textSize="22sp" />
-
-            <RadioButton
-                android:id="@+id/privateButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:onClick="onRadioButtonPressed"
-                android:text="@string/private_privacy"
-                android:textSize="22sp" />
-        </RadioGroup>
-
-        <TextView
-            android:id="@+id/changeQuotaView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/radioGroup"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignRight="@+id/radioGroup"
-            android:layout_below="@+id/changePrivacyText"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:clickable="true"
-            android:gravity="center_horizontal"
-            android:text="@string/change_quota"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <SeekBar
-            android:id="@+id/seekBar"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/changeQuotaView"
-            android:layout_centerVertical="true" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/quotaValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/seekBar"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:gravity="center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="20sp" />
+            <EditText
+                android:id="@+id/settingsWorkspaceName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:hint="@string/name"
+                android:inputType="textShortMessage"
+                android:maxLength="40"
+                android:textSize="22sp" />
 
-        <Button
-            android:id="@+id/confirmButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/quotaValue"
-            android:onClick="confirm"
-            android:text="@string/confirm" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/cancelButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/quotaValue"
-            android:onClick="cancel"
-            android:text="@string/cancel" />
+                <TextView
+                    android:id="@+id/editPeopleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/change_user_tags"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"/>
 
-    </RelativeLayout>
+                <Button
+                    android:id="@+id/editPeopleButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="addRemoveUsers"
+                    android:text="@string/users"
+                    android:layout_below="@+id/editPeopleText"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
 
-    <requestFocus />
+                <Button
+                    android:id="@+id/editTagsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="addRemoveTags"
+                    android:text="@string/tags"
+                    android:layout_below="@+id/editPeopleText"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+                <TextView
+                    android:id="@+id/changePrivacyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/change_privacy"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_below="@+id/editPeopleButton"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+
+                <RadioGroup
+                    android:id="@+id/radioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal"
+                    android:layout_below="@+id/changePrivacyText"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignRight="@+id/editTagsButton"
+                    android:layout_alignEnd="@+id/editTagsButton"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+                    <RadioButton
+                        android:id="@+id/publicButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="onPublicButtonPressed"
+                        android:text="@string/public_privacy"
+                        android:textSize="22sp"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+                    <RadioButton
+                        android:id="@+id/privateButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:onClick="onPrivateButtonPressed"
+                        android:text="@string/private_privacy"
+                        android:textSize="22sp"
+                        android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+                </RadioGroup>
+
+                <TextView
+                    android:id="@+id/changeQuotaView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:gravity="center_horizontal"
+                    android:text="@string/change_quota"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_below="@+id/radioGroup"
+                    android:layout_alignRight="@+id/changePrivacyText"
+                    android:layout_alignEnd="@+id/changePrivacyText"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/changeQuotaView"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:id="@+id/quotaValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/seekBar"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/confirmButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="confirm"
+                    android:text="@string/confirm"
+                    android:layout_below="@+id/quotaValue"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+                <Button
+                    android:id="@+id/cancelButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="cancel"
+                    android:text="@string/cancel"
+                    android:layout_below="@+id/quotaValue"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

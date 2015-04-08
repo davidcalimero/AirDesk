@@ -45,12 +45,10 @@
         android:onClick="onConfirmButtonPressed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/addTag"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/addTag"
-        android:layout_toEndOf="@+id/tagWriteView"
-        android:layout_alignLeft="@+id/addTag"
-        android:layout_alignStart="@+id/addTag" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
     <Button
         android:id="@+id/listCancel"
@@ -60,6 +58,7 @@
         android:onClick="cancel"
         android:layout_below="@+id/addTag"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
 
 </RelativeLayout>

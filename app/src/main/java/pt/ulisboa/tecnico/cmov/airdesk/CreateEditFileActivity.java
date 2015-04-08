@@ -123,7 +123,7 @@ public class CreateEditFileActivity extends ActionBarActivity {
         outState.putString(FILE_TITLE, titleView.getText().toString());
         outState.putString(FILE_CONTENT, contentView.getText().toString());
         outState.putString(OWNER_NAME, owner);
-        Log.e("CreateEditFileActivity", "state saved: " + title);
+        Log.e("CreateEditFileActivity", "state saved: " + titleView.getText().toString());
         super.onSaveInstanceState(outState);
     }
 

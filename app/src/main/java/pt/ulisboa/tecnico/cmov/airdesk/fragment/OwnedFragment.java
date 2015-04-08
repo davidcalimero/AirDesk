@@ -86,7 +86,6 @@ public class OwnedFragment extends ExpandableListFragment {
                 Intent intent = new Intent(getActivity().getApplicationContext(), CreateEditWorkspaceActivity.class);
                 intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_MODE, CreateEditWorkspaceActivity.MODE.CREATE);
                 intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_TITLE, getString(R.string.create_new_workspace));
-                intent.putExtra(CreateEditWorkspaceActivity.OWNER_NAME, userId);
                 startActivity(intent);
                 break;
             default:
