@@ -166,10 +166,7 @@ public class Workspace implements Serializable {
      * *****************************
      */
 
-    /*private String getWorkspacePath(Context context){
-        return context.getFilesDir().getAbsolutePath() + FileManager.LINE_SEP + _owner + FileManager.LINE_SEP + _name;
-    }*/
     public boolean haveSpace(int contentSize) {
-        return contentSize + getCurrentMemorySize() <= getMaximumQuota();
+        return ((contentSize + getCurrentMemorySize() <= getMaximumQuota()) && (FileManager.getInternalFreeSpace() > contentSize));
     }
 }
