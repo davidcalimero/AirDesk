@@ -10,6 +10,7 @@ public class TextFile implements Serializable {
 
     private String title;
     private String filename;
+    private boolean availability = true;
 
     public TextFile(Context context, String filename, String title, String content) {
         this.filename = filename;
@@ -38,5 +39,13 @@ public class TextFile implements Serializable {
     public void delete(Context context) {
         Log.e("TextFile", "File deleted: " + getTitle());
         context.deleteFile(filename);
+    }
+
+    public boolean isAvailable(){
+        return availability;
+    }
+
+    public void setAvailability(boolean isAvailable){
+        availability = isAvailable;
     }
 }

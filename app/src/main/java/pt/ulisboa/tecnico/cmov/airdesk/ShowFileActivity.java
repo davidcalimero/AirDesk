@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+import pt.ulisboa.tecnico.cmov.airdesk.other.ThreadHandler;
 
 
 public class ShowFileActivity extends ActionBarActivity {
@@ -51,16 +50,18 @@ public class ShowFileActivity extends ActionBarActivity {
         setTitle(title);
 
         //Get File content
-        final ProgressDialog loading = Utils.createProgressDialog(this, getString(R.string.dialog_please_wait), getString(R.string.dialog_loading_file));
-        loading.show();
-        new Thread(new Runnable() {
+        ThreadHandler.startWorkerThread(getString(R.string.dialog_loading_file), new ThreadHandler<String>(this) {
             @Override
-            public void run() {
-                text = FlowManager.getFileContent(getApplicationContext(), owner, workspace, title);
-                showText.setText(text);
-                loading.dismiss();
+            public String start() {
+                return FlowManager.getFileContent(getApplicationContext(), owner, workspace, title);
             }
-        }).start();
+
+            @Override
+            public void onFinish(String result) {
+                text = result;
+                showText.setText(result);
+            }
+        });
 
         listener = new WorkspacesChangeListener() {
             @Override
@@ -151,7 +152,7 @@ public class ShowFileActivity extends ActionBarActivity {
     }
 
     public void editButtonPressed(View view) {
-        if (FlowManager.havePermissionToEditFile(getApplicationContext(), workspace, title)) {
+        if (FlowManager.askToEdit(getApplicationContext(), workspace, title)) {
             Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, title);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);

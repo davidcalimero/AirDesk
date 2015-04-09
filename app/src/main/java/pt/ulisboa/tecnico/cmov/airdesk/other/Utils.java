@@ -1,8 +1,5 @@
 package pt.ulisboa.tecnico.cmov.airdesk.other;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-
 import java.text.DecimalFormat;
 import java.util.Collection;
 
@@ -33,14 +30,5 @@ public class Utils {
 
     public static String formatNumber(String format, float number){
         return new DecimalFormat(format).format(number);
-    }
-
-    public static ProgressDialog createProgressDialog(Context context, String title, String message){
-        ProgressDialog dialog = new ProgressDialog(context);
-        dialog.setTitle(title);
-        dialog.setMessage(message);
-        dialog.setCancelable(false);
-        dialog.setIndeterminate(false);
-        return dialog;
     }
 }

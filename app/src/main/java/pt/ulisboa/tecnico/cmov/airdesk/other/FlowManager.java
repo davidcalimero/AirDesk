@@ -121,8 +121,11 @@ public class FlowManager {
     public static void notifyEditFile(Context context, String owner, String workspaceName, String fileName, String content) throws OutOfMemoryException {
         //Only updates the user file if he is the owner
         User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(owner))
-            user.getWorkspaces().get(workspaceName).editFile(context, fileName, content);
+        if(user.getID().equals(owner)){
+            Workspace workspace = user.getWorkspaces().get(workspaceName);
+            workspace.getFiles().get(fileName).setAvailability(true);
+            workspace.editFile(context, fileName, content);
+        }
 
         //Updates interface
         for (WorkspacesChangeListener l : getInstance().listeners)
@@ -156,8 +159,13 @@ public class FlowManager {
     // METHODS TO ASK OWNER  -----------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
 
-    public static boolean havePermissionToEditFile(Context context, String workspaceName, String fileName) {
-        return true;
+    public static boolean askToEdit(Context context, String workspaceName, String fileName) {
+        TextFile file = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).getFiles().get(fileName);
+        if(file.isAvailable()){
+            file.setAvailability(false);
+            return true;
+        }
+        return false;
     }
 
     public static String getFileContent(Context context, String owner, String workspaceName, String fileName) {
