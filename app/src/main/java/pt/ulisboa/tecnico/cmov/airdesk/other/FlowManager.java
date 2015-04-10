@@ -122,9 +122,7 @@ public class FlowManager {
         //Only updates the user file if he is the owner
         User user = ((ApplicationContext) context).getActiveUser();
         if(user.getID().equals(owner)){
-            Workspace workspace = user.getWorkspaces().get(workspaceName);
-            workspace.getFiles().get(fileName).setAvailability(true);
-            workspace.editFile(context, fileName, content);
+            user.getWorkspaces().get(workspaceName).editFile(context, fileName, content);
         }
 
         //Updates interface
@@ -162,7 +160,7 @@ public class FlowManager {
     public static boolean askToEdit(Context context, String workspaceName, String fileName) {
         TextFile file = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).getFiles().get(fileName);
         if(file.isAvailable()){
-            file.setAvailability(false);
+            //TODO file.setAvailability(false);
             return true;
         }
         return false;
