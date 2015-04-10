@@ -35,7 +35,7 @@ public abstract class ThreadHandler<T extends Serializable> extends Handler {
     public static void startWorkerThread(String message, final ThreadHandler runnable){
         runnable.dialog.setMessage(message);
         runnable.dialog.show();
-        new Thread(new Runnable() {
+        new Thread(message) {
             @Override
             public void run() {
                 /*try {
@@ -50,6 +50,6 @@ public abstract class ThreadHandler<T extends Serializable> extends Handler {
                 msg.setData(bundle);
                 runnable.sendMessage(msg);
             }
-        }, message).start();
+        }.start();
     }
 }
