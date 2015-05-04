@@ -11,8 +11,8 @@ import android.widget.Toast;
 
 import java.io.Serializable;
 
-import pt.ulisboa.tecnico.cmov.airdesk.other.ThreadHandler;
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.ThreadHandler;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 
 public class LogInActivity extends ActionBarActivity {

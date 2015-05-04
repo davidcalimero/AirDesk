@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
-import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 public class CreateEditFileActivity extends ActionBarActivity {
 

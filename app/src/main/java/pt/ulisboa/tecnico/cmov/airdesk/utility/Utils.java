@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.airdesk.other;
+package pt.ulisboa.tecnico.cmov.airdesk.utility;
 
 import java.text.DecimalFormat;
 import java.util.Collection;

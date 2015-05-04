@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.R;
-import pt.ulisboa.tecnico.cmov.airdesk.widgets.AnimatedExpandableListView;
+import pt.ulisboa.tecnico.cmov.airdesk.widget.AnimatedExpandableListView;
 
 public class WorkspaceListAdapter extends AnimatedExpandableListView.AnimatedExpandableListAdapter {
 

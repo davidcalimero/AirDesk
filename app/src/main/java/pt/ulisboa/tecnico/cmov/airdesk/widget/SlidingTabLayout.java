@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pt.ulisboa.tecnico.cmov.airdesk.widgets;
+package pt.ulisboa.tecnico.cmov.airdesk.widget;
 
 import android.content.Context;
 import android.graphics.Typeface;

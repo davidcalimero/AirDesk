@@ -17,8 +17,8 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspacePagerAdapter;
-import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
-import pt.ulisboa.tecnico.cmov.airdesk.widgets.SlidingTabLayout;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.widget.SlidingTabLayout;
 
 
 public class MainMenu extends ActionBarActivity {

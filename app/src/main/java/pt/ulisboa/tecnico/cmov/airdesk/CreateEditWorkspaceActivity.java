@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
-import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 public class CreateEditWorkspaceActivity extends ActionBarActivity {
 

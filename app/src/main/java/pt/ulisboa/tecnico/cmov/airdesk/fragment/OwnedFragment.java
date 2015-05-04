@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import pt.ulisboa.tecnico.cmov.airdesk.CreateEditWorkspaceActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
-import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 
 public class OwnedFragment extends ExpandableListFragment {
 

@@ -17,7 +17,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.ListActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.MainMenu;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
-import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 
 public class ForeignFragment extends ExpandableListFragment {
 

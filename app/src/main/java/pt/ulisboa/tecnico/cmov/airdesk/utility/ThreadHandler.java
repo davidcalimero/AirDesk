@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.airdesk.other;
+package pt.ulisboa.tecnico.cmov.airdesk.utility;
 
 import android.app.ProgressDialog;
 import android.content.Context;

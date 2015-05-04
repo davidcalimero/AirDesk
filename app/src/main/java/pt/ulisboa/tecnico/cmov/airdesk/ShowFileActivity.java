@@ -15,8 +15,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
-import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
-import pt.ulisboa.tecnico.cmov.airdesk.other.ThreadHandler;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.ThreadHandler;
 
 
 public class ShowFileActivity extends ActionBarActivity {

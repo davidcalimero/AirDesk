@@ -7,8 +7,8 @@ import android.util.Log;
 
 import java.io.FileNotFoundException;
 
-import pt.ulisboa.tecnico.cmov.airdesk.other.FileManager;
-import pt.ulisboa.tecnico.cmov.airdesk.other.User;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FileManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.User;
 
 public class ApplicationContext extends Application {
 

@@ -9,8 +9,8 @@ import android.widget.ExpandableListView;
 import pt.ulisboa.tecnico.cmov.airdesk.ShowFileActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
-import pt.ulisboa.tecnico.cmov.airdesk.other.FlowManager;
-import pt.ulisboa.tecnico.cmov.airdesk.widgets.AnimatedExpandableListView;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.widget.AnimatedExpandableListView;
 
 
 public class ExpandableListFragment extends Fragment {

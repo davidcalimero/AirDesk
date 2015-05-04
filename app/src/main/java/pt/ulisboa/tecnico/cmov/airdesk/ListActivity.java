@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.listener.SwipeDismissListViewTouchListener;
-import pt.ulisboa.tecnico.cmov.airdesk.other.Utils;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 
 public class ListActivity extends ActionBarActivity {

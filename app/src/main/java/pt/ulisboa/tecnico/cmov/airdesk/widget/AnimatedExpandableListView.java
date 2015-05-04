@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.airdesk.widgets;
+package pt.ulisboa.tecnico.cmov.airdesk.widget;
 
 /*
  * Copyright (C) 2014 Gary Guo
