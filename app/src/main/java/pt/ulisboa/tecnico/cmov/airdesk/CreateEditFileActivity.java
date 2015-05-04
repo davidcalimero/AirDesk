@@ -3,7 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +20,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
-public class CreateEditFileActivity extends ActionBarActivity {
+public class CreateEditFileActivity extends AppCompatActivity {
 
     public enum MODE {CREATE, EDIT}
 

@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +19,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.ThreadHandler;
 
 
-public class ShowFileActivity extends ActionBarActivity {
+public class ShowFileActivity extends AppCompatActivity {
 
     public static final String WORKSPACE = "workspace";
     public static final String TITLE = "title";

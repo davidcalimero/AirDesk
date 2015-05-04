@@ -3,7 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +21,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.widget.SlidingTabLayout;
 
 
-public class MainMenu extends ActionBarActivity {
+public class MainMenu extends AppCompatActivity {
 
     public static final int SUBSCRIPTIONS = 1;
 

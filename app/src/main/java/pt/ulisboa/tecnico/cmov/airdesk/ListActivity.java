@@ -2,7 +2,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -17,7 +17,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.listener.SwipeDismissListViewTouchListene
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 
-public class ListActivity extends ActionBarActivity {
+public class ListActivity extends AppCompatActivity {
 
     public static final String LIST = "list";
     public static final String TITLE = "title";

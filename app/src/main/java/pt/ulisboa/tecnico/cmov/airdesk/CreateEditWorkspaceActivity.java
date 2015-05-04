@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +23,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
-public class CreateEditWorkspaceActivity extends ActionBarActivity {
+public class CreateEditWorkspaceActivity extends AppCompatActivity {
 
     public enum MODE {CREATE, EDIT}
     private EditText titleView;
