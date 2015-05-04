@@ -1,18 +1,41 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.IBinder;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
 
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FileManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.User;
+import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.WifiDirectService;
 
 public class ApplicationContext extends Application {
 
     private User activeUser;
+
+    private WifiDirectService wifiDirectService = null;
+
+    private ServiceConnection wifiDirectConnection = new ServiceConnection() {
+        // callbacks for service binding, passed to bindService()
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.e("ApplicationContext", "service connected");
+            wifiDirectService = ((WifiDirectService.WifiDirectBinder) service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.e("ApplicationContext", "service disconnected");
+            wifiDirectService = null;
+        }
+    };
 
     public User getActiveUser() {
         if(activeUser == null) {
@@ -23,7 +46,23 @@ public class ApplicationContext extends Application {
         return activeUser;
     }
 
-    public void loadUser(String email, String nickName) {
+    public WifiDirectService getWifiDirectService(){
+        return wifiDirectService;
+    }
+
+    public void init(String email, String nickName){
+        loadUser(email, nickName);
+        startService();
+    }
+
+    public void reset() {
+        Log.e("ApplicationContext", "user unload: " + activeUser.getID());
+        activeUser = null;
+        unbindService(wifiDirectConnection);
+    }
+
+
+    private void loadUser(String email, String nickName) {
         try {
             activeUser = (User) FileManager.fileToObject(email, getApplicationContext());
             Log.e("ApplicationContext", "user loaded: " + email + "," + nickName + ".");
@@ -33,9 +72,8 @@ public class ApplicationContext extends Application {
         }
     }
 
-    public void removeUser() {
-        Log.e("ApplicationContext", "user unload: " + activeUser.getID());
-        activeUser = null;
+    private void startService(){
+        bindService(new Intent(getApplicationContext(), WifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
     }
 
     public void commit() {

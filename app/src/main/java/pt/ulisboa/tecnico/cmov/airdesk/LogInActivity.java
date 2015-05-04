@@ -34,7 +34,8 @@ public class LogInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         //Hide ActionBar
-        getSupportActionBar().hide();
+        if(getSupportActionBar() != null)
+            getSupportActionBar().hide();
 
         //Get login data from sharedPreferences
         sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
@@ -47,7 +48,7 @@ public class LogInActivity extends AppCompatActivity {
         //Logout if applicable
         if (getIntent().getBooleanExtra(LOGOUT, false)) {
             sharedPreferences.edit().clear().commit();
-            appState.removeUser();
+            appState.reset();
         }
 
         //If was not logout and have data to login autologin
@@ -95,7 +96,7 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public Serializable start() {
                 //Load user
-                appState.loadUser(email, nickname);
+                appState.init(email, nickname);
                 return null;
             }
 
