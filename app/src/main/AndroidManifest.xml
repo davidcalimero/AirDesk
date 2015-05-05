@@ -2,12 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pt.ulisboa.tecnico.cmov.airdesk" >
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Market filtering -->
+    <uses-feature android:name="android.hardware.wifi.direct" android:required="true"/>
+
     <application
         android:name=".ApplicationContext"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name=".LogInActivity"
             android:configChanges="keyboardHidden|orientation"
@@ -19,12 +27,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainMenu"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ShowFileActivity"
             android:configChanges="keyboardHidden|orientation"
@@ -36,11 +46,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />
         </activity>
+
         <activity
             android:name=".ListActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".CreateEditWorkspaceActivity"
             android:configChanges="keyboardHidden|orientation"
@@ -50,6 +62,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainMenu" />
         </activity>
+
         <activity
             android:name=".CreateEditFileActivity"
             android:configChanges="keyboardHidden|orientation"
@@ -60,11 +73,7 @@
                 android:value=".MainMenu" />
         </activity>
 
-        <service
-            android:name=".wifiDirect.WifiDirectService"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
+        <service android:name=".wifiDirect.WifiDirectService" />
 
         <service android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
 
