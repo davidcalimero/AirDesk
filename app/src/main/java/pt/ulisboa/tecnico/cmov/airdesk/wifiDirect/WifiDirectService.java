@@ -6,16 +6,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
@@ -29,7 +40,8 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 
 public class WifiDirectService extends Service implements
-        SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener, WifiP2pManager.ChannelListener {
+        SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener,
+        WifiP2pManager.PeerListListener, WifiP2pManager.GroupInfoListener, WifiP2pManager.ConnectionInfoListener {
 
     private final IBinder wifiDirectBinder = new WifiDirectBinder();
     private WifiDirectBroadcastReceiver receiver;
@@ -53,10 +65,14 @@ public class WifiDirectService extends Service implements
             termiteChannel = null;
         }
     };
-
     private SimWifiP2pSocketServer mSrvSocket = null;
     private ReceiveCommTask mComm = null;
     private SimWifiP2pSocket mCliSocket = null;
+
+    //Wifi Direct
+    private WifiP2pManager wifiManager;
+    private WifiP2pManager.Channel wifiChannel;
+    private WifiP2pInfo info;
 
     @Override
     public void onCreate() {
@@ -76,10 +92,10 @@ public class WifiDirectService extends Service implements
         filter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-        WifiP2pManager manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        WifiP2pManager.Channel channel = manager.initialize(this, getMainLooper(), null);
+        wifiManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        wifiChannel = wifiManager.initialize(this, getMainLooper(), null);
 
-        receiver = new WifiDirectBroadcastReceiver(manager, channel);
+        receiver = new WifiDirectBroadcastReceiver(wifiManager, wifiChannel);
         registerReceiver(receiver, filter);
 
         bindService(new Intent(getApplicationContext(), SimWifiP2pService.class), termiteConnection, Context.BIND_AUTO_CREATE);
@@ -106,18 +122,56 @@ public class WifiDirectService extends Service implements
     }
 
     @Override
+    public void onGroupInfoAvailable(WifiP2pGroup wifiP2pGroup) {
+
+    }
+
+    @Override
     public void onPeersAvailable(SimWifiP2pDeviceList peers) {
         String ip = "";
         for (SimWifiP2pDevice device : peers.getDeviceList()) {
             ip =  device.getVirtIp();
         }
 
-        new OutgoingCommTask().execute(ip);
+        new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
+    }
+
+
+    @Override
+    public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
+        WifiP2pDevice ip = null;
+        for (WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
+            ip =  device;
+        }
+
+        //Connect
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = ip.deviceAddress;
+        config.wps.setup = WpsInfo.PBC;
+        wifiManager.connect(wifiChannel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure(int reason) {
+            }
+        });
     }
 
     @Override
-    public void onChannelDisconnected() {
-
+    public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
+        this.info = wifiP2pInfo;
+        if (info.groupFormed && info.isGroupOwner) {
+            new FileServerAsyncTask(this, null).execute();
+        } else if (info.groupFormed) {
+            Intent serviceIntent = new Intent(this, CommTask.class);
+            serviceIntent.setAction(CommTask.ACTION_SEND_FILE);
+            serviceIntent.putExtra(CommTask.EXTRAS_FILE_PATH, "");
+            serviceIntent.putExtra(CommTask.EXTRAS_GROUP_OWNER_ADDRESS, info.groupOwnerAddress.getHostAddress());
+            serviceIntent.putExtra(CommTask.EXTRAS_GROUP_OWNER_PORT, 8988);
+            startService(serviceIntent);
+        }
     }
 
     public class WifiDirectBinder extends Binder {
@@ -128,6 +182,13 @@ public class WifiDirectService extends Service implements
 
     public void sendHelloWorld(){
         termiteManager.requestPeers(termiteChannel, WifiDirectService.this);
+        wifiManager.discoverPeers(wifiChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() { }
+
+            @Override
+            public void onFailure(int reasonCode) {}
+        });
     }
 
 
@@ -252,5 +313,49 @@ public class WifiDirectService extends Service implements
             }
             s = null;
         }
+    }
+
+    public static class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
+
+        private Context context;
+        private TextView statusText;
+
+        /**
+         * @param context
+         * @param statusText
+         */
+        public FileServerAsyncTask(Context context, View statusText) {
+            this.context = context;
+            this.statusText = (TextView) statusText;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            try {
+                ServerSocket serverSocket = new ServerSocket(8988);
+                Log.d("wifi-direct-real", "Server: Socket opened");
+                Socket client = serverSocket.accept();
+                Log.d("wifi-direct-real", "Server: connection done");
+
+                InputStream inputstream = client.getInputStream();
+
+                Log.e("wifi-direct-real", "server: copying files " + inputstream.toString());
+                serverSocket.close();
+                return inputstream.toString();
+            } catch (IOException e) {
+                Log.e("wifi-direct-real", e.getMessage());
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            statusText.setText("Opening a server socket");
+        }
+
     }
 }
