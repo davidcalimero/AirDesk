@@ -4,17 +4,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.util.Log;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 
-public class WifiBroadcastReceiver extends BroadcastReceiver {
+public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
 
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
 
-    public WifiBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel){
+    public WifiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel){
         this.manager = manager;
         this.channel = channel;
     }
@@ -56,7 +55,6 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
                 break;
             case WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION:
                 break;
-
         }
     }
 }

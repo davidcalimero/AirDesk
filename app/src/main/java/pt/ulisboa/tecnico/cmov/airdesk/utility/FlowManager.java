@@ -175,6 +175,9 @@ public class FlowManager {
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
 
+        //TODO Delete the bellow
+        ((ApplicationContext) context).getWifiDirectService().sendHelloWorld();
+
         // S-Version
         for(String w : getWorkspaces(context)){
             if(getWorkspaceUsers(context, w).contains(getActiveUserID(context)) ||
