@@ -13,6 +13,8 @@ import java.io.FileNotFoundException;
 
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FileManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.User;
+import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.RealWifiDirectService;
+import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.SimWifiDirectService;
 import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.WifiDirectService;
 
 public class ApplicationContext extends Application {
@@ -22,11 +24,9 @@ public class ApplicationContext extends Application {
     private WifiDirectService wifiDirectService = null;
 
     private ServiceConnection wifiDirectConnection = new ServiceConnection() {
-        // callbacks for service binding, passed to bindService()
-
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.e("ApplicationContext", "service connected");
+            Log.e("ApplicationContext", "service connected" + className);
             wifiDirectService = ((WifiDirectService.WifiDirectBinder) service).getService();
         }
 
@@ -73,7 +73,11 @@ public class ApplicationContext extends Application {
     }
 
     private void startService(){
-        bindService(new Intent(getApplicationContext(), WifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(getApplicationContext(), RealWifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
+        if(!wifiDirectService.isSupported())
+            unbindService(wifiDirectConnection);
+
+        bindService(new Intent(getApplicationContext(), SimWifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
     }
 
     public void commit() {

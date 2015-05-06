@@ -73,7 +73,9 @@
                 android:value=".MainMenu" />
         </activity>
 
-        <service android:name=".wifiDirect.WifiDirectService" />
+        <service android:name=".wifiDirect.RealWifiDirectService" />
+
+        <service android:name=".wifiDirect.SimWifiDirectService" />
 
         <service android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
 

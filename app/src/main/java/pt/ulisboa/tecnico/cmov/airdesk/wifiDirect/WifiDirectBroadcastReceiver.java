@@ -10,13 +10,7 @@ import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 
 public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
 
-    private WifiP2pManager manager;
-    private WifiP2pManager.Channel channel;
-
-    public WifiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel){
-        this.manager = manager;
-        this.channel = channel;
-    }
+    public WifiDirectBroadcastReceiver(){}
 
     @Override
     public void onReceive(Context context, Intent intent) {

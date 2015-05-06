@@ -176,7 +176,7 @@ public class FlowManager {
         // Compare tags from Subscription and Public Profile
 
         //TODO Delete the bellow
-        ((ApplicationContext) context).getWifiDirectService().sendHelloWorld();
+        ((ApplicationContext) context).getWifiDirectService().testFunc();
 
         // S-Version
         for(String w : getWorkspaces(context)){
