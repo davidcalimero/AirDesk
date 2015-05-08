@@ -69,11 +69,6 @@ public class SimWifiDirectService extends WifiDirectService implements
     }
 
     @Override
-    public boolean isSupported() {
-        return true;
-    }
-
-    @Override
     public void testFunc() {
         termiteManager.requestPeers(termiteChannel, SimWifiDirectService.this);
     }

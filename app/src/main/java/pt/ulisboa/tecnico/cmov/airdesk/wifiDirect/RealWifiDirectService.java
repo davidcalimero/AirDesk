@@ -37,24 +37,6 @@ public class RealWifiDirectService extends WifiDirectService implements
     protected void unBind() {}
 
     @Override
-    public boolean isSupported() {
-        final boolean[] result = new boolean[1];
-        wifiManager.discoverPeers(wifiChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                result[0] = true;
-            }
-
-            @Override
-            public void onFailure(int reasonCode) {
-                result[0] = !(reasonCode == WifiP2pManager.P2P_UNSUPPORTED);
-            }
-        });
-
-        return result[0];
-    }
-
-    @Override
     public void testFunc() {
         wifiManager.discoverPeers(wifiChannel, new WifiP2pManager.ActionListener() {
             @Override

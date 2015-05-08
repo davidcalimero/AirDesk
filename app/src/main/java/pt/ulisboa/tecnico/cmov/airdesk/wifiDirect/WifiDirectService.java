@@ -49,14 +49,13 @@ public abstract class WifiDirectService extends Service {
     public boolean onUnbind(Intent intent) {
         unregisterReceiver(receiver);
         unBind();
+        stopSelf();
         return super.onUnbind(intent);
     }
 
     protected abstract void init();
 
     protected abstract void unBind();
-
-    public abstract boolean isSupported();
 
     public abstract void testFunc();
 }

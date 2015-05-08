@@ -21,6 +21,8 @@ public class ApplicationContext extends Application {
 
     private User activeUser;
 
+    private static final boolean usingSimWifiDirect = true;
+
     private WifiDirectService wifiDirectService = null;
 
     private ServiceConnection wifiDirectConnection = new ServiceConnection() {
@@ -73,12 +75,12 @@ public class ApplicationContext extends Application {
     }
 
     private void startService(){
-        bindService(new Intent(getApplicationContext(), RealWifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
-        if(!wifiDirectService.isSupported())
-            unbindService(wifiDirectConnection);
-
-        bindService(new Intent(getApplicationContext(), SimWifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
+        if(usingSimWifiDirect)
+            bindService(new Intent(getApplicationContext(), SimWifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
+        else
+            bindService(new Intent(getApplicationContext(), RealWifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
     }
+
 
     public void commit() {
         if (FileManager.objectToFile(activeUser.getID(), activeUser, getApplicationContext()))
