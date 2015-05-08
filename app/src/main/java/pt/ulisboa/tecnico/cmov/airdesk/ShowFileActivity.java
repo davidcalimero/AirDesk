@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.ThreadHandler;
@@ -21,14 +23,9 @@ import pt.ulisboa.tecnico.cmov.airdesk.utility.ThreadHandler;
 
 public class ShowFileActivity extends AppCompatActivity {
 
-    public static final String WORKSPACE = "workspace";
-    public static final String TITLE = "title";
-    public static final String OWNER_NAME = "ownerName";
+    public static final String FILE_DTO = "file_dto";
 
-    private String workspace;
-    private String title;
-    private String text;
-    private String owner;
+    private TextFileDto dto;
 
     private WorkspacesChangeListener listener;
 
@@ -39,63 +36,51 @@ public class ShowFileActivity extends AppCompatActivity {
 
         //Restore data
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
-        workspace = bundle.getString(WORKSPACE);
-        title = bundle.getString(TITLE);
-        owner = bundle.getString(OWNER_NAME);
+        dto = (TextFileDto) bundle.getSerializable(FILE_DTO);
 
-        Log.e("ShowFileActivity", owner + " " + workspace + " " + title);
+        Log.e("ShowFileActivity", dto.toString());
 
         //Init
         final TextView showText = (TextView) findViewById(R.id.textView);
-        setTitle(title);
+        setTitle(dto.title);
 
         //Get File content
         ThreadHandler.startWorkerThread(getString(R.string.dialog_loading_file), new ThreadHandler<String>(this) {
             @Override
             public String start() {
-                return FlowManager.getFileContent(getApplicationContext(), owner, workspace, title);
+                return FlowManager.send_getFileContent(getApplicationContext(), dto);
             }
 
             @Override
             public void onFinish(String result) {
-                text = result;
+                dto.content = result;
                 showText.setText(result);
             }
         });
 
         listener = new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceAdded(String ownerName, String name) {}
+            public void onWorkspaceAdded(WorkspaceDto workspaceDto) {}
 
             @Override
-            public void onWorkspaceAddedForeign(String owner, String name, ArrayList<String> files) {
-                //TODO remove this method in version N
-            }
-
-            @Override
-            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
-                //TODO remove this method in version N
-            }
-
-            @Override
-            public void onWorkspaceRemoved(String ownerName, String name) {
-                if(owner.equals(ownerName) && workspace.equals(name))
+            public void onWorkspaceRemoved(WorkspaceDto workspaceDto) {
+                if(dto.owner.equals(workspaceDto.owner) && dto.workspace.equals(workspaceDto.name))
                     finish();
             }
 
             @Override
-            public void onFileAdded(String ownerName, String workspaceName, String fileName) {}
+            public void onFileAdded(TextFileDto textFileDto) {}
 
             @Override
-            public void onFileRemoved(String ownerName, String workspaceName, String fileName) {
-                if(owner.equals(ownerName) && workspace.equals(workspaceName) && text.equals(fileName))
+            public void onFileRemoved(TextFileDto textFileDto) {
+                if(dto.owner.equals(textFileDto.owner) && dto.workspace.equals(textFileDto.workspace) && dto.title.equals(textFileDto.title))
                     finish();
             }
 
             @Override
-            public void onFileContentChange(String ownerName, String workspaceName, String filename, String content) {
-                if(owner.equals(ownerName) && workspace.equals(workspaceName) && text.equals(filename))
-                    showText.setText(content);
+            public void onFileContentChange(TextFileDto textFileDto) {
+                if(dto.owner.equals(textFileDto.owner) && dto.workspace.equals(textFileDto.workspace) && dto.title.equals(textFileDto.title))
+                    showText.setText(textFileDto.content);
             }
         };
         FlowManager.addWorkspacesChangeListener(listener);
@@ -109,10 +94,8 @@ public class ShowFileActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(WORKSPACE, workspace);
-        outState.putString(TITLE, title);
-        outState.putString(OWNER_NAME, owner);
-        Log.e("ShowFileActivity", "state saved: " + title);
+        outState.putSerializable(FILE_DTO, dto);
+        Log.e("ShowFileActivity", "state saved: " + dto.title);
         super.onSaveInstanceState(outState);
     }
 
@@ -129,12 +112,12 @@ public class ShowFileActivity extends AppCompatActivity {
             case R.id.action_delete:
                 // Create the AlertDialog object
                 new AlertDialog.Builder(this)
-                        .setMessage(getString(R.string.dialog_confirm_delete) + " \"" + title + "\"")
+                        .setMessage(getString(R.string.dialog_confirm_delete) + " \"" + dto.title + "\"")
                         .setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowManager.notifyRemoveFile(getApplicationContext(), owner, workspace, title);
+                                FlowManager.notifyRemoveFile(getApplicationContext(), dto);
                                 Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
                                 finish();
                             }
@@ -152,14 +135,11 @@ public class ShowFileActivity extends AppCompatActivity {
     }
 
     public void editButtonPressed(View view) {
-        if (FlowManager.askToEdit(getApplicationContext(), workspace, title)) {
+        if (FlowManager.send_askToEditFile(getApplicationContext(), dto)) {
             Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
-            intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, title);
+            intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, dto.title);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);
-            intent.putExtra(CreateEditFileActivity.FILE_WORKSPACE, workspace);
-            intent.putExtra(CreateEditFileActivity.FILE_TITLE, title);
-            intent.putExtra(CreateEditFileActivity.FILE_CONTENT, text);
-            intent.putExtra(CreateEditFileActivity.OWNER_NAME, owner);
+            intent.putExtra(CreateEditFileActivity.FILE_DTO, dto);
             startActivity(intent);
             finish();
         } else

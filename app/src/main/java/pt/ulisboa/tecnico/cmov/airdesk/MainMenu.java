@@ -17,7 +17,10 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspacePagerAdapter;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.Workspace;
 import pt.ulisboa.tecnico.cmov.airdesk.widget.SlidingTabLayout;
 
 
@@ -88,36 +91,48 @@ public class MainMenu extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data != null && resultCode == RESULT_OK) {
             if (requestCode == SUBSCRIPTIONS) {
-                FlowManager.setSubscriptions(getApplicationContext(), (HashSet <CharSequence>) data.getSerializableExtra(ListActivity.LIST));
+                FlowManager.setSubscriptions(getApplicationContext(), (HashSet <String>) data.getSerializableExtra(ListActivity.LIST));
                 Toast.makeText(getApplicationContext(), getString(R.string.subscriptions_changed_successfully), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     public void onSettingsButtonPressed(View view) {
+        WorkspaceDto workspaceDto = new WorkspaceDto();
+        workspaceDto.owner = email;
+        workspaceDto.name = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.groupHeader)).getText().toString();
+
         Intent intent = new Intent(getApplicationContext(), CreateEditWorkspaceActivity.class);
-        String workspaceName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.groupHeader)).getText().toString();
-        intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_TITLE, workspaceName);
+        intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_TITLE, workspaceDto.name);
         intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_MODE, CreateEditWorkspaceActivity.MODE.EDIT);
-        intent.putExtra(CreateEditWorkspaceActivity.WORKSPACE_NAME, workspaceName);
+        intent.putExtra(CreateEditWorkspaceActivity.WORKSPACE_DTO, workspaceDto);
         startActivity(intent);
     }
 
     public void onAddFileButtonPressed(View view) {
         String workspaceName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.groupHeader)).getText().toString();
         String ownerName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.tagHeader)).getText().toString();
+
+        TextFileDto textFileDto = new TextFileDto();
+        textFileDto.owner = ownerName;
+        textFileDto.workspace = workspaceName;
+
         Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
         intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, getString(R.string.create_new_file));
         intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.CREATE);
-        intent.putExtra(CreateEditFileActivity.FILE_WORKSPACE, workspaceName);
-        intent.putExtra(CreateEditFileActivity.OWNER_NAME, ownerName);
+        intent.putExtra(CreateEditFileActivity.FILE_DTO, textFileDto);
         startActivity(intent);
     }
 
     public void onRemoveWorkspaceButtonPressed(View view){
         String workspaceName = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.groupHeader)).getText().toString();
         String owner = ((TextView) ((ViewGroup) view.getParent()).findViewById(R.id.tagHeader)).getText().toString();
-        FlowManager.notifyRemoveWorkspaceUser(getApplicationContext(), owner, workspaceName, FlowManager.getActiveUserID(getApplicationContext()));
+
+        WorkspaceDto workspaceDto = new WorkspaceDto();
+        workspaceDto.owner = owner;
+        workspaceDto.name = workspaceName;
+
+        FlowManager.send_uninviteUserFromWorkspace(FlowManager.getActiveUserID(getApplicationContext()), workspaceDto);
     }
 
     //Force overflow menu on actionBar

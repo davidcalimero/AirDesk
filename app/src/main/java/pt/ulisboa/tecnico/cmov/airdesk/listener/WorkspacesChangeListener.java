@@ -1,20 +1,17 @@
 package pt.ulisboa.tecnico.cmov.airdesk.listener;
 
-import java.util.ArrayList;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 
 public interface WorkspacesChangeListener {
 
-    public void onWorkspaceAdded(String owner, String name);
+    void onWorkspaceAdded(WorkspaceDto workspaceDto);
 
-    //TODO REMOVE METHOD ON VERSION N
-    public void onWorkspaceAddedForeign(String owner, String workspaceName, ArrayList<String> files);
-    public void onWorkspaceRemovedForeign(String owner, String workspaceName);
+    void onWorkspaceRemoved(WorkspaceDto workspaceDto);
 
-    public void onWorkspaceRemoved(String owner, String workspaceName);
+    void onFileAdded(TextFileDto textFileDto);
 
-    public void onFileAdded(String owner, String workspaceName, String fileName);
+    void onFileRemoved(TextFileDto textFileDto);
 
-    public void onFileRemoved(String owner, String workspaceName, String fileName);
-
-    public void onFileContentChange(String owner, String workspaceName, String filename, String content);
+    void onFileContentChange(TextFileDto textFileDto);
 }

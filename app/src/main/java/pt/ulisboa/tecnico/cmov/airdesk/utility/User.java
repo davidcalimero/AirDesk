@@ -25,7 +25,7 @@ public class User implements Serializable {
     private HashMap<String, Workspace> _workspaceList = new HashMap<>();
 
     /* Keywords List */
-    private HashSet<CharSequence> _subscriptions = new HashSet<>();
+    private HashSet<String> _subscriptions = new HashSet<>();
 
     /*********************************/
     /********** CONSTRUCTOR **********/
@@ -55,11 +55,11 @@ public class User implements Serializable {
     }
 
     /* Client Keyword List */
-    public HashSet<CharSequence> getSubscriptions() {
+    public HashSet<String> getSubscriptions() {
         return _subscriptions;
     }
 
-    public void setSubscriptions(HashSet<CharSequence> value) {
+    public void setSubscriptions(HashSet<String> value) {
         Log.e("User", "subscriptions modified");
         _subscriptions = value;
     }

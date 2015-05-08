@@ -22,9 +22,9 @@ public class Workspace implements Serializable {
     /* Name of the workspace. */
     private String _name = "";
     /* User List */
-    private HashSet<CharSequence> _users = new HashSet<>();
+    private HashSet<String> _users = new HashSet<>();
     /* Public Profile */
-    private HashSet<CharSequence> _tags = new HashSet<>();
+    private HashSet<String> _tags = new HashSet<>();
     /* File List */
     private HashMap<String, TextFile> _files = new HashMap<>();
     /* Privacy */
@@ -54,8 +54,13 @@ public class Workspace implements Serializable {
     }
 
     /* User List */
-    public HashSet<CharSequence> getUsers() {
+    public HashSet<String> getUsers() {
         return _users;
+    }
+
+    public void setUsers(HashSet<String> users){
+        Log.e("Workspace", "users changed: " + getName());
+        _users = users;
     }
 
     public void addUser(String id)  {
@@ -69,12 +74,12 @@ public class Workspace implements Serializable {
     }
 
     /* Public Profile */
-    public HashSet<CharSequence> getTags() {
+    public HashSet<String> getTags() {
         return _tags;
     }
 
-    public void setTags(HashSet<CharSequence> tags) {
-        Log.e("Workspace", "public profile changed: " + getName());
+    public void setTags(HashSet<String> tags) {
+        Log.e("Workspace", "tags changed: " + getName());
         _tags = tags;
     }
 

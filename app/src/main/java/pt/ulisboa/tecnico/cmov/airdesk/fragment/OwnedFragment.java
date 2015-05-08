@@ -14,6 +14,8 @@ import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.airdesk.CreateEditWorkspaceActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 
@@ -32,41 +34,31 @@ public class OwnedFragment extends ExpandableListFragment {
 
         setListener(new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceAdded(String owner, String name) {
-                if(userId.equals(owner))
-                    addWorkspace(owner, name);
+            public void onWorkspaceAdded(WorkspaceDto workspaceDto) {
+                if(userId.equals(workspaceDto.owner))
+                    addWorkspace(workspaceDto.owner, workspaceDto.name);
             }
 
             @Override
-            public void onWorkspaceAddedForeign(String owner, String name, ArrayList<String> files) {
-                //TODO remove this method in version N
+            public void onWorkspaceRemoved(WorkspaceDto workspaceDto) {
+                if(userId.equals(workspaceDto.owner))
+                    removeWorkspace(workspaceDto.owner, workspaceDto.name);
             }
 
             @Override
-            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
-                //TODO remove this method in version N
+            public void onFileAdded(TextFileDto textFileDto) {
+                if(userId.equals(textFileDto.owner))
+                    addFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
             }
 
             @Override
-            public void onWorkspaceRemoved(String owner, String name) {
-                if(userId.equals(owner))
-                    removeWorkspace(owner, name);
+            public void onFileRemoved(TextFileDto textFileDto) {
+                if(userId.equals(textFileDto.owner))
+                    removeFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
             }
 
             @Override
-            public void onFileAdded(String owner, String workspaceName, String fileName) {
-                if(userId.equals(owner))
-                    addFile(owner, workspaceName, fileName);
-            }
-
-            @Override
-            public void onFileRemoved(String owner, String workspaceName, String fileName) {
-                if(userId.equals(owner))
-                    removeFile(owner, workspaceName, fileName);
-            }
-
-            @Override
-            public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
+            public void onFileContentChange(TextFileDto textFileDto) {}
         });
 
         return view;
@@ -83,9 +75,13 @@ public class OwnedFragment extends ExpandableListFragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_new_workspace:
+                WorkspaceDto workspaceDto = new WorkspaceDto();
+                workspaceDto.owner = FlowManager.getActiveUserID(getActivity().getApplicationContext());
+
                 Intent intent = new Intent(getActivity().getApplicationContext(), CreateEditWorkspaceActivity.class);
                 intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_MODE, CreateEditWorkspaceActivity.MODE.CREATE);
                 intent.putExtra(CreateEditWorkspaceActivity.ACTIVITY_TITLE, getString(R.string.create_new_workspace));
+                intent.putExtra(CreateEditWorkspaceActivity.WORKSPACE_DTO, workspaceDto);
                 startActivity(intent);
                 break;
             default:
@@ -96,10 +92,10 @@ public class OwnedFragment extends ExpandableListFragment {
 
     //Adds workspace views to the list view
     private void populateView() {
-        for (String w : FlowManager.getWorkspaces(getActivity().getApplicationContext())) {
-            addWorkspace(userId, w);
-            for (String t : FlowManager.getFiles(getActivity().getApplicationContext(), w))
-                addFile(userId, w, t);
+        for (WorkspaceDto workspace : FlowManager.getWorkspaces(getActivity().getApplicationContext())) {
+            addWorkspace(userId, workspace.name);
+            for (TextFileDto textFileDto : workspace.files)
+                addFile(userId, workspace.name, textFileDto.title);
         }
     }
 }

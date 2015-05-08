@@ -16,6 +16,8 @@ import java.util.HashSet;
 import pt.ulisboa.tecnico.cmov.airdesk.ListActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.MainMenu;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 
@@ -25,39 +27,37 @@ public class ForeignFragment extends ExpandableListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_foreign, container, false);
         setHasOptionsMenu(true);
+
+        final String userId = FlowManager.getActiveUserID(getActivity().getApplicationContext());
+
         setListener(new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceAddedForeign(String owner, String workspaceName, ArrayList<String> files) {
-                //TODO remove this method in version N
-                addWorkspace(owner, workspaceName);
-                for(String fileName : files)
-                    addFile(owner, workspaceName, fileName);
+            public void onWorkspaceAdded(WorkspaceDto workspaceDto) {
+                if(!userId.equals(workspaceDto.owner)) {
+                    addWorkspace(workspaceDto.owner, workspaceDto.name);
+                    for (TextFileDto textFileDto : workspaceDto.files)
+                        addFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
+                }
             }
 
             @Override
-            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
-                //TODO remove this method in version N
-                removeWorkspace(owner, workspaceName);
+            public void onWorkspaceRemoved(WorkspaceDto workspaceDto) {
+                if(!userId.equals(workspaceDto.owner))
+                    removeWorkspace(workspaceDto.owner, workspaceDto.name);
             }
 
             @Override
-            public void onWorkspaceAdded(String owner, String name) {}
-
-            @Override
-            public void onWorkspaceRemoved(String owner, String name) {}
-
-            @Override
-            public void onFileAdded(String owner, String workspaceName, String fileName) {
-                addFile(owner, workspaceName, fileName);
+            public void onFileAdded(TextFileDto textFileDto) {
+                addFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
             }
 
             @Override
-            public void onFileRemoved(String owner, String workspaceName, String fileName) {
-                removeFile(owner, workspaceName, fileName);
+            public void onFileRemoved(TextFileDto textFileDto) {
+                removeFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
             }
 
             @Override
-            public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
+            public void onFileContentChange(TextFileDto textFileDto) {}
         });
 
         refreshView(view);
@@ -79,7 +79,7 @@ public class ForeignFragment extends ExpandableListFragment {
                 break;
 
             case R.id.action_subscriptions:
-                HashSet<CharSequence> subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
+                HashSet<String> subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
                 Intent intent = new Intent(getActivity().getApplicationContext(), ListActivity.class);
                 intent.putExtra(ListActivity.LIST, subscriptions);
                 intent.putExtra(ListActivity.TITLE, getString(R.string.subscriptions));

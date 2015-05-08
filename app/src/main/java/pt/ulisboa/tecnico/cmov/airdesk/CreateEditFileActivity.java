@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
@@ -26,17 +28,11 @@ public class CreateEditFileActivity extends AppCompatActivity {
 
     public static final String ACTIVITY_TITLE = "activity_title";
     public static final String ACTIVITY_MODE = "mode";
-    public static final String FILE_WORKSPACE = "workspace";
-    public static final String FILE_TITLE = "title";
-    public static final String FILE_CONTENT = "content";
-    public static final String OWNER_NAME = "ownerName";
+    public static final String FILE_DTO = "file_dto";
 
     private String activityTitle;
     private MODE mode;
-    private String workspaceName;
-    private String title;
-    private String content;
-    private String owner;
+    private TextFileDto dto;
 
     private EditText titleView;
     private EditText contentView;
@@ -52,12 +48,9 @@ public class CreateEditFileActivity extends AppCompatActivity {
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
         activityTitle = bundle.getString(ACTIVITY_TITLE);
         mode = (MODE) bundle.getSerializable(ACTIVITY_MODE);
-        workspaceName = bundle.getString(FILE_WORKSPACE);
-        title = bundle.getString(FILE_TITLE);
-        content = bundle.getString(FILE_CONTENT);
-        owner = bundle.getString(OWNER_NAME);
+        dto = (TextFileDto) bundle.getSerializable(FILE_DTO);
 
-        Log.e("CreateEditFileActivity", owner + " " + workspaceName + " " + title);
+        Log.e("CreateEditFileActivity", dto.toString());
 
         //Init variables
         titleView = (EditText) findViewById(R.id.createFileTitle);
@@ -69,41 +62,32 @@ public class CreateEditFileActivity extends AppCompatActivity {
             ((Button) findViewById(R.id.createFileCreate)).setText(getString(R.string.confirm));
         }
 
-        titleView.setText(title);
-        contentView.setText(content);
+        titleView.setText(dto.title);
+        contentView.setText(dto.content);
         setTitle(activityTitle);
 
         listener =  new WorkspacesChangeListener() {
             @Override
-            public void onWorkspaceAdded(String owner, String name) {}
+            public void onWorkspaceAdded(WorkspaceDto workspaceDto) {}
 
             @Override
-            public void onWorkspaceAddedForeign(String owner, String name, ArrayList<String> files) {
-                //TODO remove this method in version N
-            }
-
-            @Override
-            public void onWorkspaceRemovedForeign(String owner, String workspaceName) {
-                //TODO remove this method in version N
-            }
-
-            @Override
-            public void onWorkspaceRemoved(String ownerName, String name) {
-                if(owner.equals(ownerName) && workspaceName.equals(name))
+            public void onWorkspaceRemoved(WorkspaceDto workspaceDto) {
+                if(dto.owner.equals(workspaceDto.owner) && dto.workspace.equals(workspaceDto.name))
                     finish();
             }
 
             @Override
-            public void onFileAdded(String owner, String workspaceName, String fileName) {}
+            public void onFileAdded(TextFileDto textFileDto) {}
 
             @Override
-            public void onFileRemoved(String ownerName, String workspace, String fileName) {
-                if(mode == MODE.EDIT && owner.equals(ownerName) && workspaceName.equals(workspace) && title.equals(fileName))
+            public void onFileRemoved(TextFileDto textFileDto) {
+                if(mode == MODE.EDIT && dto.owner.equals(textFileDto.owner) &&
+                        dto.workspace.equals(textFileDto.workspace) && dto.title.equals(textFileDto.title))
                     finish();
             }
 
             @Override
-            public void onFileContentChange(String owner, String workspaceName, String filename, String content) {}
+            public void onFileContentChange(TextFileDto textFileDto) {}
         };
         FlowManager.addWorkspacesChangeListener(listener);
     }
@@ -116,12 +100,12 @@ public class CreateEditFileActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        dto.title = titleView.getText().toString();
+        dto.content = contentView.getText().toString();
+
         outState.putString(ACTIVITY_TITLE, activityTitle);
         outState.putSerializable(ACTIVITY_MODE, mode);
-        outState.putString(FILE_WORKSPACE, workspaceName);
-        outState.putString(FILE_TITLE, titleView.getText().toString());
-        outState.putString(FILE_CONTENT, contentView.getText().toString());
-        outState.putString(OWNER_NAME, owner);
+        outState.putSerializable(FILE_DTO, dto);
         Log.e("CreateEditFileActivity", "state saved: " + titleView.getText().toString());
         super.onSaveInstanceState(outState);
     }
@@ -140,12 +124,12 @@ public class CreateEditFileActivity extends AppCompatActivity {
             case R.id.action_delete:
                 // Create the AlertDialog object
                 new AlertDialog.Builder(this)
-                        .setMessage(getString(R.string.dialog_confirm_delete) + " \"" + title + "\"")
+                        .setMessage(getString(R.string.dialog_confirm_delete) + " \"" + dto.title + "\"")
                         .setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowManager.notifyRemoveFile(getApplicationContext(), owner, workspaceName, title);
+                                FlowManager.notifyRemoveFile(getApplicationContext(), dto);
                                 Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
                             }
                         })
@@ -162,25 +146,25 @@ public class CreateEditFileActivity extends AppCompatActivity {
     }
 
     public void onCreateFileButtonPressed(View view) {
-        String newTitle = Utils.trim(titleView.getText().toString());
-        String newContent = contentView.getText().toString();
-        if(newTitle.length() == 0){
+        dto.title = Utils.trim(titleView.getText().toString());
+        dto.content = contentView.getText().toString();
+        if(dto.title.length() == 0){
             Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
             return;
         }
         try {
             if (mode.equals(MODE.CREATE)) {
-                FlowManager.notifyAddFile(getApplicationContext(), owner, workspaceName, newTitle, newContent);
+                FlowManager.notifyAddFile(getApplicationContext(), dto);
                 Toast.makeText(getApplicationContext(), getString(R.string.file_created_successfully), Toast.LENGTH_SHORT).show();
             } else {
-                FlowManager.notifyEditFile(getApplicationContext(), owner, workspaceName, newTitle, newContent);
+                FlowManager.notifyEditFile(getApplicationContext(), dto);
                 Toast.makeText(getApplicationContext(), getString(R.string.file_edited_successfully), Toast.LENGTH_SHORT).show();
             }
             finish();
         } catch (OutOfMemoryException e) {
             Toast.makeText(getApplicationContext(), getString(R.string.not_enough_memory_available), Toast.LENGTH_SHORT).show();
         } catch (AlreadyExistsException e) {
-            Toast.makeText(getApplicationContext(), "\"" + newTitle + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "\"" + dto.title + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
         }
     }
 

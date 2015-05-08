@@ -19,6 +19,7 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
@@ -29,10 +30,9 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
     private EditText titleView;
 
     //region INTENT MACROS
-    public static final String WORKSPACE_NAME = "workspaceName";
+    public static final String WORKSPACE_DTO = "workspace_dto";
     public static final String ACTIVITY_MODE = "mode";
     public static final String ACTIVITY_TITLE = "title";
-    public static final String MAP = "map";
     //endregion
 
     //region INTENT REQUEST CODES
@@ -48,12 +48,11 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
     //endregion
 
     //region CLASS VARIABLES
-    private String workspaceName;
+    private WorkspaceDto dto;
     private String title;
     private MODE mode;
-    private HashSet<CharSequence> tags = new HashSet<>();
-    private HashSet<CharSequence> users = new HashSet<>();
-    private HashMap<CharSequence, Boolean> usersMap = new HashMap<>();
+    private HashSet<String> tags = new HashSet<>();
+    private HashSet<String> users = new HashSet<>();
     private boolean isPrivate = false;
     private long quota = 0;
     //endregion
@@ -65,23 +64,22 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
 
         //Restore data
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
-        workspaceName = bundle.getString(WORKSPACE_NAME);
+        dto = (WorkspaceDto) bundle.getSerializable(WORKSPACE_DTO);
         mode = (MODE) bundle.getSerializable(ACTIVITY_MODE);
         title = bundle.getString(ACTIVITY_TITLE);
 
-        Log.e("CreateEditWorkspace", workspaceName + " " + title);
+        Log.e("CreateEditWorkspace", dto.toString());
 
         if (savedInstanceState != null) {
-            users = (HashSet<CharSequence>) savedInstanceState.getSerializable(USERS_LIST);
-            tags = (HashSet<CharSequence>) savedInstanceState.getSerializable(TAGS_LIST);
+            users = (HashSet<String>) savedInstanceState.getSerializable(USERS_LIST);
+            tags = (HashSet<String>) savedInstanceState.getSerializable(TAGS_LIST);
             quota = savedInstanceState.getLong(MAX_QUOTA);
             isPrivate = savedInstanceState.getBoolean(PRIVACY);
-            usersMap = (HashMap<CharSequence, Boolean>) savedInstanceState.getSerializable(MAP);
         } else if (mode == MODE.EDIT) {
-            users = FlowManager.getWorkspaceUsers(getApplicationContext(), workspaceName);
-            tags = FlowManager.getWorkspaceTags(getApplicationContext(), workspaceName);
-            quota = FlowManager.getWorkspaceMaxQuota(getApplicationContext(), workspaceName);
-            isPrivate = FlowManager.isWorkspacePrivate(getApplicationContext(), workspaceName);
+            users = FlowManager.getWorkspaceUsers(getApplicationContext(), dto.name);
+            tags = FlowManager.getWorkspaceTags(getApplicationContext(), dto.name);
+            quota = FlowManager.getWorkspaceMaxQuota(getApplicationContext(), dto.name);
+            isPrivate = FlowManager.isWorkspacePrivate(getApplicationContext(), dto.name);
         }
 
         // Privacy
@@ -96,14 +94,14 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(WORKSPACE_NAME, titleView.getText().toString());
+        dto.name = titleView.getText().toString();
+        outState.putSerializable(WORKSPACE_DTO, dto);
         outState.putSerializable(USERS_LIST, users);
         outState.putSerializable(TAGS_LIST, tags);
         outState.putSerializable(ACTIVITY_MODE, mode);
         outState.putLong(MAX_QUOTA, quota);
         outState.putBoolean(PRIVACY, isPrivate);
         outState.putString(ACTIVITY_TITLE, title);
-        outState.putSerializable(MAP, usersMap);
         Log.e("CreateEditWorkspace", "state saved: " + titleView.getText().toString());
         super.onSaveInstanceState(outState);
     }
@@ -112,9 +110,8 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
     public void addRemoveUsers(View v) {
         Intent intent = new Intent(getApplicationContext(), ListActivity.class);
         intent.putExtra(ListActivity.LIST, users);
-        String name = mode == MODE.EDIT ? workspaceName : getString(R.string.new_workspace);
+        String name = mode == MODE.EDIT ? dto.name : getString(R.string.new_workspace);
         intent.putExtra(ListActivity.TITLE, getString(R.string.users_of) + " " + name);
-        intent.putExtra(ListActivity.MAP, usersMap);
         startActivityForResult(intent, USERS);
     }
 
@@ -122,7 +119,7 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
     public void addRemoveTags(View v) {
         Intent intent = new Intent(getApplicationContext(), ListActivity.class);
         intent.putExtra(ListActivity.LIST, tags);
-        String name = mode == MODE.EDIT ? workspaceName : getString(R.string.new_workspace);
+        String name = mode == MODE.EDIT ? dto.name : getString(R.string.new_workspace);
         intent.putExtra(ListActivity.TITLE, getString(R.string.tags_of) + " " + name);
         startActivityForResult(intent, TAGS);
     }
@@ -132,13 +129,12 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
         if (data != null && resultCode == RESULT_OK)
             switch (requestCode) {
                 case USERS:
-                    usersMap = (HashMap<CharSequence, Boolean>) data.getSerializableExtra(ListActivity.MAP);
-                    users = (HashSet<CharSequence>) data.getSerializableExtra(ListActivity.LIST);
+                    users = (HashSet<String>) data.getSerializableExtra(ListActivity.LIST);
                     Log.e("CreateEditWorkspace", "User List loaded");
                     break;
 
                 case TAGS:
-                    tags = (HashSet<CharSequence>) data.getSerializableExtra(ListActivity.LIST);
+                    tags = (HashSet<String>) data.getSerializableExtra(ListActivity.LIST);
                     Log.e("CreateEditWorkspace", "Tag List loaded");
                     break;
             }
@@ -156,21 +152,21 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
     // Final Buttons
     public void confirm(View v) {
         if (mode == MODE.EDIT) {
-            FlowManager.notifyEditWorkspace(getApplicationContext(), workspaceName, isPrivate, usersMap, tags, quota);
+            FlowManager.notifyEditWorkspace(getApplicationContext(), dto, isPrivate, users, tags, quota);
             Toast.makeText(getApplicationContext(), getString(R.string.workspace_edited_successfully), Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            workspaceName = Utils.trim(((EditText) findViewById(R.id.settingsWorkspaceName)).getText().toString());
-            if(workspaceName.length() == 0){
+            dto.name = Utils.trim(((EditText) findViewById(R.id.settingsWorkspaceName)).getText().toString());
+            if(dto.name.length() == 0){
                 Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
-                FlowManager.notifyAddWorkspace(getApplicationContext(), workspaceName, isPrivate, users, tags, quota);
+                FlowManager.notifyAddWorkspace(getApplicationContext(), dto, isPrivate, users, tags, quota);
                 Toast.makeText(getApplicationContext(), getString(R.string.workspace_created_successfully), Toast.LENGTH_SHORT).show();
                 finish();
             } catch (AlreadyExistsException e) {
-                Toast.makeText(getApplicationContext(), "\"" + workspaceName + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "\"" + dto.name + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -193,12 +189,13 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
         switch (id) {
             case R.id.action_delete:
                 new AlertDialog.Builder(this)
-                        .setMessage(getString(R.string.dialog_confirm_delete) + " \"" + workspaceName + "\"")
+                        .setMessage(getString(R.string.dialog_confirm_delete) + " \"" + dto.name + "\"")
                         .setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowManager.notifyRemoveWorkspace(getApplicationContext(), workspaceName);
+                                Log.e("", "" + dto);
+                                FlowManager.notifyRemoveWorkspace(getApplicationContext(), dto);
                                 Toast.makeText(getApplicationContext(), getString(R.string.workspace_removed_successfully), Toast.LENGTH_SHORT).show();
                                 finish();
                             }
@@ -221,7 +218,7 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
         final TextView quotaText = (TextView) findViewById(R.id.quotaValue);
 
         // Define Limits
-        final long minQuota = mode == MODE.EDIT ? FlowManager.getWorkspaceMemorySize(getApplicationContext(), workspaceName) : 0;
+        final long minQuota = mode == MODE.EDIT ? FlowManager.getWorkspaceMemorySize(getApplicationContext(), dto.name) : 0;
         final long maxQuota = FlowManager.getUserFreeMemorySpace() + minQuota;
 
         // Customize SeekBar
@@ -260,12 +257,11 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
     private void formatLayout(){
         titleView = (EditText) findViewById(R.id.settingsWorkspaceName);
         if (mode.equals(MODE.EDIT)) {
-            titleView.setText(workspaceName);
+            titleView.setText(dto.name);
             titleView.setVisibility(View.GONE);
         } else {
             ((Button) findViewById(R.id.confirmButton)).setText(getString(R.string.create));
         }
-
         setTitle(title);
     }
 }

@@ -21,14 +21,12 @@ public class ListActivity extends AppCompatActivity {
 
     public static final String LIST = "list";
     public static final String TITLE = "title";
-    public static final String MAP = "map";
 
     private static final String TEXT = "text";
 
     private String title;
     private String text;
-    private HashSet<CharSequence> list;
-    private HashMap<CharSequence, Boolean> map;
+    private HashSet<String> list;
     private ArrayAdapter<String> adapter;
 
     private EditText writer;
@@ -41,12 +39,9 @@ public class ListActivity extends AppCompatActivity {
 
         //Restore data
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
-        list = (HashSet<CharSequence>) bundle.getSerializable(LIST);
+        list = (HashSet<String>) bundle.getSerializable(LIST);
         title = bundle.getString(TITLE);
         text = bundle.getString(TEXT);
-        map = (HashMap<CharSequence, Boolean>) bundle.getSerializable(MAP);
-        if(map == null)
-            map = new HashMap<>();
 
         //ListView inicialization
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -69,9 +64,6 @@ public class ListActivity extends AppCompatActivity {
                             adapter.remove(item);
                             adapter.remove(item);
                             list.remove(item);
-                            Boolean ret = map.remove(item);
-                            if(ret == null)
-                                map.put(item, false);
                         }
                         adapter.notifyDataSetChanged();
                     }
@@ -87,7 +79,6 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(MAP, map);
         outState.putSerializable(LIST, list);
         outState.putString(TITLE, title);
         outState.putString(TEXT, writer.getText().toString());
@@ -97,7 +88,6 @@ public class ListActivity extends AppCompatActivity {
 
     public void onConfirmButtonPressed(View view) {
         Intent intent = new Intent();
-        intent.putExtra(MAP, map);
         intent.putExtra(LIST, list);
         setResult(RESULT_OK, intent);
         finish();
@@ -120,9 +110,6 @@ public class ListActivity extends AppCompatActivity {
         writer.getText().clear();
         adapter.add(item);
         list.add(item);
-        Boolean ret = map.remove(item);
-        if(ret == null)
-            map.put(item, true);
 
         //Focus last last added
         listView.setSelection(listView.getAdapter().getCount() - 1);

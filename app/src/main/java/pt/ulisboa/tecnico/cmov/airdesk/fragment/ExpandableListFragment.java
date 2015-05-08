@@ -8,6 +8,7 @@ import android.widget.ExpandableListView;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ShowFileActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspaceListAdapter;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.widget.AnimatedExpandableListView;
@@ -30,10 +31,13 @@ public class ExpandableListFragment extends Fragment {
                 String filename = adapter.getChild(groupPosition, childPosition).toString();
                 String owner = adapter.getTag(groupPosition).toString();
 
+                TextFileDto textFileDto = new TextFileDto();
+                textFileDto.owner = owner;
+                textFileDto.workspace = workspaceName;
+                textFileDto.title = filename;
+
                 Intent intent = new Intent(getActivity().getApplicationContext(), ShowFileActivity.class);
-                intent.putExtra(ShowFileActivity.WORKSPACE, workspaceName);
-                intent.putExtra(ShowFileActivity.TITLE, filename);
-                intent.putExtra(ShowFileActivity.OWNER_NAME, owner);
+                intent.putExtra(ShowFileActivity.FILE_DTO, textFileDto);
                 startActivity(intent);
                 return false;
             }

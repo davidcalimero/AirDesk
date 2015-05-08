@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
@@ -40,150 +42,213 @@ public class FlowManager {
     }
 
     //----------------------------------------------------------------------------------------------
-    // METHODS TO NOTIFY USERS  --------------------------------------------------------------------
+    // NET LAYER METHODS ---------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
 
-    public static void notifyAddWorkspace(Context context, String name, boolean isPrivate, HashSet<CharSequence> users, HashSet<CharSequence> tags, long quota) throws AlreadyExistsException {
-        //Only updates the user workspace list if he is the owner
-        Workspace workspace = new Workspace(name, isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC, quota);
-        workspace.setTags(tags);
-        ((ApplicationContext) context).getActiveUser().addWorkspace(workspace);
-        ((ApplicationContext) context).commit();
+    //TODO SEND ------------------------------------------------------------------------------------
 
-        //Updates interface
+    public static void send_uninviteUserFromWorkspace(String userId, WorkspaceDto workspaceDto){
+        receive_unmountWorkspace(workspaceDto);
+    }
+
+    private static void send_mountWorkspace(String userId, WorkspaceDto workspaceDto){ }
+
+    private static void send_unmountWorkspace(String userId, WorkspaceDto workspaceDto){ }
+
+    private static void send_addFile(String userId, TextFileDto textFileDto){ }
+
+    private static void send_removeFile(String userId, TextFileDto textFileDto){ }
+
+    private static void send_editFile(String userId, TextFileDto textFileDto){ }
+
+    public static boolean send_askToEditFile(Context context, TextFileDto textFileDto) {
+        if(getActiveUserID(context).equals(textFileDto.owner))
+            return receive_askToEditFile(context, textFileDto);
+
+        return true; //TODO
+    }
+
+    public static String send_getFileContent(Context context, TextFileDto textFileDto) {
+        if(getActiveUserID(context).equals(textFileDto.owner))
+            return receive_getFileContent(context, textFileDto);
+
+        return ""; //TODO
+    }
+
+    //RECEIVE --------------------------------------------------------------------------------------
+
+    public static void receive_uninviteUserFromWorkspace(Context context, String userId, WorkspaceDto workspaceDto){
+        ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceDto.name).removeUser(userId);
+    }
+
+    public static void receive_mountWorkspace(WorkspaceDto workspaceDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceAdded(getActiveUserID(context), name);
-
-        //send information to users
-        for(CharSequence u : users)
-            notifyNewWorkspaceUser(context, name, u.toString(), new ArrayList<String>());
+            l.onWorkspaceAdded(workspaceDto);
     }
 
-    public static void notifyRemoveWorkspace(Context context, String workspaceName) {
-        //Only updates the user workspace list if he is the owner
-        ((ApplicationContext) context).getActiveUser().removeWorkspace(workspaceName, context);
-        ((ApplicationContext) context).commit();
-
-        //Updates interface
+    public static void receive_unmountWorkspace(WorkspaceDto workspaceDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceRemoved(getActiveUserID(context), workspaceName);
+            l.onWorkspaceRemoved(workspaceDto);
+    }
 
-        //send information to users
+    public static void receive_addFile(Context context, TextFileDto textFileDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onWorkspaceRemovedForeign(getActiveUserID(context), workspaceName);
+            l.onFileAdded(textFileDto);
+
+        //Notify the rest of the users
+        if(getActiveUserID(context).equals(textFileDto.owner))
+            for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
+                send_addFile(user, textFileDto);
     }
 
-    public static void notifyEditWorkspace(Context context, String workspaceName, boolean isPrivate, HashMap<CharSequence, Boolean> usersChanges, HashSet<CharSequence> tags, long quota) {
-        Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName);
-        for(CharSequence item : usersChanges.keySet()) {
-            if (usersChanges.get(item))
-                notifyNewWorkspaceUser(context, workspaceName, item.toString(), getFiles(context, workspaceName));
-            else
-                notifyRemoveWorkspaceUser(context, getActiveUserID(context), workspaceName, item.toString());
-        }
-        workspace.setTags(tags);
-        workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
-        workspace.setMaximumQuota(quota);
-        ((ApplicationContext) context).commit();
-    }
-
-    public static void notifyAddFile(Context context, String owner, String workspaceName, String fileName, String content) throws AlreadyExistsException, OutOfMemoryException {
-        //Only updates the user files list if he is the owner
-        User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(owner)) {
-            String id = user.getID() + "-" + workspaceName + "-" + fileName;
-            user.getWorkspaces().get(workspaceName).addFile(context, id, fileName, content);
-            ((ApplicationContext) context).commit();
-        }
-
-        //Updates interface
+    public static void receive_removeFile(Context context, TextFileDto textFileDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onFileAdded(owner, workspaceName, fileName);
+            l.onFileRemoved(textFileDto);
 
-        //send information to users
+        //Notify the rest of the users
+        if(getActiveUserID(context).equals(textFileDto.owner))
+            for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
+                send_removeFile(user, textFileDto);
     }
 
-    public static void notifyRemoveFile(Context context, String owner, String workspaceName, String fileName) {
-        //Only updates the user files list if he is the owner
-        User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(owner)) {
-            user.getWorkspaces().get(workspaceName).removeFile(context, fileName);
-            ((ApplicationContext) context).commit();
-        }
-
-        //Updates interface
+    public static void receive_editFile(Context context, TextFileDto textFileDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onFileRemoved(owner, workspaceName, fileName);
+            l.onFileContentChange(textFileDto);
 
-        //send information to users
+        //Notify the rest of the users
+        if(getActiveUserID(context).equals(textFileDto.owner))
+            for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
+                send_editFile(user, textFileDto);
     }
 
-    public static void notifyEditFile(Context context, String owner, String workspaceName, String fileName, String content) throws OutOfMemoryException {
-        //Only updates the user file if he is the owner
-        User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(owner)){
-            user.getWorkspaces().get(workspaceName).editFile(context, fileName, content);
-        }
-
-        //Updates interface
-        for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onFileContentChange(owner, workspaceName, fileName, content);
-
-        //send information to users
-    }
-
-    public static void notifyNewWorkspaceUser(Context context, String workspaceName, String user, ArrayList<String> files) {
-        ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).addUser(user);
-        ((ApplicationContext) context).commit();
-
-        //send information to users
-        for (WorkspacesChangeListener l : getInstance().listeners) {
-            l.onWorkspaceAddedForeign(getActiveUserID(context), workspaceName, files);
-        }
-    }
-
-    public static void notifyRemoveWorkspaceUser(Context context, String owner, String workspaceName, String user) {
-        ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).removeUser(user);
-        ((ApplicationContext) context).commit();
-
-        //send information to users
-        if(user.equals(getActiveUserID(context))) {
-            for (WorkspacesChangeListener l : getInstance().listeners)
-                l.onWorkspaceRemovedForeign(owner, workspaceName);
-        }
-    }
-
-    //----------------------------------------------------------------------------------------------
-    // METHODS TO ASK OWNER  -----------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------
-
-    public static boolean askToEdit(Context context, String workspaceName, String fileName) {
-        TextFile file = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).getFiles().get(fileName);
-        if(file.isAvailable()){
+    public static boolean receive_askToEditFile(Context context, TextFileDto textFileDto){
+        TextFile file = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title);
+            if(file.isAvailable()){
             //TODO file.setAvailability(false);
             return true;
         }
         return false;
     }
 
-    public static String getFileContent(Context context, String owner, String workspaceName, String fileName) {
-        return ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).getFiles().get(fileName).getContent(context);
+    public static String receive_getFileContent(Context context, TextFileDto textFileDto){
+        return ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title).getContent(context);
     }
 
-    public static void updateForeignList(Context context, HashSet<CharSequence> tags){
+    //----------------------------------------------------------------------------------------------
+    // METHODS TO NOTIFY USERS AND INTERFACE  ------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
+
+    public static void notifyAddWorkspace(Context context, WorkspaceDto workspaceDto, boolean isPrivate, HashSet<String> users, HashSet<String> tags, long quota) throws AlreadyExistsException {
+        //Updates business layer
+        Workspace workspace = new Workspace(workspaceDto.name, isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC, quota);
+        workspace.setTags(tags);
+        workspace.setUsers(users);
+        ((ApplicationContext) context).getActiveUser().addWorkspace(workspace);
+        ((ApplicationContext) context).commit();
+
+        //Updates interface
+        receive_mountWorkspace(workspaceDto);
+
+        //Notify other users
+        for(String user : users)
+            send_mountWorkspace(user, workspaceDto);
+    }
+
+    public static void notifyRemoveWorkspace(Context context, WorkspaceDto workspaceDto) {
+        //Updates business layer
+        User user = ((ApplicationContext) context).getActiveUser();
+        Workspace workspace = user.getWorkspaces().get(workspaceDto.name);
+        user.removeWorkspace(workspaceDto.name, context);
+        ((ApplicationContext) context).commit();
+
+        //Updates interface
+        receive_unmountWorkspace(workspaceDto);
+
+        //Notify other users
+        for(String userId : workspace.getUsers())
+            send_unmountWorkspace(userId, workspaceDto);
+    }
+
+    public static void notifyEditWorkspace(Context context, WorkspaceDto workspaceDto, boolean isPrivate, HashSet<String> users, HashSet<String> tags, long quota) {
+        //Updates business layer
+        Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceDto.name);
+        workspace.setTags(tags);
+        workspace.setUsers(users);
+        workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
+        workspace.setMaximumQuota(quota);
+        ((ApplicationContext) context).commit();
+
+        //Update dto
+        workspaceDto.files = getFiles(context, workspaceDto.name);
+
+        //Notify other users
+        for(String userId : workspace.getUsers())
+            if(!users.contains(userId))
+                send_unmountWorkspace(userId, workspaceDto);
+
+        for(String userId : users)
+            if(!workspace.getUsers().contains(userId))
+                send_mountWorkspace(userId, workspaceDto);
+    }
+
+    public static void notifyAddFile(Context context, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException {
+        //Updates business layer
+        User user = ((ApplicationContext) context).getActiveUser();
+        if(user.getID().equals(textFileDto.owner)) {
+            String id = user.getID() + "-" + textFileDto.workspace + "-" + textFileDto.title;
+            user.getWorkspaces().get(textFileDto.workspace).addFile(context, id, textFileDto.title, textFileDto.content);
+            ((ApplicationContext) context).commit();
+        }
+
+        //Updates interface
+        receive_addFile(context, textFileDto);
+
+        //Notify other users
+        send_addFile(textFileDto.owner, textFileDto);
+    }
+
+    public static void notifyRemoveFile(Context context, TextFileDto textFileDto) {
+        //Only updates the user files list if he is the owner
+        User user = ((ApplicationContext) context).getActiveUser();
+        if(user.getID().equals(textFileDto.owner)) {
+            user.getWorkspaces().get(textFileDto.workspace).removeFile(context, textFileDto.title);
+            ((ApplicationContext) context).commit();
+        }
+
+        //Updates interface
+        receive_removeFile(context, textFileDto);
+
+        //Notify other users
+        send_removeFile(textFileDto.owner, textFileDto);
+    }
+
+    public static void notifyEditFile(Context context, TextFileDto textFileDto) throws OutOfMemoryException {
+        //Only updates the user file if he is the owner
+        User user = ((ApplicationContext) context).getActiveUser();
+        if(user.getID().equals(textFileDto.owner))
+            user.getWorkspaces().get(textFileDto.workspace).editFile(context, textFileDto.title, textFileDto.content);
+
+        //Updates interface
+        receive_editFile(context, textFileDto);
+
+        //Notify other users
+        send_editFile(textFileDto.owner, textFileDto);
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // METHODS TO ASK OWNER  -----------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
+
+    public static void updateForeignList(Context context, HashSet<String> tags){
         // N-Version TODO
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
 
-        //TODO Delete the bellow
-        ((ApplicationContext) context).getWifiDirectService().testFunc();
-
         // S-Version
-        for(String w : getWorkspaces(context)){
-            if(getWorkspaceUsers(context, w).contains(getActiveUserID(context)) ||
-                    (!isWorkspacePrivate(context, w) && Utils.haveElementsInCommon(getWorkspaceTags(context, w), tags))) {
-                // Add user to the list (if not already there)
-                notifyNewWorkspaceUser(context, w, getActiveUserID(context), getFiles(context, w));
+        for(WorkspaceDto workspaceDto : getWorkspaces(context)){
+            if(getWorkspaceUsers(context, workspaceDto.name).contains(getActiveUserID(context)) ||
+                    (!isWorkspacePrivate(context, workspaceDto.name) && Utils.haveElementsInCommon(getWorkspaceTags(context, workspaceDto.name), tags))) {
+                send_mountWorkspace(getActiveUserID(context), workspaceDto);
             }
         }
     }
@@ -196,28 +261,34 @@ public class FlowManager {
         return ((ApplicationContext) context).getActiveUser().getID();
     }
 
-    public static HashSet<CharSequence> getSubscriptions(Context context) {
+    public static HashSet<String> getSubscriptions(Context context) {
         return ((ApplicationContext) context).getActiveUser().getSubscriptions();
     }
 
-    public static void setSubscriptions(Context context, HashSet<CharSequence> tags) {
+    public static void setSubscriptions(Context context, HashSet<String> tags) {
         ((ApplicationContext) context).getActiveUser().setSubscriptions(tags);
         ((ApplicationContext) context).commit();
     }
 
-    public static ArrayList<String> getWorkspaces(Context context) {
-        ArrayList<String> workspaces = new ArrayList<>();
-        for (Workspace w : ((ApplicationContext) context).getActiveUser().getWorkspaces().values()) {
-            workspaces.add(w.getName());
+    public static ArrayList<WorkspaceDto> getWorkspaces(Context context) {
+        ArrayList<WorkspaceDto> workspaces = new ArrayList<>();
+        WorkspaceDto workspaceDto;
+
+        for (Workspace workspace : ((ApplicationContext) context).getActiveUser().getWorkspaces().values()) {
+            workspaceDto = new WorkspaceDto();
+            workspaceDto.owner = getActiveUserID(context);
+            workspaceDto.name = workspace.getName();
+            workspaceDto.files = getFiles(context, workspaceDto.name);
+            workspaces.add(workspaceDto);
         }
         return workspaces;
     }
 
-    public static HashSet<CharSequence> getWorkspaceUsers(Context context, String workspaceName) {
+    public static HashSet<String> getWorkspaceUsers(Context context, String workspaceName) {
         return ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).getUsers();
     }
 
-    public static HashSet<CharSequence> getWorkspaceTags(Context context, String workspaceName) {
+    public static HashSet<String> getWorkspaceTags(Context context, String workspaceName) {
         return ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).getTags();
     }
 
@@ -238,10 +309,16 @@ public class FlowManager {
         return FileManager.getInternalFreeSpace();
     }
 
-    public static ArrayList<String> getFiles(Context context, String workspaceName) {
-        ArrayList<String> files = new ArrayList<>();
-        for (TextFile f : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).getFiles().values())
-            files.add(f.getTitle());
+    private static ArrayList<TextFileDto> getFiles(Context context, String workspaceName) {
+        ArrayList<TextFileDto> files = new ArrayList<>();
+        TextFileDto textFileDto;
+        for (TextFile f : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceName).getFiles().values()) {
+            textFileDto = new TextFileDto();
+            textFileDto.owner = getActiveUserID(context);
+            textFileDto.workspace = workspaceName;
+            textFileDto.title = f.getTitle();
+            files.add(textFileDto);
+        }
         return files;
     }
 }
