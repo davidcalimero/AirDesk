@@ -19,6 +19,8 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
+
 public class RealWifiDirectService extends WifiDirectService implements
         WifiP2pManager.PeerListListener, WifiP2pManager.GroupInfoListener, WifiP2pManager.ConnectionInfoListener {
 
@@ -37,6 +39,11 @@ public class RealWifiDirectService extends WifiDirectService implements
     protected void unBind() {}
 
     @Override
+    protected void processGroup() {
+        // Does nothing
+    }
+
+    @Override
     public void testFunc() {
         wifiManager.discoverPeers(wifiChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -45,6 +52,11 @@ public class RealWifiDirectService extends WifiDirectService implements
             @Override
             public void onFailure(int reasonCode) {}
         });
+    }
+
+    @Override
+    public void sendDto(Dto dto) {
+
     }
 
     @Override

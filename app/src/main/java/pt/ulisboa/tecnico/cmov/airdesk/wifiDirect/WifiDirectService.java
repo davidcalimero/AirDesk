@@ -8,6 +8,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
 
 public abstract class WifiDirectService extends Service {
 
@@ -34,7 +35,7 @@ public abstract class WifiDirectService extends Service {
         filter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         filter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        receiver = new WifiDirectBroadcastReceiver();
+        receiver = new WifiDirectBroadcastReceiver(this);
         registerReceiver(receiver, filter);
 
         init();
@@ -57,5 +58,9 @@ public abstract class WifiDirectService extends Service {
 
     protected abstract void unBind();
 
+    protected abstract void processGroup();
+
     public abstract void testFunc();
+
+    public abstract void sendDto(Dto dto);
 }

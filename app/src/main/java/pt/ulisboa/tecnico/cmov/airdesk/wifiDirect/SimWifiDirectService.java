@@ -9,10 +9,12 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
@@ -22,6 +24,11 @@ import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.MessageDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 
 public class SimWifiDirectService extends WifiDirectService implements
         SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener {
@@ -32,8 +39,9 @@ public class SimWifiDirectService extends WifiDirectService implements
     private SimWifiP2pManager.Channel termiteChannel;
 
     private SimWifiP2pSocketServer termiteSrvSocket = null;
-    private SimWifiP2pSocket termiteCliSocket = null;
-    private ReceiveCommTask termiteComm = null;
+    //private HashMap<String, String> termiteNickConverter = null;
+    private HashMap<String, SimWifiP2pSocket> termiteCliSocket = null;
+    private ArrayList<DTOTreatmentTask> termiteComm = null;
 
     private ServiceConnection termiteConnection = new ServiceConnection() {
         @Override
@@ -60,7 +68,12 @@ public class SimWifiDirectService extends WifiDirectService implements
         bindService(new Intent(getApplicationContext(), SimWifiP2pService.class), termiteConnection, Context.BIND_AUTO_CREATE);
 
         //Create listener socket
-        new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new IncomingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        //Initialize structures
+        termiteCliSocket = new HashMap<>();
+        //termiteNickConverter = new HashMap<>();
+        termiteComm = new ArrayList<>();
     }
 
     @Override
@@ -69,14 +82,61 @@ public class SimWifiDirectService extends WifiDirectService implements
     }
 
     @Override
+    protected void processGroup() {
+        termiteManager.requestGroupInfo(termiteChannel, SimWifiDirectService.this);
+    }
+
+    @Override
     public void testFunc() {
         termiteManager.requestPeers(termiteChannel, SimWifiDirectService.this);
     }
 
     @Override
+    public void sendDto(Dto dto){
+        //In the moment, it will send to every client
+        for(String key : termiteCliSocket.keySet()){
+            SimWifiP2pSocket sock = termiteCliSocket.get(key);
+            try {
+                sock.getOutputStream().write(dto.hashCode());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList, SimWifiP2pInfo simWifiP2pInfo) {
+
+        // MAKE A LIST OF IPs, TO INCREASE TIME EFFICIENCY
+        HashSet<String> ips = new HashSet<>();
         for (String deviceName : simWifiP2pInfo.getDevicesInNetwork()) {
             SimWifiP2pDevice device = simWifiP2pDeviceList.getByName(deviceName);
+            ips.add(device.getVirtIp());
+        }
+
+        // REMOVE SOCKET IF NOT A MEMBER ANYMORE
+        for(String key : termiteCliSocket.keySet()){
+            if(!ips.contains(key)) {
+                SimWifiP2pSocket sock = termiteCliSocket.get(key);
+                try {
+                    sock.close();
+                    Log.e("GroupInfoAvailable", "Removing ClientSocket");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("Termite-GroupInfo", "Error removing the socket");
+                }
+                termiteCliSocket.remove(key);
+            }
+        }
+
+        // ADD SOCKET IF NEW MEMBER, USING OUTGOINGCOMMTASK (only the GO does this)
+        if(simWifiP2pInfo.askIsGO()){
+            Log.e("Test","Group Owner");
+            for (String ip : ips) {
+                if(!termiteCliSocket.containsKey(ip)){
+                    new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
+                }
+            }
         }
     }
 
@@ -90,12 +150,12 @@ public class SimWifiDirectService extends WifiDirectService implements
         new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
     }
 
-    public class IncommingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
+    public class IncomingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
 
-            Log.d("SimWifiDirectService", "IncommingCommTask started (" + this.hashCode() + ").");
+            Log.d("SimWifiDirectService", "IncomingCommTask started (" + this.hashCode() + ").");
 
             try {
                 termiteSrvSocket = new SimWifiP2pSocketServer(10001);
@@ -105,15 +165,8 @@ public class SimWifiDirectService extends WifiDirectService implements
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     SimWifiP2pSocket sock = termiteSrvSocket.accept();
-                    if (termiteCliSocket != null && termiteCliSocket.isClosed()) {
-                        termiteCliSocket = null;
-                    }
-                    if (termiteCliSocket != null) {
-                        Log.d("SimWifiDirectService", "Closing accepted socket because mCliSocket still active.");
-                        sock.close();
-                    } else {
-                        publishProgress(sock);
-                    }
+                    publishProgress(sock);
+                    Log.e("Hello World", "Recebeu socket");
                 } catch (IOException e) {
                     Log.d("Error accepting socket:", e.getMessage());
                     break;
@@ -125,14 +178,22 @@ public class SimWifiDirectService extends WifiDirectService implements
 
         @Override
         protected void onProgressUpdate(SimWifiP2pSocket... values) {
-            termiteCliSocket = values[0];
-            termiteComm = new ReceiveCommTask();
 
-            termiteComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, termiteCliSocket);
+            //TODO RECEIVE IP AND PUT IT ON THE HASHMAP
+            //termiteCliSocket.put(values[0]);
+
+            DTOTreatmentTask task = new DTOTreatmentTask();
+            termiteComm.add(task);
+            Log.e("CenazIncomming","add receiveCommTask");
+
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, values[0]);
         }
     }
 
     public class OutgoingCommTask extends AsyncTask<String, Void, String> {
+
+        String param = null;
+        SimWifiP2pSocket cli = null;
 
         @Override
         protected void onPreExecute() {
@@ -142,7 +203,14 @@ public class SimWifiDirectService extends WifiDirectService implements
         @Override
         protected String doInBackground(String... params) {
             try {
-                termiteCliSocket = new SimWifiP2pSocket(params[0], 10001);
+                param = params[0];
+                if(termiteCliSocket.containsKey(param))
+                    cli = termiteCliSocket.get(param);
+                else {
+                    cli = new SimWifiP2pSocket(param, 10001);
+                    termiteCliSocket.put(param, cli);
+                }
+                Log.e("CenazOutgoing","add client socket to list");
             } catch (UnknownHostException e) {
                 return "Unknown Host:" + e.getMessage();
             } catch (IOException e) {
@@ -157,61 +225,70 @@ public class SimWifiDirectService extends WifiDirectService implements
                 Log.e("SimWifiDirectService", result);
             }
             else {
-                termiteComm = new ReceiveCommTask();
-                termiteComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, termiteCliSocket);
+                DTOTreatmentTask task = new DTOTreatmentTask();
+                termiteComm.add(task);
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, termiteCliSocket.get(param));
             }
 
             //TODO this try should not be here
             try {
-                if(termiteCliSocket != null) {
-                    termiteCliSocket.getOutputStream().write(("HelloWorld\n").getBytes());
-                    termiteCliSocket.close();
+                if(cli != null) {
+                    cli.getOutputStream().write(("HelloWorld\n").getBytes());
+                    Log.e("CenazOutgoing","remove ClientSocket from list, and close it.");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
     }
 
-    public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
+    public class DTOTreatmentTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
         SimWifiP2pSocket s;
 
         @Override
         protected Void doInBackground(SimWifiP2pSocket... params) {
-            BufferedReader sockIn;
-            String st;
+            ObjectInputStream ois;
 
             s = params[0];
 
             try {
-                sockIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                while ((st = sockIn.readLine()) != null) {
-                    publishProgress(st);
+                while (!Thread.currentThread().isInterrupted()) {
+                    // PROCESS DTO
+                    ois = new ObjectInputStream(s.getInputStream());
+                    Dto dto = (Dto) ois.readObject();
+
+                    // CHECK DTO TYPE, AND EXECUTE DTO REQUEST
+                    switch (dto.messageType) {
+                        case "MESSAGE":
+                            Log.e("Received message", ((MessageDto) dto).message);
+                            break;
+                        case "USER":
+                            Log.e("Received user", ((UserDto) dto).userID);
+                            break;
+                        case "TEXTFILE":
+                            Log.e("Received file", "from owner " + ((TextFileDto) dto).owner + ", with title " + ((TextFileDto) dto).title + ", and content " + ((TextFileDto) dto).content);
+                            break;
+                        case "WORKSPACE":
+                            Log.e("Received workspace", "from owner " + ((WorkspaceDto) dto).owner + ", with name " + ((WorkspaceDto) dto).name);
+                            break;
+                        default:
+                            Log.e("Error: Unrecognized Dto", dto.messageType);
+                    }
+                    // SEND BACK INFORMATION
+
                 }
+
             } catch (IOException e) {
                 Log.d("Error reading socket:", e.getMessage());
+            } catch (ClassNotFoundException e) {
+                Log.e("Error getting DTO:", e.getMessage());
             }
             return null;
         }
 
         @Override
-        protected void onProgressUpdate(String... values) {
-            Log.d("SimWifi recived", values[0]);
-        }
-
-        @Override
         protected void onPostExecute(Void result) {
-            if (!s.isClosed()) {
-                try {
-                    s.close();
-                }
-                catch (Exception e) {
-                    Log.d("Error closing socket:", e.getMessage());
-                }
-            }
-            s = null;
+            termiteComm.remove(this);
         }
     }
 }

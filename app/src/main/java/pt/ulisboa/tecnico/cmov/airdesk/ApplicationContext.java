@@ -11,6 +11,7 @@ import android.util.Log;
 
 import java.io.FileNotFoundException;
 
+import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FileManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.User;
 import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.RealWifiDirectService;
@@ -81,9 +82,12 @@ public class ApplicationContext extends Application {
             bindService(new Intent(getApplicationContext(), RealWifiDirectService.class), wifiDirectConnection, Context.BIND_AUTO_CREATE);
     }
 
-
     public void commit() {
         if (FileManager.objectToFile(activeUser.getID(), activeUser, getApplicationContext()))
             Log.e("User", "user committed:" + activeUser.getID());
+    }
+
+    public void sendDto(Dto dto){
+        wifiDirectService.sendDto(dto);
     }
 }

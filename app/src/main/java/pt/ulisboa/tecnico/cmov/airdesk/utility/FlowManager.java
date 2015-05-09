@@ -4,11 +4,12 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.MessageDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
@@ -73,6 +74,12 @@ public class FlowManager {
             return receive_getFileContent(context, textFileDto);
 
         return ""; //TODO
+    }
+
+    public static UserDto send_userID(Context context){
+        UserDto userDto = new UserDto();
+        userDto.userID = getActiveUserID(context);
+        return userDto;
     }
 
     //RECEIVE --------------------------------------------------------------------------------------
@@ -243,6 +250,10 @@ public class FlowManager {
         // N-Version TODO
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
+
+        MessageDto dto = new MessageDto();
+        dto.message = "Hello World";
+        ((ApplicationContext) context).sendDto(dto);
 
         // S-Version
         for(WorkspaceDto workspaceDto : getWorkspaces(context)){
