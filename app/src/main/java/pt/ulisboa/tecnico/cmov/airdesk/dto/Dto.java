@@ -4,5 +4,4 @@ import java.io.Serializable;
 
 public interface Dto extends Serializable{
 
-    public String messageType = null;
 }
