@@ -20,7 +20,6 @@ import pt.ulisboa.tecnico.cmov.airdesk.adapter.WorkspacePagerAdapter;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
-import pt.ulisboa.tecnico.cmov.airdesk.utility.Workspace;
 import pt.ulisboa.tecnico.cmov.airdesk.widget.SlidingTabLayout;
 
 
@@ -132,7 +131,8 @@ public class MainMenu extends AppCompatActivity {
         workspaceDto.owner = owner;
         workspaceDto.name = workspaceName;
 
-        FlowManager.send_uninviteUserFromWorkspace(FlowManager.getActiveUserID(getApplicationContext()), workspaceDto);
+        // antigo send_uninviteUserFromWorkspace
+        FlowManager.send_userRemovedForeignWorkspace(FlowManager.getActiveUserID(getApplicationContext()), workspaceDto, getApplicationContext());
     }
 
     //Force overflow menu on actionBar
