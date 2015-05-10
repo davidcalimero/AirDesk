@@ -11,6 +11,4 @@ public class WorkspaceDto implements Dto {
     public String toString() {
         return owner + " " + name + " " + (files != null ? files.size() : 0);
     }
-
-    public String messageType = "WORKSPACE";
 }

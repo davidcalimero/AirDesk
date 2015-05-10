@@ -10,6 +10,4 @@ public class TextFileDto implements Dto {
     public String toString() {
         return owner + " " + workspace + " " + title;
     }
-
-    public String messageType = "TEXTFILE";
 }
