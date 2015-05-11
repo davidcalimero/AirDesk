@@ -9,10 +9,8 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +29,8 @@ import pt.ulisboa.tecnico.cmov.airdesk.dto.MessageDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 public class SimWifiDirectService extends WifiDirectService implements
         SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener {
@@ -41,7 +41,7 @@ public class SimWifiDirectService extends WifiDirectService implements
     private SimWifiP2pManager.Channel termiteChannel;
 
     private SimWifiP2pSocketServer termiteSrvSocket = null;
-    //private HashMap<String, String> termiteNickConverter = null;
+    private HashMap<String, String> termiteNickConverter = null;
     private HashMap<String, SimWifiP2pSocket> termiteCliSocket = null;
     private ArrayList<DTOTreatmentTask> termiteComm = null;
 
@@ -96,22 +96,11 @@ public class SimWifiDirectService extends WifiDirectService implements
     @Override
     public void sendDto(Dto dto){
         Log.e("DtoSend", "Sending DTO");
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        ObjectOutputStream oos;
-        try {
-            oos = new ObjectOutputStream(buffer);
-            oos.writeObject(dto);
-            oos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        byte[] rawData = buffer.toByteArray();
-
         //In the moment, it will send to every client
         for(String key : termiteCliSocket.keySet()){
             SimWifiP2pSocket sock = termiteCliSocket.get(key);
             try {
-                sock.getOutputStream().write(rawData);
+                sock.getOutputStream().write(Utils.parseDtoToSend(dto));
                 Log.e("DtoSend", "Is sending...");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -172,6 +161,41 @@ public class SimWifiDirectService extends WifiDirectService implements
         new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
     }
 
+    // PROCESS DTOs
+    private void processWorkspaceDto(WorkspaceDto dto, SimWifiP2pSocket sockToSend) {
+
+    }
+
+    private void processTextFileDto(TextFileDto dto, SimWifiP2pSocket sockToSend) {
+
+    }
+
+    private void processUserDto(UserDto dto, String ip) {
+        // Checks if the this user has already that nick there. If not, it adds to the hashmap.
+        termiteNickConverter.put(ip, dto.userID);
+    }
+
+    private void processMessageDto(MessageDto dto, SimWifiP2pSocket sockToSend) {
+        Log.e("DTO Process", "Begin");
+        Dto newDto;
+        switch(dto.message){
+            case MessageDto.HELLO_WORLD:
+                Log.e("Hello World", ":)");
+            case MessageDto.USER_REQUEST:
+                String id = FlowManager.getActiveUserID(getApplicationContext());
+                newDto = new UserDto(id);
+                try {
+                    sockToSend.getOutputStream().write(Utils.parseDtoToSend(newDto));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            default:
+                Log.e("MessageDto", "Don't know what to do");
+        }
+    }
+
+
+    // ASYNC TASKS
     public class IncomingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
 
         @Override
@@ -208,7 +232,8 @@ public class SimWifiDirectService extends WifiDirectService implements
             termiteComm.add(task);
             Log.e("Incoming","add a DTO Treatment Task");
 
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, values[0]);
+            //TODO!! FUUUUUUUUUUUCK!
+            //task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, values[0]);
         }
     }
 
@@ -251,46 +276,49 @@ public class SimWifiDirectService extends WifiDirectService implements
             else {
                 DTOTreatmentTask task = new DTOTreatmentTask();
                 termiteComm.add(task);
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, termiteCliSocket.get(param));
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, param);
+                try {
+                    cli.getOutputStream().write(Utils.parseDtoToSend(new MessageDto(MessageDto.USER_REQUEST)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    public class DTOTreatmentTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
+    public class DTOTreatmentTask extends AsyncTask<String, String, Void> {
+        String sockIp;
         SimWifiP2pSocket s;
 
         @Override
-        protected Void doInBackground(SimWifiP2pSocket... params) {
+        protected Void doInBackground(String... ip) {
             ObjectInputStream ois;
 
-            s = params[0];
+            sockIp = ip[0];
+            s = termiteCliSocket.get(sockIp);
 
             try {
                 while (!Thread.currentThread().isInterrupted() || !isCancelled()) {
                     // PROCESS DTO
-                    Log.e("Received DTO", "yey");
                     ois = new ObjectInputStream(s.getInputStream());
                     Dto dto = (Dto) ois.readObject();
-                    Log.e("Received DTO", "Read DTO " + dto.toString() + " with message: ");
 
                     // CHECK DTO TYPE, AND EXECUTE DTO REQUEST
                     if(dto instanceof MessageDto){
                         Log.e("Received message", ((MessageDto) dto).message);
-                        processMessageDto(((MessageDto) dto));
+                        processMessageDto(((MessageDto) dto), s);
                     } else if(dto instanceof UserDto){
                         Log.e("Received user", ((UserDto) dto).userID);
-                        processUserDto((UserDto) dto);
+                        processUserDto((UserDto) dto, sockIp);
                     } else if(dto instanceof TextFileDto){
                         Log.e("Received file", "from owner " + ((TextFileDto) dto).owner + ", with title " + ((TextFileDto) dto).title + ", and content " + ((TextFileDto) dto).content);
-                        processTextFileDto((TextFileDto) dto);
+                        processTextFileDto((TextFileDto) dto, s);
                     } else if(dto instanceof WorkspaceDto){
                         Log.e("Received workspace", "from owner " + ((WorkspaceDto) dto).owner + ", with name " + ((WorkspaceDto) dto).name);
-                        processWorkspaceDto((WorkspaceDto) dto);
+                        processWorkspaceDto((WorkspaceDto) dto, s);
                     } else {
                         Log.e("Received DTO", "It's not a DTO!");
                     }
-                    // SEND BACK INFORMATION
-                    Log.e("Received DTO", "Nao devia mostrar alguma coisa aqui?!");
                 }
 
             } catch (IOException e) {
@@ -298,7 +326,7 @@ public class SimWifiDirectService extends WifiDirectService implements
             } catch (ClassNotFoundException e) {
                 //Log.e("Error getting DTO:", e.getMessage());
             } catch (NullPointerException e){
-               Log.e("Received DTO", "Let me guess?! :D");
+                Log.e("Received DTO", "Let me guess?! :D");
             }
             return null;
         }
@@ -309,22 +337,4 @@ public class SimWifiDirectService extends WifiDirectService implements
         }
     }
 
-    private void processWorkspaceDto(WorkspaceDto dto) {
-
-    }
-
-    private void processTextFileDto(TextFileDto dto) {
-
-    }
-
-    private void processUserDto(UserDto dto) {
-
-    }
-
-    private void processMessageDto(MessageDto dto) {
-        Log.e("DTO Process", "Begin");
-        // O que fazer com os pedidos??
-        if(dto.message.equals("Hello World!"))  // Usar macros dentro de cada Dto para distinguir.
-            Log.e("DTO Process", "Hello World! :D");
-    }
 }

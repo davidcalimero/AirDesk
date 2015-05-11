@@ -1,7 +1,12 @@
 package pt.ulisboa.tecnico.cmov.airdesk.utility;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 import java.util.Collection;
+
+import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
 
 public class Utils {
 
@@ -30,5 +35,18 @@ public class Utils {
 
     public static String formatNumber(String format, float number){
         return new DecimalFormat(format).format(number);
+    }
+
+    public static byte[] parseDtoToSend(Dto dto){
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        ObjectOutputStream oos;
+        try {
+            oos = new ObjectOutputStream(buffer);
+            oos.writeObject(dto);
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return buffer.toByteArray();
     }
 }

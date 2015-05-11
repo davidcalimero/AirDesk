@@ -54,7 +54,7 @@ public class FlowManager {
         receive_unmountWorkspace(workspaceDto);
 
         //MessageDto creation
-        MessageDto msgDto = new MessageDto();
+        MessageDto msgDto = new MessageDto("Hello World!");
         msgDto.message = "uninviteUserFromWorkspace " + userId + " " + workspaceDto.name;
 
         //sending the DTO
@@ -102,7 +102,7 @@ public class FlowManager {
     }
 
     public static UserDto send_userID(Context context){
-        UserDto userDto = new UserDto();
+        UserDto userDto = new UserDto("teste");
         userDto.userID = getActiveUserID(context);
         return userDto;
     }
@@ -276,7 +276,7 @@ public class FlowManager {
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
 
-        MessageDto dto = new MessageDto();
+        MessageDto dto = new MessageDto("Hello World!");
         dto.message = "Hello World";
         ((ApplicationContext) context).sendDto(dto);
 
