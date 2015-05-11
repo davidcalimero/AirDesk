@@ -51,13 +51,11 @@ public class FlowManager {
     public static void send_userRemovedForeignWorkspace(String userId, WorkspaceDto workspaceDto, Context context){
         //unmouting workspace on local device
         receive_unmountWorkspace(workspaceDto);
-
         //Create message pack
         MessagePack messagePack = new MessagePack();
         messagePack.request = MessagePack.UNINVITE_FROM_WORKSPACE;
         messagePack.dto = workspaceDto;
         messagePack.receiver = userId;
-
         //sending the DTO
         ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
     }

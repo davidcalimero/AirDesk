@@ -89,11 +89,6 @@ public class SimWifiDirectService extends WifiDirectService implements
     }
 
     @Override
-    public void testFunc() {
-        termiteManager.requestPeers(termiteChannel, SimWifiDirectService.this);
-    }
-
-    @Override
     public void sendMessage(MessagePack message){
         Log.e("DtoSend", "Sending DTO");
         //In the moment, it will send to every client

@@ -43,7 +43,7 @@ public class RealWifiDirectService extends WifiDirectService implements
         // Does nothing
     }
 
-    @Override
+    /*@Override
     public void testFunc() {
         wifiManager.discoverPeers(wifiChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -52,7 +52,7 @@ public class RealWifiDirectService extends WifiDirectService implements
             @Override
             public void onFailure(int reasonCode) {}
         });
-    }
+    }*/
 
     @Override
     public void sendMessage(MessagePack message) {

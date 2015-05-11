@@ -60,7 +60,5 @@ public abstract class WifiDirectService extends Service {
 
     protected abstract void processGroup();
 
-    public abstract void testFunc();
-
     public abstract void sendMessage(MessagePack message);
 }
