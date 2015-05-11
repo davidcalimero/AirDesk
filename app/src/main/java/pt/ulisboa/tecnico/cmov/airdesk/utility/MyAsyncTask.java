@@ -4,9 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import java.io.Serializable;
-
-public abstract class MyAsyncTask<BackgroundType, ProgressType extends Serializable, PostType extends Serializable> extends Handler {
+public abstract class MyAsyncTask<BackgroundType, ProgressType, PostType> extends Handler {
 
     private static String POST_EXECUTE = "postExecute";
     private static String PROGRESS_UPDATE = "progressUpdate";
@@ -15,13 +13,13 @@ public abstract class MyAsyncTask<BackgroundType, ProgressType extends Serializa
 
     @Override
     public void handleMessage(Message msg) {
-        Serializable data = msg.getData().getSerializable(PROGRESS_UPDATE);
+        byte[] data = msg.getData().getByteArray(PROGRESS_UPDATE);
         if(data != null)
-            onProgressUpdate((ProgressType) data);
+            onProgressUpdate((ProgressType) Utils.bytesToObject(data));
 
-        data = msg.getData().getSerializable(POST_EXECUTE);
+        data = msg.getData().getByteArray(POST_EXECUTE);
         if(data != null)
-            onPostExecute((PostType) data);
+            onPostExecute((PostType) Utils.bytesToObject(data));
 }
 
     protected abstract PostType doInBackground(BackgroundType param);
@@ -32,7 +30,7 @@ public abstract class MyAsyncTask<BackgroundType, ProgressType extends Serializa
 
     public void publishProgress(ProgressType param){
         Bundle bundle = new Bundle();
-        bundle.putSerializable(PROGRESS_UPDATE, param);
+        bundle.putByteArray(PROGRESS_UPDATE, Utils.objectToBytes(param));
         Message msg = obtainMessage();
         msg.setData(bundle);
         sendMessage(msg);
@@ -50,7 +48,7 @@ public abstract class MyAsyncTask<BackgroundType, ProgressType extends Serializa
             @Override
             public void run() {
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(POST_EXECUTE, doInBackground(param));
+                bundle.putSerializable(POST_EXECUTE, Utils.objectToBytes(doInBackground(param)));
                 Message msg = obtainMessage();
                 msg.setData(bundle);
                 sendMessage(msg);
