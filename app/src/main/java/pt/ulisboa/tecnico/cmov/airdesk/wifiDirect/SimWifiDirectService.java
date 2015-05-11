@@ -25,7 +25,7 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
-import pt.ulisboa.tecnico.cmov.airdesk.dto.MessageDto;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
@@ -94,13 +94,13 @@ public class SimWifiDirectService extends WifiDirectService implements
     }
 
     @Override
-    public void sendDto(Dto dto){
+    public void sendMessage(MessagePack message){
         Log.e("DtoSend", "Sending DTO");
         //In the moment, it will send to every client
         for(String key : termiteCliSocket.keySet()){
             SimWifiP2pSocket sock = termiteCliSocket.get(key);
             try {
-                sock.getOutputStream().write(Utils.parseDtoToSend(dto));
+                sock.getOutputStream().write(Utils.objectToBytes(message));
                 Log.e("DtoSend", "Is sending...");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -172,25 +172,26 @@ public class SimWifiDirectService extends WifiDirectService implements
 
     private void processUserDto(UserDto dto, String ip) {
         // Checks if the this user has already that nick there. If not, it adds to the hashmap.
-        termiteNickConverter.put(ip, dto.userID);
+        termiteNickConverter.put(ip, dto.id);
     }
 
-    private void processMessageDto(MessageDto dto, SimWifiP2pSocket sockToSend) {
+    private void processMessageDto(MessagePack dto, SimWifiP2pSocket sockToSend) {
         Log.e("DTO Process", "Begin");
-        Dto newDto;
-        switch(dto.message){
-            case MessageDto.HELLO_WORLD:
+        UserDto newDto;
+        switch(dto.request){
+            case MessagePack.HELLO_WORLD:
                 Log.e("Hello World", ":)");
-            case MessageDto.USER_REQUEST:
+            case MessagePack.USER_REQUEST:
                 String id = FlowManager.getActiveUserID(getApplicationContext());
-                newDto = new UserDto(id);
+                newDto = new UserDto();
+                newDto.id = id;
                 try {
-                    sockToSend.getOutputStream().write(Utils.parseDtoToSend(newDto));
+                    sockToSend.getOutputStream().write(Utils.objectToBytes(newDto));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             default:
-                Log.e("MessageDto", "Don't know what to do");
+                Log.e("MessagePack", "Don't know what to do");
         }
     }
 
@@ -278,7 +279,9 @@ public class SimWifiDirectService extends WifiDirectService implements
                 termiteComm.add(task);
                 task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, param);
                 try {
-                    cli.getOutputStream().write(Utils.parseDtoToSend(new MessageDto(MessageDto.USER_REQUEST)));
+                    MessagePack messagePack = new MessagePack();
+                    messagePack.request = MessagePack.USER_REQUEST;
+                    cli.getOutputStream().write(Utils.objectToBytes(messagePack));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -304,11 +307,11 @@ public class SimWifiDirectService extends WifiDirectService implements
                     Dto dto = (Dto) ois.readObject();
 
                     // CHECK DTO TYPE, AND EXECUTE DTO REQUEST
-                    if(dto instanceof MessageDto){
-                        Log.e("Received message", ((MessageDto) dto).message);
-                        processMessageDto(((MessageDto) dto), s);
+                    if(dto instanceof MessagePack){
+                        Log.e("Received message", ((MessagePack) dto).request);
+                        processMessageDto(((MessagePack) dto), s);
                     } else if(dto instanceof UserDto){
-                        Log.e("Received user", ((UserDto) dto).userID);
+                        Log.e("Received user", ((UserDto) dto).id);
                         processUserDto((UserDto) dto, sockIp);
                     } else if(dto instanceof TextFileDto){
                         Log.e("Received file", "from owner " + ((TextFileDto) dto).owner + ", with title " + ((TextFileDto) dto).title + ", and content " + ((TextFileDto) dto).content);

@@ -1,10 +1,14 @@
 package pt.ulisboa.tecnico.cmov.airdesk.dto;
 
+import java.util.HashSet;
+
 public class UserDto implements Dto {
 
-    public String userID;
+    public String id;
+    public HashSet<String> subscriptions;
 
-    public UserDto(String id){
-        userID = id;
+    @Override
+    public String toString() {
+        return id + " " + (subscriptions != null ? subscriptions.size() : 0);
     }
 }

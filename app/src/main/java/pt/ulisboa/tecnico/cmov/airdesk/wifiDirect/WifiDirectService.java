@@ -8,7 +8,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
-import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 
 public abstract class WifiDirectService extends Service {
 
@@ -62,5 +62,5 @@ public abstract class WifiDirectService extends Service {
 
     public abstract void testFunc();
 
-    public abstract void sendDto(Dto dto);
+    public abstract void sendMessage(MessagePack message);
 }

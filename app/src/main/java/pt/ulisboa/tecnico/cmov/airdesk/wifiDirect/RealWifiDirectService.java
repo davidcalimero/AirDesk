@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 
 public class RealWifiDirectService extends WifiDirectService implements
         WifiP2pManager.PeerListListener, WifiP2pManager.GroupInfoListener, WifiP2pManager.ConnectionInfoListener {
@@ -55,7 +55,7 @@ public class RealWifiDirectService extends WifiDirectService implements
     }
 
     @Override
-    public void sendDto(Dto dto) {
+    public void sendMessage(MessagePack message) {
 
     }
 

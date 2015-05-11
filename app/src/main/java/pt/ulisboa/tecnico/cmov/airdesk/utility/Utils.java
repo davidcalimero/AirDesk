@@ -37,12 +37,12 @@ public class Utils {
         return new DecimalFormat(format).format(number);
     }
 
-    public static byte[] parseDtoToSend(Dto dto){
+    public static byte[] objectToBytes(Object object){
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         ObjectOutputStream oos;
         try {
             oos = new ObjectOutputStream(buffer);
-            oos.writeObject(dto);
+            oos.writeObject(object);
             oos.close();
         } catch (IOException e) {
             e.printStackTrace();

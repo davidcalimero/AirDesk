@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
-import pt.ulisboa.tecnico.cmov.airdesk.dto.MessageDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
@@ -53,38 +52,64 @@ public class FlowManager {
         //unmouting workspace on local device
         receive_unmountWorkspace(workspaceDto);
 
-        //MessageDto creation
-        MessageDto msgDto = new MessageDto("Hello World!");
-        msgDto.message = "uninviteUserFromWorkspace " + userId + " " + workspaceDto.name;
+        //Create message pack
+        MessagePack messagePack = new MessagePack();
+        messagePack.request = MessagePack.UNINVITE_FROM_WORKSPACE;
+        messagePack.dto = workspaceDto;
+        messagePack.receiver = userId;
 
         //sending the DTO
-        ((ApplicationContext) context).sendDto(msgDto);
+        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
     }
 
     private static void send_mountWorkspace(String userId, WorkspaceDto workspaceDto, Context context){
-
+        //Create message pack
+        MessagePack messagePack = new MessagePack();
+        messagePack.request = MessagePack.MOUNT_WORKSPACE;
+        messagePack.dto = workspaceDto;
+        messagePack.receiver = userId;
         //sending the DTO
-        ((ApplicationContext) context).sendDto(workspaceDto);
+        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
     }
 
     private static void send_unmountWorkspace(String userId, WorkspaceDto workspaceDto, Context context){
+        //Create message pack
+        MessagePack messagePack = new MessagePack();
+        messagePack.request = MessagePack.UNMOUNT_WORKSPACE;
+        messagePack.dto = workspaceDto;
+        messagePack.receiver = userId;
         //sending the DTO
-        ((ApplicationContext) context).sendDto(workspaceDto);
+        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
     }
 
     private static void send_addFile(String userId, TextFileDto textFileDto, Context context){
+        //Create message pack
+        MessagePack messagePack = new MessagePack();
+        messagePack.request = MessagePack.ADD_FILE;
+        messagePack.dto = textFileDto;
+        messagePack.receiver = userId;
         //sending the DTO
-        ((ApplicationContext) context).sendDto(textFileDto);
+        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
     }
 
     private static void send_removeFile(String userId, TextFileDto textFileDto, Context context){
+        //Create message pack
+        MessagePack messagePack = new MessagePack();
+        messagePack.request = MessagePack.REMOVE_FILE;
+        messagePack.dto = textFileDto;
+        messagePack.receiver = userId;
         //sending the DTO
-        ((ApplicationContext) context).sendDto(textFileDto);
+        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
     }
 
     private static void send_editFile(String userId, TextFileDto textFileDto, Context context){
+        //Create message pack
+        MessagePack messagePack = new MessagePack();
+        messagePack.request = MessagePack.EDIT_FILE;
+        messagePack.dto = textFileDto;
+        messagePack.receiver = userId;
         //sending the DTO
-        ((ApplicationContext) context).sendDto(textFileDto);
+        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
     }
 
     public static boolean send_askToEditFile(Context context, TextFileDto textFileDto) {
@@ -102,8 +127,9 @@ public class FlowManager {
     }
 
     public static UserDto send_userID(Context context){
-        UserDto userDto = new UserDto("teste");
-        userDto.userID = getActiveUserID(context);
+        UserDto userDto = new UserDto();
+        userDto.id = getActiveUserID(context);
+        userDto.subscriptions = getSubscriptions(context);
         return userDto;
     }
 
@@ -276,9 +302,9 @@ public class FlowManager {
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
 
-        MessageDto dto = new MessageDto("Hello World!");
-        dto.message = "Hello World";
-        ((ApplicationContext) context).sendDto(dto);
+        MessagePack dto = new MessagePack();
+        dto.request = "Hello World";
+        ((ApplicationContext) context).getWifiDirectService().sendMessage(dto);
 
         // S-Version
         for(WorkspaceDto workspaceDto : getWorkspaces(context)){

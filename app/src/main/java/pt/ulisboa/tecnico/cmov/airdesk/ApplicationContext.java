@@ -86,8 +86,4 @@ public class ApplicationContext extends Application {
         if (FileManager.objectToFile(activeUser.getID(), activeUser, getApplicationContext()))
             Log.e("User", "user committed:" + activeUser.getID());
     }
-
-    public void sendDto(Dto dto){
-        wifiDirectService.sendDto(dto);
-    }
 }
