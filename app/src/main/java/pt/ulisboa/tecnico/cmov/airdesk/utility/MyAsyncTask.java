@@ -11,24 +11,24 @@ public abstract class MyAsyncTask<BackgroundType, ProgressType extends Serializa
     private static String POST_EXECUTE = "postExecute";
     private static String PROGRESS_UPDATE = "progressUpdate";
 
-    private Thread thread;
+    private Thread thread = null;
 
     @Override
     public void handleMessage(Message msg) {
-        Serializable data = msg.getData().getSerializable(POST_EXECUTE);
-        if(data != null)
-            onPostExecute((PostType) data);
-
-        data = msg.getData().getSerializable(PROGRESS_UPDATE);
+        Serializable data = msg.getData().getSerializable(PROGRESS_UPDATE);
         if(data != null)
             onProgressUpdate((ProgressType) data);
+
+        data = msg.getData().getSerializable(POST_EXECUTE);
+        if(data != null)
+            onPostExecute((PostType) data);
 }
 
     protected abstract PostType doInBackground(BackgroundType param);
 
-    protected abstract void onProgressUpdate(ProgressType param);
+    protected void onProgressUpdate(ProgressType param){}
 
-    protected abstract void onPostExecute(PostType param);
+    protected void onPostExecute(PostType param){}
 
     public void publishProgress(ProgressType param){
         Bundle bundle = new Bundle();
@@ -43,6 +43,9 @@ public abstract class MyAsyncTask<BackgroundType, ProgressType extends Serializa
     }
 
     public void execute(final BackgroundType param){
+        if(thread != null)
+            cancel();
+
         thread = new Thread() {
             @Override
             public void run() {
