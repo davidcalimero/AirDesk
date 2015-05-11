@@ -1,12 +1,12 @@
 package pt.ulisboa.tecnico.cmov.airdesk.utility;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 import java.util.Collection;
-
-import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
 
 public class Utils {
 
@@ -48,5 +48,19 @@ public class Utils {
             e.printStackTrace();
         }
         return buffer.toByteArray();
+    }
+
+    public static Object bytesToObject(byte[] data){
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        ObjectInputStream ois;
+        try {
+            ois = new ObjectInputStream(in);
+            return ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
