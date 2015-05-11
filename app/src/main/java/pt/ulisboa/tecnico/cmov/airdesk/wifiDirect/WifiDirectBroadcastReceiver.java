@@ -42,13 +42,13 @@ public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
                 Log.e("BroadcastReceiver", "Network Membership Changed");
                 SimWifiP2pInfo member_info = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
                 member_info.print();
-                //_service.processGroup();
+                _service.processGroup();
                 break;
             case SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION:
                 Log.e("BroadcastReceiver","Group Ownership Changed");
                 SimWifiP2pInfo group_info = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
                 group_info.print();
-                _service.processGroup();
+                //_service.processGroup();
                 break;
 
             //WifiDirect

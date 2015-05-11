@@ -301,7 +301,7 @@ public class FlowManager {
         // Compare tags from Subscription and Public Profile
 
         MessagePack dto = new MessagePack();
-        dto.request = "Hello World";
+        dto.request = MessagePack.HELLO_WORLD;
         ((ApplicationContext) context).getWifiDirectService().sendMessage(dto);
 
         // S-Version

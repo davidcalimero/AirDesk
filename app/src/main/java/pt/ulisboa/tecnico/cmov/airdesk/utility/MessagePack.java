@@ -22,9 +22,8 @@ public class MessagePack implements Serializable {
     public String request;
     public Dto dto;
 
-
     @Override
     public String toString() {
-        return request + " to " + receiver + ": " + dto.toString();
+        return request + " to " + receiver + ": " + (dto == null ? null : dto.toString());
     }
 }
