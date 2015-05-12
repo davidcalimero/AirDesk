@@ -203,10 +203,6 @@ public class FlowManager {
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
 
-        MessagePack dto = new MessagePack();
-        dto.request = MessagePack.HELLO_WORLD;
-        ((ApplicationContext) context).getWifiDirectService().sendMessage(dto);
-
         // S-Version
         for(WorkspaceDto workspaceDto : getWorkspaces(context)){
             if(getWorkspaceUsers(context, workspaceDto.name).contains(getActiveUserID(context)) ||
