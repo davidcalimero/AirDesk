@@ -5,11 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Messenger;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class SimWifiDirectService extends WifiDirectService implements
 
     @Override
     public void sendMessage(MessagePack message){
-        Log.e("MessageSend", "Sending Message");
+        Log.e("sendMessage", "Sending Message");
         if(termiteIDConverter.containsKey(message.receiver)){}
 
         /** /
@@ -106,6 +106,7 @@ public class SimWifiDirectService extends WifiDirectService implements
 
         // CHECKS IF THE DEVICE IS GO
         isGO = simWifiP2pInfo.askIsGO();
+        Log.e("GroupInfoAvailable", "isGO = " + isGO);
 
         // MAKE A LIST OF IPs, TO INCREASE TIME EFFICIENCY
         ArrayList<String> ips = new ArrayList<>();
@@ -135,6 +136,7 @@ public class SimWifiDirectService extends WifiDirectService implements
 
         if(isGO) {
             //Create listener socket
+            Log.e("GroupInfoAvailable", "IncomingCommTask created");
             new IncomingCommTask().execute(null);
         }
     }
@@ -153,12 +155,11 @@ public class SimWifiDirectService extends WifiDirectService implements
 
     // PROCESS MESSAGE
     private void processMessage(MessagePack message) {
-        Log.e("Message Process", "SAY DOWN FOR WHAT?!");
-        Log.e("Message Process", "Message is " + message.request);
+        Log.e("processMessage", "Processing...");
 
         switch(message.request){
             case MessagePack.HELLO_WORLD:
-                Log.e("Message Process", "Hello World! :D");
+                Log.e("processMessage", message.request);
                 break;
             case MessagePack.USER_REQUEST:
 
@@ -188,13 +189,8 @@ public class SimWifiDirectService extends WifiDirectService implements
     public class IncomingCommTask extends MyAsyncTask<Void, SimWifiP2pSocket, Void> {
 
         @Override
-        protected Void doInBackground(Void params) {
-
+        protected Void doInBackground(Void param) {
             Log.d("SimWifiDirectService", "IncomingCommTask started (" + this.hashCode() + ").");
-            if(Looper.getMainLooper().getThread() == Thread.currentThread())
-                Log.e("Bkg: main thread", "NOOOES");
-            else
-                Log.e("Bkg: background thread", "yupie");
 
             try {
                 termiteSrvSocket = new SimWifiP2pSocketServer(10001);
@@ -218,12 +214,6 @@ public class SimWifiDirectService extends WifiDirectService implements
 
         @Override
         protected void onProgressUpdate(SimWifiP2pSocket value) {
-
-            if(Looper.getMainLooper().getThread() == Thread.currentThread())
-                Log.e("Pgrs: main thread", "yupie");
-            else
-                Log.e("Pgrs: background thread", "NOOOES");
-
             MessageTreatmentTask task = new MessageTreatmentTask();
             termiteComm.add(task);
             Log.e("Incoming","add a Message Treatment Task");
@@ -232,12 +222,12 @@ public class SimWifiDirectService extends WifiDirectService implements
         }
     }
 
-    public class OutgoingCommTask extends MyAsyncTask<String, Void, String> {
+    public class OutgoingCommTask extends MyAsyncTask<String, Void, Void> {
 
         SimWifiP2pSocket cli = null;
 
         @Override
-        protected String doInBackground(String param) {
+        protected Void doInBackground(String param) {
             long initialTime = System.currentTimeMillis();
             while(System.currentTimeMillis() - initialTime < 1000) {
                 try {
@@ -253,14 +243,9 @@ public class SimWifiDirectService extends WifiDirectService implements
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            if(Looper.getMainLooper().getThread() == Thread.currentThread())
-                Log.e("out: main thread", "yupie");
-            else
-                Log.e("out: background thread", "NOOOES");
-
+        protected void onPostExecute(Void param) {
             if(cli != null) {
-                Log.e("Outgoing","Chegou cá");
+                Log.e("Outgoing","Chegou aqui");
                 MessageTreatmentTask task = new MessageTreatmentTask();
                 termiteComm.add(task);
                 task.execute(cli);
@@ -276,7 +261,7 @@ public class SimWifiDirectService extends WifiDirectService implements
         }
     }
 
-    public class MessageTreatmentTask extends MyAsyncTask<SimWifiP2pSocket, String, Void> {
+    public class MessageTreatmentTask extends MyAsyncTask<SimWifiP2pSocket, Void, Void> {
 
         @Override
         protected Void doInBackground(SimWifiP2pSocket s) {
@@ -293,11 +278,11 @@ public class SimWifiDirectService extends WifiDirectService implements
                 processMessage(message);
 
             } catch (IOException e) {
-                Log.e("Error reading socket:", e.getMessage());
+                e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                Log.e("Error getting Message:", e.getMessage());
+                e.printStackTrace();
             } catch (NullPointerException e){
-                Log.e("Didn't receive Message", e.getMessage());
+                e.printStackTrace();
             }
             return null;
         }

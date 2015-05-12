@@ -1,26 +1,31 @@
 package pt.ulisboa.tecnico.cmov.airdesk.utility;
 
-import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 public abstract class MyAsyncTask<BackgroundType, ProgressType, PostType> extends Handler {
 
-    private static String POST_EXECUTE = "postExecute";
-    private static String PROGRESS_UPDATE = "progressUpdate";
+    private final static int POST_EXECUTE = 1;
+    private final static int PROGRESS_UPDATE = 2;
 
     private Thread thread = null;
 
+    public MyAsyncTask(){
+        super(Looper.getMainLooper());
+    }
+
     @Override
     public void handleMessage(Message msg) {
-        byte[] data = msg.getData().getByteArray(PROGRESS_UPDATE);
-        if(data != null)
-            onProgressUpdate((ProgressType) Utils.bytesToObject(data));
-
-        data = msg.getData().getByteArray(POST_EXECUTE);
-        if(data != null)
-            onPostExecute((PostType) Utils.bytesToObject(data));
-}
+        switch (msg.arg1){
+            case PROGRESS_UPDATE:
+                onProgressUpdate((ProgressType) msg.obj);
+                break;
+            case POST_EXECUTE:
+                onPostExecute((PostType) msg.obj);
+                break;
+        }
+    }
 
     protected abstract PostType doInBackground(BackgroundType param);
 
@@ -29,10 +34,9 @@ public abstract class MyAsyncTask<BackgroundType, ProgressType, PostType> extend
     protected void onPostExecute(PostType param){}
 
     public void publishProgress(ProgressType param){
-        Bundle bundle = new Bundle();
-        bundle.putByteArray(PROGRESS_UPDATE, Utils.objectToBytes(param));
         Message msg = obtainMessage();
-        msg.setData(bundle);
+        msg.arg1 = PROGRESS_UPDATE;
+        msg.obj = param;
         sendMessage(msg);
     }
 
@@ -41,19 +45,17 @@ public abstract class MyAsyncTask<BackgroundType, ProgressType, PostType> extend
     }
 
     public void execute(final BackgroundType param){
-        if(thread != null)
-            cancel();
-
-        thread = new Thread() {
-            @Override
-            public void run() {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(POST_EXECUTE, Utils.objectToBytes(doInBackground(param)));
-                Message msg = obtainMessage();
-                msg.setData(bundle);
-                sendMessage(msg);
-            }
-        };
+        if(thread == null) {
+            thread = new Thread() {
+                @Override
+                public void run() {
+                    Message msg = obtainMessage();
+                    msg.arg1 = POST_EXECUTE;
+                    msg.obj = doInBackground(param);
+                    sendMessage(msg);
+                }
+            };
+        }
         thread.start();
     }
 }
