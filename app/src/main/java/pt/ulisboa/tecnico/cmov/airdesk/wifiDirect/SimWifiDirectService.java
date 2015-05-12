@@ -9,7 +9,6 @@ import android.os.Messenger;
 import android.util.Log;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -23,6 +22,10 @@ import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MyAsyncTask;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
@@ -36,7 +39,7 @@ public class SimWifiDirectService extends WifiDirectService implements
     private SimWifiP2pManager.Channel termiteChannel;
 
     private SimWifiP2pSocketServer termiteSrvSocket = null;
-    private HashMap<String, SimWifiP2pSocket> termiteIDConverter = null;
+    private HashMap<String, String> termiteIDConverter = null;
     private ArrayList<MessageTreatmentTask> termiteComm = null;
 
     private boolean isGO = false;
@@ -69,6 +72,9 @@ public class SimWifiDirectService extends WifiDirectService implements
         termiteIDConverter = new HashMap<>();
         //termiteNickConverter = new HashMap<>();
         termiteComm = new ArrayList<>();
+
+        //Create listener socket
+        new IncomingCommTask().execute(null);
     }
 
     @Override
@@ -83,22 +89,13 @@ public class SimWifiDirectService extends WifiDirectService implements
 
     @Override
     public void sendMessage(MessagePack message){
-        Log.e("sendMessage", "Sending Message");
-        if(termiteIDConverter.containsKey(message.receiver)){}
-
-        /** /
-        Log.e("DtoSend", "Sending DTO");
-        //In the moment, it will send to every client
-        for(String key : termiteCliSocket.keySet()){
-            SimWifiP2pSocket sock = termiteCliSocket.get(key);
-            try {
-                sock.getOutputStream().write(Utils.objectToBytes(message));
-                Log.e("DtoSend", "Is sending...");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        Log.e("MessageSend", "Sending Message");
+        // Send Message to someone (IP yet not on
+        if(termiteIDConverter.containsKey(message.receiver)){
+            new OutgoingCommTask().execute(termiteIDConverter.get(message.receiver));
         }
-         /**/
+        else
+            Log.e("MessageSend", "Don't know receiver");
     }
 
     @Override
@@ -108,36 +105,29 @@ public class SimWifiDirectService extends WifiDirectService implements
         isGO = simWifiP2pInfo.askIsGO();
         Log.e("GroupInfoAvailable", "isGO = " + isGO);
 
-        // MAKE A LIST OF IPs, TO INCREASE TIME EFFICIENCY
-        ArrayList<String> ips = new ArrayList<>();
-        for (String deviceName : simWifiP2pInfo.getDevicesInNetwork()) {
-            SimWifiP2pDevice device = simWifiP2pDeviceList.getByName(deviceName);
-            ips.add(device.getVirtIp());
-        }
-
-        // TERMINATE MESSAGETREAMENTTASK
+        // TERMINATE MESSAGETREAMENTTASKS
         for(MessageTreatmentTask t : termiteComm){
             t.cancel();
             termiteComm.remove(t);
         }
 
-        // REMOVE SOCKETS
+        ArrayList<String> ips = new ArrayList<>();
+        // GETS DEVICES' IPS
+        for(SimWifiP2pDevice device : simWifiP2pDeviceList.getDeviceList()){
+            ips.add(device.getVirtIp());
+        }
+
+        // REMOVE UNREACHABLE IPS FROM THE HASH
         for(String key : termiteIDConverter.keySet()){
-            SimWifiP2pSocket s = termiteIDConverter.get(key);
-            if(s.isClosed())
+            String ip = termiteIDConverter.get(key);
+            if(!ips.contains(ip))
                 termiteIDConverter.remove(key);
         }
 
-        // ESTABLISH CONNECTION WITH GROUP OWNER
-        if(!isGO){
-            Log.e("GroupInfoAvailable", ips.get(0));
-            new OutgoingCommTask().execute(ips.get(0));
-        }
-
-        if(isGO) {
-            //Create listener socket
-            Log.e("GroupInfoAvailable", "IncomingCommTask created");
-            new IncomingCommTask().execute(null);
+        // KNOW IDs
+        for(SimWifiP2pDevice device : simWifiP2pDeviceList.getDeviceList()){
+            if(!termiteIDConverter.containsValue(device.getVirtIp()) && !simWifiP2pInfo.getDeviceName().equals(device.deviceName))
+                new OutgoingCommTask().execute(device.getVirtIp());
         }
     }
 
@@ -154,34 +144,50 @@ public class SimWifiDirectService extends WifiDirectService implements
     }
 
     // PROCESS MESSAGE
-    private void processMessage(MessagePack message) {
-        Log.e("processMessage", "Processing...");
+    private MessagePack processMessage(MessagePack message) {
+        Log.e("Message Process", "Message is " + message.request);
 
         switch(message.request){
             case MessagePack.HELLO_WORLD:
-                Log.e("processMessage", message.request);
-                break;
-            case MessagePack.USER_REQUEST:
-
-                break;
+                Log.e("Message Process", "Hello World! :D");
+                return null;
             case MessagePack.MOUNT_WORKSPACE:
-
-                break;
+                FlowManager.receive_mountWorkspace((WorkspaceDto) message.dto);
+                return null;
             case MessagePack.UNMOUNT_WORKSPACE:
-
-                break;
+                FlowManager.receive_mountWorkspace((WorkspaceDto) message.dto);
+                return null;
             case MessagePack.ADD_FILE:
-
-                break;
+                FlowManager.receive_addFile(getApplicationContext(), (TextFileDto) message.dto);
+                return null;
             case MessagePack.EDIT_FILE:
-
-                break;
+                FlowManager.receive_editFile(getApplicationContext(), (TextFileDto) message.dto);
+                return null;
             case MessagePack.REMOVE_FILE:
-
-                break;
+                FlowManager.receive_removeFile(getApplicationContext(), (TextFileDto) message.dto);
+                return null;
             default:
+                return null;
+        }
+    }
 
-                break;
+    private MessagePack process(MessagePack message, String ip){
+        if((message.request).equals(MessagePack.USER_REQUEST))
+            return processUser(message, ip);
+        return processMessage(message);
+    }
+
+    private MessagePack processUser(MessagePack message, String ip){
+        if(message.type == MessagePack.TYPE.REQUEST){
+            MessagePack pack = new MessagePack();
+            pack.request = MessagePack.USER_REQUEST;
+            pack.type = MessagePack.TYPE.REPLY;
+            pack.dto = FlowManager.send_userID(getApplicationContext());
+            return pack;
+        }
+        else {
+            termiteIDConverter.put(((UserDto)message.dto).id, ip);
+            return null;
         }
     }
 
@@ -216,7 +222,7 @@ public class SimWifiDirectService extends WifiDirectService implements
         protected void onProgressUpdate(SimWifiP2pSocket value) {
             MessageTreatmentTask task = new MessageTreatmentTask();
             termiteComm.add(task);
-            Log.e("Incoming","add a Message Treatment Task");
+            Log.e("Incoming","added a Message Treatment Task");
 
             task.execute(value);
         }
@@ -225,13 +231,15 @@ public class SimWifiDirectService extends WifiDirectService implements
     public class OutgoingCommTask extends MyAsyncTask<String, Void, Void> {
 
         SimWifiP2pSocket cli = null;
+        String deviceIp = null;
 
         @Override
         protected Void doInBackground(String param) {
+            deviceIp = param;
             long initialTime = System.currentTimeMillis();
             while(System.currentTimeMillis() - initialTime < 1000) {
                 try {
-                    cli = new SimWifiP2pSocket(param, 10001);
+                    cli = new SimWifiP2pSocket(deviceIp, 10001);
                     return null;
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
@@ -239,6 +247,7 @@ public class SimWifiDirectService extends WifiDirectService implements
                     e.printStackTrace();
                 }
             }
+            Log.e("Outgoing", "Não conseguiu estabelecer ligação");
             return null;
         }
 
@@ -247,12 +256,15 @@ public class SimWifiDirectService extends WifiDirectService implements
             if(cli != null) {
                 Log.e("Outgoing","Chegou aqui");
                 MessageTreatmentTask task = new MessageTreatmentTask();
+                task.setDeviceIp(deviceIp);
                 termiteComm.add(task);
+                Log.e("Outgoing", "A executar o MessageTreatment");
                 task.execute(cli);
 
                 MessagePack pack = new MessagePack();
                 pack.request = MessagePack.HELLO_WORLD;
                 try {
+                    Log.e("Outgoing", "A enviar o Hello World para o client");
                     cli.getOutputStream().write(Utils.objectToBytes(pack));
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -262,6 +274,12 @@ public class SimWifiDirectService extends WifiDirectService implements
     }
 
     public class MessageTreatmentTask extends MyAsyncTask<SimWifiP2pSocket, Void, Void> {
+
+        String ip = null;
+
+        public void setDeviceIp(String ip){
+            this.ip = ip;
+        }
 
         @Override
         protected Void doInBackground(SimWifiP2pSocket s) {
@@ -275,7 +293,12 @@ public class SimWifiDirectService extends WifiDirectService implements
                 MessagePack message = (MessagePack) ois.readObject();
                 Log.e("MessagePackReceive", "Segundo");
                 // PROCESS DTO
-                processMessage(message);
+                MessagePack sendPack = process(message, ip);
+                if(sendPack != null) {
+                    s.getOutputStream().write(Utils.objectToBytes(sendPack));
+                    s.close();
+                    Log.e("MessagePackSend", "A enviar o socket");
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();

@@ -17,9 +17,12 @@ public class MessagePack implements Serializable {
     public static final String REMOVE_FILE = "Remove File";
     public static final String EDIT_FILE = "Edit File";
 
-    public String receiver;
+    public enum TYPE {REQUEST, REPLY}
 
+    public String sender;
+    public String receiver;
     public String request;
+    public TYPE type;
     public Dto dto;
 
     @Override
