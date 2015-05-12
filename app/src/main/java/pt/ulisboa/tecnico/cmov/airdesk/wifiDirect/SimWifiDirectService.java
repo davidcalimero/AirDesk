@@ -26,6 +26,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MyAsyncTask;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
@@ -182,7 +183,7 @@ public class SimWifiDirectService extends WifiDirectService implements
             MessagePack pack = new MessagePack();
             pack.request = MessagePack.USER_REQUEST;
             pack.type = MessagePack.TYPE.REPLY;
-            pack.dto = FlowManager.send_userID(getApplicationContext());
+            pack.dto = FlowProxy.send_userID(getApplicationContext());
             return pack;
         }
         else {

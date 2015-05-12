@@ -48,12 +48,16 @@ public class ForeignFragment extends ExpandableListFragment {
 
             @Override
             public void onFileAdded(TextFileDto textFileDto) {
-                addFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
+                if(!userId.equals(textFileDto.owner)) {
+                    addFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
+                }
             }
 
             @Override
             public void onFileRemoved(TextFileDto textFileDto) {
-                removeFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
+                if(!userId.equals(textFileDto.owner)) {
+                    removeFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
+                }
             }
 
             @Override

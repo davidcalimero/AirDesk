@@ -8,7 +8,6 @@ import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ApplicationContext;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
-import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
@@ -16,15 +15,14 @@ import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 
 public class FlowManager {
 
-    private static FlowManager singleton = null;
+    private static FlowManager instance = new FlowManager();
 
     private ArrayList<WorkspacesChangeListener> listeners = new ArrayList<>();
 
+    private FlowManager(){}
+
     private static FlowManager getInstance() {
-        if (singleton == null) {
-            singleton = new FlowManager();
-        }
-        return singleton;
+        return instance;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -44,92 +42,6 @@ public class FlowManager {
     //----------------------------------------------------------------------------------------------
     // NET LAYER METHODS ---------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
-
-    //TODO SEND ------------------------------------------------------------------------------------
-
-    // antigo send_uninviteUserFromWorkspace
-    public static void send_userRemovedForeignWorkspace(String userId, WorkspaceDto workspaceDto, Context context){
-        //unmouting workspace on local device
-        receive_unmountWorkspace(workspaceDto);
-        //Create message pack
-        MessagePack messagePack = new MessagePack();
-        messagePack.request = MessagePack.UNINVITE_FROM_WORKSPACE;
-        messagePack.dto = workspaceDto;
-        messagePack.receiver = userId;
-        //sending the DTO
-        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
-    }
-
-    private static void send_mountWorkspace(String userId, WorkspaceDto workspaceDto, Context context){
-        //Create message pack
-        MessagePack messagePack = new MessagePack();
-        messagePack.request = MessagePack.MOUNT_WORKSPACE;
-        messagePack.dto = workspaceDto;
-        messagePack.receiver = userId;
-        //sending the DTO
-        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
-    }
-
-    private static void send_unmountWorkspace(String userId, WorkspaceDto workspaceDto, Context context){
-        //Create message pack
-        MessagePack messagePack = new MessagePack();
-        messagePack.request = MessagePack.UNMOUNT_WORKSPACE;
-        messagePack.dto = workspaceDto;
-        messagePack.receiver = userId;
-        //sending the DTO
-        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
-    }
-
-    private static void send_addFile(String userId, TextFileDto textFileDto, Context context){
-        //Create message pack
-        MessagePack messagePack = new MessagePack();
-        messagePack.request = MessagePack.ADD_FILE;
-        messagePack.dto = textFileDto;
-        messagePack.receiver = userId;
-        //sending the DTO
-        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
-    }
-
-    private static void send_removeFile(String userId, TextFileDto textFileDto, Context context){
-        //Create message pack
-        MessagePack messagePack = new MessagePack();
-        messagePack.request = MessagePack.REMOVE_FILE;
-        messagePack.dto = textFileDto;
-        messagePack.receiver = userId;
-        //sending the DTO
-        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
-    }
-
-    private static void send_editFile(String userId, TextFileDto textFileDto, Context context){
-        //Create message pack
-        MessagePack messagePack = new MessagePack();
-        messagePack.request = MessagePack.EDIT_FILE;
-        messagePack.dto = textFileDto;
-        messagePack.receiver = userId;
-        //sending the DTO
-        ((ApplicationContext) context).getWifiDirectService().sendMessage(messagePack);
-    }
-
-    public static boolean send_askToEditFile(Context context, TextFileDto textFileDto) {
-        if(getActiveUserID(context).equals(textFileDto.owner))
-            return receive_askToEditFile(context, textFileDto);
-
-        return true; //TODO
-    }
-
-    public static String send_getFileContent(Context context, TextFileDto textFileDto) {
-        if(getActiveUserID(context).equals(textFileDto.owner))
-            return receive_getFileContent(context, textFileDto);
-
-        return ""; //TODO
-    }
-
-    public static UserDto send_userID(Context context){
-        UserDto userDto = new UserDto();
-        userDto.id = getActiveUserID(context);
-        userDto.subscriptions = getSubscriptions(context);
-        return userDto;
-    }
 
     //RECEIVE --------------------------------------------------------------------------------------
 
@@ -154,7 +66,7 @@ public class FlowManager {
         //Notify the rest of the users
         if(getActiveUserID(context).equals(textFileDto.owner))
             for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
-                send_addFile(user, textFileDto, context);
+                FlowProxy.send_addFile(user, textFileDto, context);
     }
 
     public static void receive_removeFile(Context context, TextFileDto textFileDto){
@@ -164,7 +76,7 @@ public class FlowManager {
         //Notify the rest of the users
         if(getActiveUserID(context).equals(textFileDto.owner))
             for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
-                send_removeFile(user, textFileDto, context);
+                FlowProxy.send_removeFile(user, textFileDto, context);
     }
 
     public static void receive_editFile(Context context, TextFileDto textFileDto){
@@ -174,7 +86,7 @@ public class FlowManager {
         //Notify the rest of the users
         if(getActiveUserID(context).equals(textFileDto.owner))
             for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
-                send_editFile(user, textFileDto, context);
+                FlowProxy.send_editFile(user, textFileDto, context);
     }
 
     public static boolean receive_askToEditFile(Context context, TextFileDto textFileDto){
@@ -202,12 +114,12 @@ public class FlowManager {
         ((ApplicationContext) context).getActiveUser().addWorkspace(workspace);
         ((ApplicationContext) context).commit();
 
-        //Updates interface
-        receive_mountWorkspace(workspaceDto);
+        //Notify owner
+        FlowProxy.send_mountWorkspace(workspaceDto.owner, workspaceDto, context);
 
         //Notify other users
-        for(String user : users)
-            send_mountWorkspace(user, workspaceDto, context);
+        for(String userId : users)
+            FlowProxy.send_mountWorkspace(userId, workspaceDto, context);
     }
 
     public static void notifyRemoveWorkspace(Context context, WorkspaceDto workspaceDto) {
@@ -217,12 +129,12 @@ public class FlowManager {
         user.removeWorkspace(workspaceDto.name, context);
         ((ApplicationContext) context).commit();
 
-        //Updates interface
-        receive_unmountWorkspace(workspaceDto);
+        //Notify owner
+        FlowProxy.send_unmountWorkspace(workspaceDto.owner, workspaceDto, context);
 
         //Notify other users
         for(String userId : workspace.getUsers())
-            send_unmountWorkspace(userId, workspaceDto, context);
+            FlowProxy.send_unmountWorkspace(userId, workspaceDto, context);
     }
 
     public static void notifyEditWorkspace(Context context, WorkspaceDto workspaceDto, boolean isPrivate, HashSet<String> users, HashSet<String> tags, long quota) {
@@ -240,11 +152,11 @@ public class FlowManager {
         //Notify other users
         for(String userId : workspace.getUsers())
             if(!users.contains(userId))
-                send_unmountWorkspace(userId, workspaceDto, context);
+                FlowProxy.send_unmountWorkspace(userId, workspaceDto, context);
 
         for(String userId : users)
             if(!workspace.getUsers().contains(userId))
-                send_mountWorkspace(userId, workspaceDto, context);
+                FlowProxy.send_mountWorkspace(userId, workspaceDto, context);
     }
 
     public static void notifyAddFile(Context context, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException {
@@ -256,11 +168,8 @@ public class FlowManager {
             ((ApplicationContext) context).commit();
         }
 
-        //Updates interface
-        receive_addFile(context, textFileDto);
-
-        //Notify other users
-        send_addFile(textFileDto.owner, textFileDto, context);
+        //Notify owner
+        FlowProxy.send_addFile(textFileDto.owner, textFileDto, context);
     }
 
     public static void notifyRemoveFile(Context context, TextFileDto textFileDto) {
@@ -271,11 +180,8 @@ public class FlowManager {
             ((ApplicationContext) context).commit();
         }
 
-        //Updates interface
-        receive_removeFile(context, textFileDto);
-
-        //Notify other users
-        send_removeFile(textFileDto.owner, textFileDto, context);
+        //Notify owner
+        FlowProxy.send_removeFile(textFileDto.owner, textFileDto, context);
     }
 
     public static void notifyEditFile(Context context, TextFileDto textFileDto) throws OutOfMemoryException {
@@ -284,11 +190,8 @@ public class FlowManager {
         if(user.getID().equals(textFileDto.owner))
             user.getWorkspaces().get(textFileDto.workspace).editFile(context, textFileDto.title, textFileDto.content);
 
-        //Updates interface
-        receive_editFile(context, textFileDto);
-
-        //Notify other users
-        send_editFile(textFileDto.owner, textFileDto, context);
+        //Notify owner
+        FlowProxy.send_editFile(textFileDto.owner, textFileDto, context);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -308,7 +211,7 @@ public class FlowManager {
         for(WorkspaceDto workspaceDto : getWorkspaces(context)){
             if(getWorkspaceUsers(context, workspaceDto.name).contains(getActiveUserID(context)) ||
                     (!isWorkspacePrivate(context, workspaceDto.name) && Utils.haveElementsInCommon(getWorkspaceTags(context, workspaceDto.name), tags))) {
-                send_mountWorkspace(getActiveUserID(context), workspaceDto, context);
+                FlowProxy.send_mountWorkspace(getActiveUserID(context), workspaceDto, context);
             }
         }
     }

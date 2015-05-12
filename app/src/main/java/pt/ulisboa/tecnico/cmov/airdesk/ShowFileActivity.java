@@ -12,12 +12,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.ThreadHandler;
 
 
@@ -48,7 +47,7 @@ public class ShowFileActivity extends AppCompatActivity {
         ThreadHandler.startWorkerThread(getString(R.string.dialog_loading_file), new ThreadHandler<String>(this) {
             @Override
             public String start() {
-                return FlowManager.send_getFileContent(getApplicationContext(), dto);
+                return FlowProxy.send_getFileContent(getApplicationContext(), dto);
             }
 
             @Override
@@ -135,7 +134,7 @@ public class ShowFileActivity extends AppCompatActivity {
     }
 
     public void editButtonPressed(View view) {
-        if (FlowManager.send_askToEditFile(getApplicationContext(), dto)) {
+        if (FlowProxy.send_askToEditFile(getApplicationContext(), dto)) {
             Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, dto.title);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);
