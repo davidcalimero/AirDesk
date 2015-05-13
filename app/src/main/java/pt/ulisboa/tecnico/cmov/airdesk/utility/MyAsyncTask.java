@@ -40,6 +40,11 @@ public abstract class MyAsyncTask<BackgroundType, ProgressType, PostType> extend
         sendMessage(msg);
     }
 
+    public void join() throws InterruptedException {
+        if(thread != null)
+            thread.join();
+    }
+
     public void cancel(){
         thread.interrupt();
     }
