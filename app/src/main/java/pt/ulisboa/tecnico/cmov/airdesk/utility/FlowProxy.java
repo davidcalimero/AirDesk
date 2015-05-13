@@ -62,7 +62,9 @@ public class FlowProxy {
     //SEND -----------------------------------------------------------------------------------------
 
     public void send_userLeftWorkspace(final Context context, final WorkspaceDto workspaceDto, final ConnectionHandler handler){
-        new MyAsyncTask<Void, Void, Void>() {
+        new MyAsyncTask<Void, MessagePack, Void>() {
+            private boolean failure = false;
+
             @Override
             protected Void doInBackground(Void param) {
                 //Create message pack
@@ -82,26 +84,39 @@ public class FlowProxy {
                 ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
                     @Override
                     public void onSuccess(MessagePack result) {
-                        handler.onSuccess(result.data);
+                        publishProgress(result);
                     }
 
                     @Override
                     public void onFailure() {
-                        handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                 });
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(MessagePack message) {
+                if(handler != null){
+                    if(failure)
+                        handler.onFailure();
+                    else
+                        handler.onSuccess(message.data);
+                }
             }
         }.execute(null);
     }
 
     public void send_mountWorkspace(final Context context, final String userId, final WorkspaceDto workspaceDto, final ConnectionHandler handler){
-        new MyAsyncTask<Void, Void, Void>() {
+        new MyAsyncTask<Void, MessagePack, Void>() {
+            private boolean failure = false;
+
             @Override
             protected Void doInBackground(Void param) {
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     FlowManager.receive_mountWorkspace(workspaceDto);
-                    if(handler != null) handler.onSuccess(null);
+                    publishProgress(null);
                     return null;
                 }
 
@@ -122,26 +137,40 @@ public class FlowProxy {
                 ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
                     @Override
                     public void onSuccess(MessagePack result) {
-                        handler.onSuccess(result.data);
+                        publishProgress(result);
                     }
 
                     @Override
                     public void onFailure() {
-                        handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                 });
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(MessagePack message) {
+                if(handler != null){
+                    if(failure)
+                        handler.onFailure();
+                    else
+                        handler.onSuccess(message.data);
+                }
             }
         }.execute(null);
     }
 
     public void send_unmountWorkspace(final Context context, final String userId, final WorkspaceDto workspaceDto, final ConnectionHandler handler){
-        new MyAsyncTask<Void, Void, Void>() {
+        new MyAsyncTask<Void, MessagePack, Void>() {
+            private boolean failure = false;
+
             @Override
             protected Void doInBackground(Void param) {
+
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     FlowManager.receive_unmountWorkspace(workspaceDto);
-                    if(handler != null) handler.onSuccess(null);
+                    publishProgress(null);
                     return null;
                 }
 
@@ -162,31 +191,46 @@ public class FlowProxy {
                 ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
                     @Override
                     public void onSuccess(MessagePack result) {
-                        handler.onSuccess(result.data);
+                        publishProgress(result);
                     }
 
                     @Override
                     public void onFailure() {
-                        handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                 });
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(MessagePack message) {
+                if(handler != null){
+                    if(failure)
+                        handler.onFailure();
+                    else
+                        handler.onSuccess(message.data);
+                }
             }
         }.execute(null);
     }
 
     public void send_addFile(final Context context, final String userId, final TextFileDto textFileDto, final ConnectionHandler handler){
         new MyAsyncTask<Void, Void, Void>() {
+            private boolean failure = false;
+
             @Override
             protected Void doInBackground(Void param) {
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     try {
                         FlowManager.receive_addFile(context, textFileDto);
-                        if(handler != null) handler.onSuccess(null);
+                        publishProgress(null);
                     } catch (AlreadyExistsException e) {
-                        if(handler != null) handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     } catch (OutOfMemoryException e) {
-                        if(handler != null) handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                     return null;
                 }
@@ -208,26 +252,40 @@ public class FlowProxy {
                 ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
                     @Override
                     public void onSuccess(MessagePack result) {
-                        handler.onSuccess(result.data);
+                        publishProgress(null);
                     }
 
                     @Override
                     public void onFailure() {
-                        handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                 });
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Void message) {
+                if(handler != null){
+                    if(failure)
+                        handler.onFailure();
+                    else
+                        handler.onSuccess(null);
+                }
             }
         }.execute(null);
     }
 
     public void send_removeFile(final Context context, final String userId, final TextFileDto textFileDto, final ConnectionHandler handler){
         new MyAsyncTask<Void, Void, Void>() {
+            private boolean failure = false;
+
             @Override
             protected Void doInBackground(Void param) {
+
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     FlowManager.receive_removeFile(context, textFileDto);
-                    if(handler != null) handler.onSuccess(null);
+                    publishProgress(null);
                     return null;
                 }
 
@@ -248,31 +306,47 @@ public class FlowProxy {
                 ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
                     @Override
                     public void onSuccess(MessagePack result) {
-                        handler.onSuccess(result.data);
+                        publishProgress(null);
                     }
 
                     @Override
                     public void onFailure() {
-                        handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                 });
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Void message) {
+                if(handler != null){
+                    if(failure)
+                        handler.onFailure();
+                    else
+                        handler.onSuccess(null);
+                }
             }
         }.execute(null);
     }
 
     public void send_editFile(final Context context, final String userId, final TextFileDto textFileDto, final ConnectionHandler handler){
          new MyAsyncTask<Void, Void, Void>() {
+             private boolean failure = false;
+
             @Override
             protected Void doInBackground(Void param) {
+
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     try {
                         FlowManager.receive_editFile(context, textFileDto);
-                        if(handler != null) handler.onSuccess(null);
+                        publishProgress(null);
                     } catch (AlreadyExistsException e) {
-                        if(handler != null) handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     } catch (OutOfMemoryException e) {
-                        if(handler != null) handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                     return null;
                 }
@@ -293,25 +367,38 @@ public class FlowProxy {
                 ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
                     @Override
                     public void onSuccess(MessagePack result) {
-                        handler.onSuccess(result.data);
+                        publishProgress(null);
                     }
 
                     @Override
                     public void onFailure() {
-                        handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                 });
                 return null;
             }
+
+             @Override
+             protected void onProgressUpdate(Void message) {
+                 if(handler != null){
+                     if(failure)
+                         handler.onFailure();
+                     else
+                         handler.onSuccess(null);
+                 }
+             }
         }.execute(null);
     }
 
     public void send_askToEditFile(final Context context, final TextFileDto textFileDto, final ConnectionHandler handler) {
-        new MyAsyncTask<Void, Void, Void>() {
+        new MyAsyncTask<Void, Boolean, Void>() {
+            private boolean failure = false;
+
             @Override
             protected Void doInBackground(Void param) {
                 if (FlowManager.getActiveUserID(context).equals(textFileDto.owner)) {
-                    handler.onSuccess(FlowManager.receive_askToEditFile(context, textFileDto));
+                    publishProgress(FlowManager.receive_askToEditFile(context, textFileDto));
                     return null;
                 }
 
@@ -327,26 +414,38 @@ public class FlowProxy {
                 ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
                     @Override
                     public void onSuccess(MessagePack result) {
-                        handler.onSuccess(result.data);
+                        publishProgress((Boolean) result.data);
                     }
 
                     @Override
                     public void onFailure() {
-                        handler.onFailure();
+                        failure = true;
+                        publishProgress(false);
                     }
                 });
-
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Boolean param) {
+                if(handler != null){
+                    if(failure)
+                        handler.onFailure();
+                    else
+                        handler.onSuccess(param);
+                }
             }
         }.execute(null);
     }
 
     public void send_getFileContent(final Context context, final TextFileDto textFileDto, final ConnectionHandler handler) {
-        new MyAsyncTask<Void, Void, Void>() {
+        new MyAsyncTask<Void, String, Void>() {
+            private boolean failure = false;
+
             @Override
             protected Void doInBackground(Void param) {
                 if(FlowManager.getActiveUserID(context).equals(textFileDto.owner)) {
-                    handler.onSuccess(FlowManager.receive_getFileContent(context, textFileDto));
+                    publishProgress(FlowManager.receive_getFileContent(context, textFileDto));
                     return null;
                 }
 
@@ -362,25 +461,27 @@ public class FlowProxy {
                 ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
                     @Override
                     public void onSuccess(MessagePack result) {
-                        handler.onSuccess(((TextFileDto) result.data).content);
+                        publishProgress(((TextFileDto) result.data).content);
                     }
 
                     @Override
                     public void onFailure() {
-                        handler.onFailure();
+                        failure = true;
+                        publishProgress(null);
                     }
                 });
-
                 return null;
             }
-        }.execute(null);
-    }
 
-    public UserDto send_userID(Context context){
-        //TODO
-        UserDto userDto = new UserDto();
-        userDto.id = FlowManager.getActiveUserID(context);
-        userDto.subscriptions = FlowManager.getSubscriptions(context);
-        return userDto;
+            @Override
+            protected void onProgressUpdate(String content) {
+                if(handler != null){
+                    if(failure)
+                        handler.onFailure();
+                    else
+                        handler.onSuccess(content);
+                }
+            }
+        }.execute(null);
     }
 }
