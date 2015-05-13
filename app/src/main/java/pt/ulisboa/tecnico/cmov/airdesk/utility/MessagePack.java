@@ -6,10 +6,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
 
 public class MessagePack implements Serializable {
     // MACROS
-    public static final String HELLO_WORLD = "Hello World";
-
     public static final String USER_REQUEST = "User Request";
-    public static final String USER_RECEIVE = "User Receive";
 
     public static final String UNINVITE_FROM_WORKSPACE = "Uninvite From Workspace";
     public static final String MOUNT_WORKSPACE = "Mount Workspace";
@@ -17,15 +14,20 @@ public class MessagePack implements Serializable {
     public static final String ADD_FILE = "Add File";
     public static final String REMOVE_FILE = "Remove File";
     public static final String EDIT_FILE = "Edit File";
+
     public static final String FILE_CONTENT = "File Content";
+    public static final String ASK_TO_EDIT = "Ask to edit";
+
+    public enum Type {REQUEST, REPLY}
 
     public String sender;
     public String receiver;
     public String request;
-    public Dto dto;
+    public Object data;
+    public Type type;
 
     @Override
     public String toString() {
-        return request + " to " + receiver + ": " + (dto == null ? null : dto.toString());
+        return request + " to " + receiver + ": " + (data == null ? null : data.toString());
     }
 }

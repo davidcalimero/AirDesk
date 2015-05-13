@@ -55,7 +55,8 @@
     <string name="subscriptions_changed_successfully">Subscriptions changed successfully</string>
     <string name="not_enough_memory_available">Not enough memory available</string>
     <string name="file_cant_be_edited_at_the_moment">File can\'t be edited at the moment</string>
-    <string name="error_file_not_avaliable_try_again_later">Error: File not avaliable. Try again later</string>
+    <string name="error_connection_lost_try_again_later">Error: Connection lost. Try again later</string>
+    <string name="error_could_not_apply_changes">Error: Could not apply changes</string>
 
     <!-- AlertDialogs -->
     <string name="dialog_confirm_delete">Do you want to delete</string>

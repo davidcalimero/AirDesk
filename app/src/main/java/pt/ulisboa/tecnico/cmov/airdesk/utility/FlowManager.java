@@ -46,13 +46,17 @@ public class FlowManager {
 
     //RECEIVE --------------------------------------------------------------------------------------
 
+    public static String receive_userRequest(Context context){
+        return getActiveUserID(context);
+    }
+
     public static void receive_userJoined(Context context, UserDto userDto){
         for(WorkspaceDto workspaceDto : getWorkspaces(context))
             if(getWorkspaceUsers(context, workspaceDto.name).contains(userDto.id))
-                FlowProxy.getInstance().send_mountWorkspace(userDto.id, workspaceDto, context);
+                FlowProxy.getInstance().send_mountWorkspace(context, userDto.id, workspaceDto, null);
     }
 
-    public static void receive_userLeaved(UserDto userDto){
+    public static void receive_userLeft(UserDto userDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onUserLeaved(userDto);
     }
@@ -71,40 +75,61 @@ public class FlowManager {
             l.onWorkspaceRemoved(workspaceDto);
     }
 
-    public static void receive_addFile(Context context, TextFileDto textFileDto){
+    public static void receive_addFile(Context context, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException{
+        //Update interface
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onFileAdded(textFileDto);
 
         //Notify the rest of the users
-        if(getActiveUserID(context).equals(textFileDto.owner))
-            for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
-                FlowProxy.getInstance().send_addFile(user, textFileDto, context);
+        if(getActiveUserID(context).equals(textFileDto.owner)) {
+            //Update local data
+            String id = getActiveUserID(context) + "-" + textFileDto.workspace + "-" + textFileDto.title;
+            ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).addFile(context, id, textFileDto.title, textFileDto.content);
+            ((ApplicationContext) context).commit();
+
+            //Notify other users
+            for (String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
+                FlowProxy.getInstance().send_addFile(context, user, textFileDto, null);
+        }
     }
 
     public static void receive_removeFile(Context context, TextFileDto textFileDto){
+        //Update interface
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onFileRemoved(textFileDto);
 
-        //Notify the rest of the users
-        if(getActiveUserID(context).equals(textFileDto.owner))
-            for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
-                FlowProxy.getInstance().send_removeFile(user, textFileDto, context);
+        if(getActiveUserID(context).equals(textFileDto.owner)) {
+            //Update local data
+            ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).removeFile(context, textFileDto.title);
+            ((ApplicationContext) context).commit();
+
+            //Notify other users
+            for (String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
+                FlowProxy.getInstance().send_removeFile(context, user, textFileDto, null);
+        }
     }
 
-    public static void receive_editFile(Context context, TextFileDto textFileDto){
+    public static void receive_editFile(Context context, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException{
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onFileContentChange(textFileDto);
 
         //Notify the rest of the users
-        if(getActiveUserID(context).equals(textFileDto.owner))
-            for(String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
-                FlowProxy.getInstance().send_editFile(user, textFileDto, context);
+        if(getActiveUserID(context).equals(textFileDto.owner)) {
+            //Update local data
+            Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace);
+            workspace.editFile(context, textFileDto.title, textFileDto.content);
+            workspace.getFiles().get(textFileDto.title).setAvailability(true);
+
+            //Notify other users
+            for (String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
+                FlowProxy.getInstance().send_editFile(context, user, textFileDto, null);
+        }
     }
 
     public static boolean receive_askToEditFile(Context context, TextFileDto textFileDto){
         TextFile file = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title);
             if(file.isAvailable()){
-            //TODO file.setAvailability(false);
+                file.setAvailability(false);
             return true;
         }
         return false;
@@ -127,11 +152,11 @@ public class FlowManager {
         ((ApplicationContext) context).commit();
 
         //Notify owner
-        FlowProxy.getInstance().send_mountWorkspace(workspaceDto.owner, workspaceDto, context);
+        FlowProxy.getInstance().send_mountWorkspace(context, workspaceDto.owner, workspaceDto, null);
 
         //Notify other users
         for(String userId : users)
-            FlowProxy.getInstance().send_mountWorkspace(userId, workspaceDto, context);
+            FlowProxy.getInstance().send_mountWorkspace(context, userId, workspaceDto, null);
     }
 
     public static void notifyRemoveWorkspace(Context context, WorkspaceDto workspaceDto) {
@@ -142,11 +167,11 @@ public class FlowManager {
         ((ApplicationContext) context).commit();
 
         //Notify owner
-        FlowProxy.getInstance().send_unmountWorkspace(workspaceDto.owner, workspaceDto, context);
+        FlowProxy.getInstance().send_unmountWorkspace(context, workspaceDto.owner, workspaceDto, null);
 
         //Notify other users
         for(String userId : workspace.getUsers())
-            FlowProxy.getInstance().send_unmountWorkspace(userId, workspaceDto, context);
+            FlowProxy.getInstance().send_unmountWorkspace(context, userId, workspaceDto, null);
     }
 
     public static void notifyEditWorkspace(Context context, WorkspaceDto workspaceDto, boolean isPrivate, HashSet<String> users, HashSet<String> tags, long quota) {
@@ -164,46 +189,11 @@ public class FlowManager {
         //Notify other users
         for(String userId : workspace.getUsers())
             if(!users.contains(userId))
-                FlowProxy.getInstance().send_unmountWorkspace(userId, workspaceDto, context);
+                FlowProxy.getInstance().send_unmountWorkspace(context, userId, workspaceDto, null);
 
         for(String userId : users)
             if(!workspace.getUsers().contains(userId))
-                FlowProxy.getInstance().send_mountWorkspace(userId, workspaceDto, context);
-    }
-
-    public static void notifyAddFile(Context context, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException {
-        //Updates business layer
-        User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(textFileDto.owner)) {
-            String id = user.getID() + "-" + textFileDto.workspace + "-" + textFileDto.title;
-            user.getWorkspaces().get(textFileDto.workspace).addFile(context, id, textFileDto.title, textFileDto.content);
-            ((ApplicationContext) context).commit();
-        }
-
-        //Notify owner
-        FlowProxy.getInstance().send_addFile(textFileDto.owner, textFileDto, context);
-    }
-
-    public static void notifyRemoveFile(Context context, TextFileDto textFileDto) {
-        //Only updates the user files list if he is the owner
-        User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(textFileDto.owner)) {
-            user.getWorkspaces().get(textFileDto.workspace).removeFile(context, textFileDto.title);
-            ((ApplicationContext) context).commit();
-        }
-
-        //Notify owner
-        FlowProxy.getInstance().send_removeFile(textFileDto.owner, textFileDto, context);
-    }
-
-    public static void notifyEditFile(Context context, TextFileDto textFileDto) throws OutOfMemoryException {
-        //Only updates the user file if he is the owner
-        User user = ((ApplicationContext) context).getActiveUser();
-        if(user.getID().equals(textFileDto.owner))
-            user.getWorkspaces().get(textFileDto.workspace).editFile(context, textFileDto.title, textFileDto.content);
-
-        //Notify owner
-        FlowProxy.getInstance().send_editFile(textFileDto.owner, textFileDto, context);
+                FlowProxy.getInstance().send_mountWorkspace(context, userId, workspaceDto, null);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -219,7 +209,7 @@ public class FlowManager {
         for(WorkspaceDto workspaceDto : getWorkspaces(context)){
             if(getWorkspaceUsers(context, workspaceDto.name).contains(getActiveUserID(context)) ||
                     (!isWorkspacePrivate(context, workspaceDto.name) && Utils.haveElementsInCommon(getWorkspaceTags(context, workspaceDto.name), tags))) {
-                FlowProxy.getInstance().send_mountWorkspace(getActiveUserID(context), workspaceDto, context);
+                FlowProxy.getInstance().send_mountWorkspace(context, getActiveUserID(context), workspaceDto, null);
             }
         }
     }

@@ -12,15 +12,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 public class CreateEditFileActivity extends AppCompatActivity {
@@ -136,8 +136,18 @@ public class CreateEditFileActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowManager.notifyRemoveFile(getApplicationContext(), dto);
-                                Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
+                                FlowProxy.getInstance().send_removeFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler<Void>() {
+                                    @Override
+                                    public void onSuccess(Void result) {
+                                        Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Toast.makeText(getApplicationContext(), getString(R.string.error_connection_lost_try_again_later), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
                         })
                         .setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
@@ -159,19 +169,42 @@ public class CreateEditFileActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
             return;
         }
-        try {
-            if (mode.equals(MODE.CREATE)) {
-                FlowManager.notifyAddFile(getApplicationContext(), dto);
-                Toast.makeText(getApplicationContext(), getString(R.string.file_created_successfully), Toast.LENGTH_SHORT).show();
-            } else {
-                FlowManager.notifyEditFile(getApplicationContext(), dto);
-                Toast.makeText(getApplicationContext(), getString(R.string.file_edited_successfully), Toast.LENGTH_SHORT).show();
-            }
-            finish();
-        } catch (OutOfMemoryException e) {
-            Toast.makeText(getApplicationContext(), getString(R.string.not_enough_memory_available), Toast.LENGTH_SHORT).show();
-        } catch (AlreadyExistsException e) {
-            Toast.makeText(getApplicationContext(), "\"" + dto.title + "\" " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
+
+        if (mode.equals(MODE.CREATE)) {
+            FlowProxy.getInstance().send_addFile(getApplication(), dto.owner, dto, new ConnectionHandler<Exception>() {
+                @Override
+                public void onSuccess(Exception result) {
+                    if(result != null) {
+                        Toast.makeText(getApplicationContext(), getString(R.string.error_could_not_apply_changes), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Toast.makeText(getApplicationContext(), getString(R.string.file_created_successfully), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_could_not_apply_changes), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } else {
+            FlowProxy.getInstance().send_editFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler() {
+                @Override
+                public void onSuccess(Object result) {
+                    if(result != null) {
+                        Toast.makeText(getApplicationContext(), getString(R.string.error_could_not_apply_changes), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Toast.makeText(getApplicationContext(), getString(R.string.file_edited_successfully), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error_could_not_apply_changes), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

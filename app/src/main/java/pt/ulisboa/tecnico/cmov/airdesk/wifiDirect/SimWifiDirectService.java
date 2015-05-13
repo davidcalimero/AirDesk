@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
@@ -25,6 +26,8 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
+import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
+import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
@@ -41,7 +44,7 @@ public class SimWifiDirectService extends WifiDirectService implements
     private SimWifiP2pManager.Channel termiteChannel;
 
     private SimWifiP2pSocketServer termiteSrvSocket = null;
-    private HashMap<String, String> termiteIDConverter = null;
+    private HashSet<String> devices = null;
 
     private boolean isGO = false;
 
@@ -70,7 +73,7 @@ public class SimWifiDirectService extends WifiDirectService implements
         bindService(new Intent(getApplicationContext(), SimWifiP2pService.class), termiteConnection, Context.BIND_AUTO_CREATE);
 
         //Initialize structures
-        termiteIDConverter = new HashMap<>();
+        devices = new HashSet<>();
 
         //Create listener socket
         new IncomingCommTask().execute(null);
@@ -95,7 +98,7 @@ public class SimWifiDirectService extends WifiDirectService implements
     public void sendMessageWithResponse(MessagePack message, ConnectionHandler<MessagePack> handler) {
         Log.e("MessageSend", "Sending Message");
 
-        if(termiteIDConverter.containsValue(message.receiver))
+        if(devices.contains(message.receiver))
             new OutgoingCommTask(handler).execute(message);
         else {
             Log.e("MessageSend", "Don't know receiver");
@@ -117,94 +120,109 @@ public class SimWifiDirectService extends WifiDirectService implements
         }
 
         // REMOVE UNREACHABLE IPS FROM THE HASH
-        for(String key : termiteIDConverter.keySet()){
-            String ip = termiteIDConverter.get(key);
+        for(String ip : devices){
             if(!ips.contains(ip))
-                termiteIDConverter.remove(key);
+                devices.remove(ip);
+            FlowProxy.getInstance().removeDevice(ip);
         }
 
         // KNOW IDs. WILL SEND A USER_REQUEST MESSAGEPACK
         /**/
         for(SimWifiP2pDevice device : simWifiP2pDeviceList.getDeviceList()){
-            if(!termiteIDConverter.containsValue(device.getVirtIp()) && !simWifiP2pInfo.getDeviceName().equals(device.deviceName)){
-                MessagePack message = new MessagePack();
-                message.receiver = device.getVirtIp();
-                message.request = MessagePack.USER_REQUEST;
-                new OutgoingCommTask(new ConnectionHandler<MessagePack>() {
-                    @Override
-                    public void onSuccess(MessagePack result) {
-                        Log.e("Connection", "Cenaz");
-                    }
-
-                    @Override
-                    public void onFailure() {
-
-                    }
-                }).execute(message);
+            if(!devices.contains(device.getVirtIp()) && !simWifiP2pInfo.getDeviceName().equals(device.deviceName)){
+                devices.add(device.getVirtIp());
+                FlowProxy.getInstance().addDevice(getApplicationContext(), device.getVirtIp());
             }
         }
         /**/
     }
 
     @Override
-    public void onPeersAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList) {
-        /** /
-        String ip = "";
-        for (SimWifiP2pDevice device : simWifiP2pDeviceList.getDeviceList()) {
-            ip =  device.getVirtIp();
-        }
-
-        new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
-        /**/
-    }
+    public void onPeersAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList) {}
 
     // PROCESS MESSAGE
     private MessagePack processMessage(MessagePack message) {
         Log.e("Message Process", "Message is " + message.request);
 
         switch(message.request){
-            case MessagePack.HELLO_WORLD:
-                Log.e("Message Process", "Hello World! :D");
-                return message;
-                //return null;
+            case MessagePack.USER_REQUEST:
+                if(message.type == MessagePack.Type.REQUEST){
+                    MessagePack pack = new MessagePack();
+                    pack.request = MessagePack.USER_REQUEST;
+                    pack.type = MessagePack.Type.REPLY;
+                    pack.data = FlowManager.receive_userRequest(getApplicationContext());
+                    return pack;
+                }
+                return null;
+
             case MessagePack.MOUNT_WORKSPACE:
-                FlowManager.receive_mountWorkspace((WorkspaceDto) message.dto);
+                FlowManager.receive_mountWorkspace((WorkspaceDto) message.data);
                 return null;
+
             case MessagePack.UNMOUNT_WORKSPACE:
-                FlowManager.receive_mountWorkspace((WorkspaceDto) message.dto);
+                FlowManager.receive_mountWorkspace((WorkspaceDto) message.data);
                 return null;
+
             case MessagePack.ADD_FILE:
-                FlowManager.receive_addFile(getApplicationContext(), (TextFileDto) message.dto);
+                if(message.type == MessagePack.Type.REQUEST){
+                    MessagePack pack1 = new MessagePack();
+                    pack1.request = MessagePack.ADD_FILE;
+                    pack1.type = MessagePack.Type.REPLY;
+                    pack1.data = null;
+                    try {
+                        FlowManager.receive_addFile(getApplicationContext(), (TextFileDto) message.data);
+                    } catch (AlreadyExistsException e) {
+                        pack1.data = e;
+                    } catch (OutOfMemoryException e) {
+                        pack1.data = e;
+                    }
+                    return pack1;
+                }
                 return null;
+
             case MessagePack.EDIT_FILE:
-                FlowManager.receive_editFile(getApplicationContext(), (TextFileDto) message.dto);
+                if(message.type == MessagePack.Type.REQUEST){
+                    MessagePack pack2 = new MessagePack();
+                    pack2.request = MessagePack.EDIT_FILE;
+                    pack2.type = MessagePack.Type.REPLY;
+                    pack2.data = null;
+                    try {
+                        FlowManager.receive_editFile(getApplicationContext(), (TextFileDto) message.data);
+                    } catch (AlreadyExistsException e) {
+                        pack2.data = e;
+                    } catch (OutOfMemoryException e) {
+                        pack2.data = e;
+                    }
+                    return pack2;
+                }
                 return null;
+
             case MessagePack.REMOVE_FILE:
-                FlowManager.receive_removeFile(getApplicationContext(), (TextFileDto) message.dto);
+                FlowManager.receive_removeFile(getApplicationContext(), (TextFileDto) message.data);
                 return null;
+
+            case MessagePack.FILE_CONTENT:
+                if(message.type == MessagePack.Type.REQUEST){
+                    MessagePack pack3 = new MessagePack();
+                    pack3.request = MessagePack.FILE_CONTENT;
+                    pack3.type = MessagePack.Type.REPLY;
+                    pack3.data = FlowManager.receive_getFileContent(getApplicationContext(), (TextFileDto) message.data);
+                    return pack3;
+                }
+                return null;
+
+            case MessagePack.ASK_TO_EDIT:
+                if(message.type == MessagePack.Type.REQUEST){
+                    MessagePack pack4 = new MessagePack();
+                    pack4.request = MessagePack.USER_REQUEST;
+                    pack4.type = MessagePack.Type.REPLY;
+                    pack4.data = FlowManager.receive_askToEditFile(getApplicationContext(), (TextFileDto) message.data);
+                    return pack4;
+                }
+                return null;
+
             default:
                 return null;
-        }
-    }
-
-    private MessagePack process(MessagePack message, String ip){
-        if((message.request).equals(MessagePack.USER_REQUEST) || (message.request).equals(MessagePack.USER_RECEIVE))
-            return processUser(message, ip);
-        return processMessage(message);
-    }
-
-    private MessagePack processUser(MessagePack message, String ip){
-        if(message.request.equals(MessagePack.USER_REQUEST)){
-            MessagePack pack = new MessagePack();
-            pack.request = MessagePack.USER_RECEIVE;
-            pack.dto = FlowProxy.getInstance().send_userID(getApplicationContext());
-            return pack;
-        }
-        else {
-            Log.e("User with IP", ip);
-            Log.e("Has the ID", ((UserDto) message.dto).id);
-            termiteIDConverter.put(((UserDto)message.dto).id, ip);
-            return null;
         }
     }
 
@@ -322,7 +340,7 @@ public class SimWifiDirectService extends WifiDirectService implements
                 MessagePack message = (MessagePack) ois.readObject();
                 Log.e("MessagePackReceive", "Segundo");
                 // PROCESS DTO
-                MessagePack sendPack = process(message, ip);
+                MessagePack sendPack = processMessage(message);
                 if(sendPack != null) {
                     s.getOutputStream().write(Utils.objectToBytes(sendPack));
                     Log.e("MessagePackSend", "A enviar o socket");

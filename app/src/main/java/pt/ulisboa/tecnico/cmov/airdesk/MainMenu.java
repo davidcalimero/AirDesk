@@ -132,7 +132,7 @@ public class MainMenu extends AppCompatActivity {
         workspaceDto.owner = owner;
         workspaceDto.name = workspaceName;
 
-        FlowProxy.send_userLeavedWorkspace(workspaceDto, getApplicationContext());
+        FlowProxy.getInstance().send_userLeftWorkspace(getApplicationContext(), workspaceDto, null);
     }
 
     //Force overflow menu on actionBar

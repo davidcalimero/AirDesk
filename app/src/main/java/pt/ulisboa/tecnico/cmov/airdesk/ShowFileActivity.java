@@ -45,15 +45,16 @@ public class ShowFileActivity extends AppCompatActivity {
         setTitle(dto.title);
 
         //Get File content
-        FlowProxy.getInstance().send_getFileContent(getApplicationContext(), dto, new ConnectionHandler<String>(){
+        FlowProxy.getInstance().send_getFileContent(getApplicationContext(), dto, new ConnectionHandler<String>() {
             @Override
             public void onSuccess(String result) {
                 dto.content = result;
                 showText.setText(result);
             }
+
             @Override
             public void onFailure() {
-                Toast.makeText(getApplicationContext(), getString(R.string.error_file_not_avaliable_try_again_later) ,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.error_connection_lost_try_again_later), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -122,9 +123,18 @@ public class ShowFileActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowManager.notifyRemoveFile(getApplicationContext(), dto);
-                                Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
-                                finish();
+                                FlowProxy.getInstance().send_removeFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler<Void>() {
+                                    @Override
+                                    public void onSuccess(Void result) {
+                                        Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Toast.makeText(getApplicationContext(), getString(R.string.error_connection_lost_try_again_later), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
                         })
                         .setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
@@ -140,14 +150,25 @@ public class ShowFileActivity extends AppCompatActivity {
     }
 
     public void editButtonPressed(View view) {
-        if (FlowProxy.getInstance().send_askToEditFile(getApplicationContext(), dto)) {
-            Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
-            intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, dto.title);
-            intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);
-            intent.putExtra(CreateEditFileActivity.FILE_DTO, dto);
-            startActivity(intent);
-            finish();
-        } else
-            Toast.makeText(getApplicationContext(), getString(R.string.file_cant_be_edited_at_the_moment), Toast.LENGTH_SHORT).show();
+        FlowProxy.getInstance().send_askToEditFile(getApplicationContext(), dto, new ConnectionHandler<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
+                if(result){
+                    Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
+                    intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, dto.title);
+                    intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);
+                    intent.putExtra(CreateEditFileActivity.FILE_DTO, dto);
+                    startActivity(intent);
+                    finish();
+                }
+                else
+                    Toast.makeText(getApplicationContext(), getString(R.string.file_cant_be_edited_at_the_moment), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(getApplicationContext(), getString(R.string.error_connection_lost_try_again_later), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
