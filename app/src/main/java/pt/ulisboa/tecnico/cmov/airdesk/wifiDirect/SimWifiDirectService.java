@@ -25,6 +25,7 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
@@ -41,7 +42,6 @@ public class SimWifiDirectService extends WifiDirectService implements
 
     private SimWifiP2pSocketServer termiteSrvSocket = null;
     private HashMap<String, String> termiteIDConverter = null;
-    private ArrayList<MessageTreatmentTask> termiteComm = null;
 
     private boolean isGO = false;
 
@@ -71,8 +71,6 @@ public class SimWifiDirectService extends WifiDirectService implements
 
         //Initialize structures
         termiteIDConverter = new HashMap<>();
-        //termiteNickConverter = new HashMap<>();
-        termiteComm = new ArrayList<>();
 
         //Create listener socket
         new IncomingCommTask().execute(null);
@@ -90,42 +88,19 @@ public class SimWifiDirectService extends WifiDirectService implements
 
     @Override
     public void sendMessage(MessagePack message){
-        Log.e("MessageSend", "Sending Message");
-        // Send Message to someone
-        if(termiteIDConverter.containsKey(message.receiver)){
-            new OutgoingCommTask().execute(message);
-        }
-        else
-            Log.e("MessageSend", "Don't know receiver");
+        sendMessageWithResponse(message, null);
     }
 
     //Make the connection without worrying about blocking
-    public MessagePack sendMessageWithResponse(MessagePack message){
-        SimWifiP2pSocket conn;
-        ObjectInputStream ois;
+    public void sendMessageWithResponse(MessagePack message, ConnectionHandler<MessagePack> handler) {
+        Log.e("MessageSend", "Sending Message");
 
-        try {
-            // Establishes the connection
-            conn = new SimWifiP2pSocket(message.receiver, 10001);
-
-            // Sends the message
-            conn.getOutputStream().write(Utils.objectToBytes(message));
-
-            // Waits for a pack from the other device
-            ois = new ObjectInputStream(conn.getInputStream());
-
-            // Get the received pack.
-            MessagePack receivedPack = (MessagePack) ois.readObject();
-
-            // Process pack?
-            process(receivedPack, message.receiver);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        if(termiteIDConverter.containsValue(message.receiver))
+            new OutgoingCommTask(handler).execute(message);
+        else {
+            Log.e("MessageSend", "Don't know receiver");
+            if(handler != null) handler.onFailure();
         }
-        return null;
     }
 
     @Override
@@ -134,12 +109,6 @@ public class SimWifiDirectService extends WifiDirectService implements
         // CHECKS IF THE DEVICE IS GO
         isGO = simWifiP2pInfo.askIsGO();
         Log.e("GroupInfoAvailable", "isGO = " + isGO);
-
-        // TERMINATE MESSAGETREAMENTTASKS
-        for(MessageTreatmentTask t : termiteComm){
-            t.cancel();
-            termiteComm.remove(t);
-        }
 
         ArrayList<String> ips = new ArrayList<>();
         // GETS DEVICES' IPS
@@ -162,7 +131,7 @@ public class SimWifiDirectService extends WifiDirectService implements
                 message.receiver = device.getVirtIp();
                 message.request = MessagePack.USER_REQUEST;
                 message.type = MessagePack.TYPE.REQUEST;
-                new OutgoingCommTask().execute(message);
+                new OutgoingCommTask(null).execute(message);
             }
         }
         /**/
@@ -187,7 +156,8 @@ public class SimWifiDirectService extends WifiDirectService implements
         switch(message.request){
             case MessagePack.HELLO_WORLD:
                 Log.e("Message Process", "Hello World! :D");
-                return null;
+                return message;
+                //return null;
             case MessagePack.MOUNT_WORKSPACE:
                 FlowManager.receive_mountWorkspace((WorkspaceDto) message.dto);
                 return null;
@@ -260,7 +230,6 @@ public class SimWifiDirectService extends WifiDirectService implements
         @Override
         protected void onProgressUpdate(SimWifiP2pSocket value) {
             MessageTreatmentTask task = new MessageTreatmentTask();
-            termiteComm.add(task);
             Log.e("Incoming","added a Message Treatment Task");
 
             task.execute(value);
@@ -268,9 +237,12 @@ public class SimWifiDirectService extends WifiDirectService implements
     }
 
     public class OutgoingCommTask extends MyAsyncTask<MessagePack, Void, Void> {
+        ConnectionHandler<MessagePack> handler;
 
         SimWifiP2pSocket cli = null;
         MessagePack message = null;
+
+        public OutgoingCommTask(ConnectionHandler<MessagePack> handler){super(); this.handler = handler;}
 
         @Override
         protected Void doInBackground(MessagePack message) {
@@ -294,13 +266,6 @@ public class SimWifiDirectService extends WifiDirectService implements
         @Override
         protected void onPostExecute(Void param) {
             if(cli != null) {
-                Log.e("Outgoing","Chegou aqui");
-                MessageTreatmentTask task = new MessageTreatmentTask();
-                task.setDeviceIp(message.receiver);
-                termiteComm.add(task);
-                Log.e("Outgoing", "A executar o MessageTreatment");
-                task.execute(cli);
-
                 // SEND MESSAGE
                 try {
                     Log.e("Outgoing", "A enviar a mensagem para o client");
@@ -309,6 +274,12 @@ public class SimWifiDirectService extends WifiDirectService implements
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                Log.e("Outgoing","Chegou aqui");
+                MessageTreatmentTask task = new MessageTreatmentTask(handler);
+                task.setDeviceIp(message.receiver);
+                Log.e("Outgoing", "A executar o MessageTreatment");
+                task.execute(cli);
             }
         }
     }
@@ -316,9 +287,17 @@ public class SimWifiDirectService extends WifiDirectService implements
     public class MessageTreatmentTask extends MyAsyncTask<SimWifiP2pSocket, Void, Void> {
 
         String ip = null;
-
         public void setDeviceIp(String ip){
             this.ip = ip;
+        }
+
+        ConnectionHandler<MessagePack> handler = null;
+        public MessageTreatmentTask(ConnectionHandler<MessagePack> handler) {
+            super();
+            this.handler = handler;
+        }
+        public MessageTreatmentTask(){
+            super();
         }
 
         @Override
@@ -336,23 +315,22 @@ public class SimWifiDirectService extends WifiDirectService implements
                 MessagePack sendPack = process(message, ip);
                 if(sendPack != null) {
                     s.getOutputStream().write(Utils.objectToBytes(sendPack));
-                    s.close();
                     Log.e("MessagePackSend", "A enviar o socket");
                 }
+                s.close();
+                if(handler != null) handler.onSuccess(message);
 
             } catch (IOException e) {
                 e.printStackTrace();
+                if(handler != null) handler.onFailure();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+                if(handler != null) handler.onFailure();
             } catch (NullPointerException e){
                 e.printStackTrace();
+                if(handler != null) handler.onFailure();
             }
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            termiteComm.remove(this);
         }
     }
 

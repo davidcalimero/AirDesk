@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 
 public class RealWifiDirectService extends WifiDirectService implements
@@ -60,10 +61,9 @@ public class RealWifiDirectService extends WifiDirectService implements
     }
 
     @Override
-    public MessagePack sendMessageWithResponse(MessagePack message) throws ConnectionLostException {
+    public void sendMessageWithResponse(MessagePack message, ConnectionHandler<MessagePack> handler) {
 
     }
-
     @Override
     public void onGroupInfoAvailable(WifiP2pGroup wifiP2pGroup) {}
 
@@ -109,10 +109,6 @@ public class RealWifiDirectService extends WifiDirectService implements
         private Context context;
         private TextView statusText;
 
-        /**
-         * @param context
-         * @param statusText
-         */
         public FileServerAsyncTask(Context context, View statusText) {
             this.context = context;
             this.statusText = (TextView) statusText;

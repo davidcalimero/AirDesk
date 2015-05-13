@@ -8,6 +8,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 
@@ -63,7 +64,7 @@ public abstract class WifiDirectService extends Service {
 
     public abstract void sendMessage(MessagePack message);
 
-    public abstract MessagePack sendMessageWithResponse(MessagePack message) throws ConnectionLostException;
+    public abstract void sendMessageWithResponse(MessagePack message, ConnectionHandler<MessagePack> handler);
 
     //----------------------------------------------------------------------------------------------
     // WIFI DIRECT UPDATERS  -----------------------------------------------------------------------
