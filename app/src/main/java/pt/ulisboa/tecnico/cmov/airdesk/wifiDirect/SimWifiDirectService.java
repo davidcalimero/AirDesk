@@ -219,7 +219,7 @@ public class SimWifiDirectService extends WifiDirectService implements
             MessagePack pack = new MessagePack();
             pack.request = MessagePack.USER_REQUEST;
             pack.type = MessagePack.TYPE.REPLY;
-            pack.dto = FlowProxy.send_userID(getApplicationContext());
+            pack.dto = FlowProxy.getInstance().send_userID(getApplicationContext());
             return pack;
         }
         else {

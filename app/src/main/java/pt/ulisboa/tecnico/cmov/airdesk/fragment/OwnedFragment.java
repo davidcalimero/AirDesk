@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import pt.ulisboa.tecnico.cmov.airdesk.CreateEditWorkspaceActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
@@ -33,6 +34,9 @@ public class OwnedFragment extends ExpandableListFragment {
         populateView();
 
         setListener(new WorkspacesChangeListener() {
+            @Override
+            public void onUserLeaved(UserDto userDto) {}
+
             @Override
             public void onWorkspaceAdded(WorkspaceDto workspaceDto) {
                 if(userId.equals(workspaceDto.owner))

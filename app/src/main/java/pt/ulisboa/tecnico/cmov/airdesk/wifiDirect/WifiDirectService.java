@@ -8,6 +8,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 
 public abstract class WifiDirectService extends Service {
@@ -61,4 +62,18 @@ public abstract class WifiDirectService extends Service {
     protected abstract void processGroup();
 
     public abstract void sendMessage(MessagePack message);
+
+    public abstract MessagePack sendMessageWithResponse(MessagePack message) throws ConnectionLostException;
+
+    //----------------------------------------------------------------------------------------------
+    // WIFI DIRECT UPDATERS  -----------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
+
+    protected void addDevice(String ip){
+        FlowProxy.getInstance().addDevice(getApplicationContext(), ip);
+    }
+
+    protected void removeDevice(String ip){
+        FlowProxy.getInstance().removeDevice(ip);
+    }
 }

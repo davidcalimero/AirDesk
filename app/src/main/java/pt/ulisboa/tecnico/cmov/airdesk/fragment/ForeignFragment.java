@@ -17,6 +17,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.ListActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.MainMenu;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
@@ -31,6 +32,11 @@ public class ForeignFragment extends ExpandableListFragment {
         final String userId = FlowManager.getActiveUserID(getActivity().getApplicationContext());
 
         setListener(new WorkspacesChangeListener() {
+            @Override
+            public void onUserLeaved(UserDto userDto) {
+                removeOwner(userDto.id);
+            }
+
             @Override
             public void onWorkspaceAdded(WorkspaceDto workspaceDto) {
                 if(!userId.equals(workspaceDto.owner)) {

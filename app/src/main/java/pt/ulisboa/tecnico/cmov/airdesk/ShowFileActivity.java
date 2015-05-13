@@ -13,11 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
+import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
-import pt.ulisboa.tecnico.cmov.airdesk.utility.ThreadHandler;
 
 
 public class ShowFileActivity extends AppCompatActivity {
@@ -44,20 +45,25 @@ public class ShowFileActivity extends AppCompatActivity {
         setTitle(dto.title);
 
         //Get File content
-        ThreadHandler.startWorkerThread(getString(R.string.dialog_loading_file), new ThreadHandler<String>(this) {
+        FlowProxy.getInstance().send_getFileContent(getApplicationContext(), dto, new ConnectionHandler<String>(){
             @Override
-            public String start() {
-                return FlowProxy.send_getFileContent(getApplicationContext(), dto);
-            }
-
-            @Override
-            public void onFinish(String result) {
+            public void onSuccess(String result) {
                 dto.content = result;
                 showText.setText(result);
+            }
+            @Override
+            public void onFailure() {
+                Toast.makeText(getApplicationContext(), getString(R.string.error_file_not_avaliable_try_again_later) ,Toast.LENGTH_SHORT).show();
             }
         });
 
         listener = new WorkspacesChangeListener() {
+            @Override
+            public void onUserLeaved(UserDto userDto) {
+                if(dto.owner.equals(userDto.id))
+                    finish();
+            }
+
             @Override
             public void onWorkspaceAdded(WorkspaceDto workspaceDto) {}
 
@@ -134,7 +140,7 @@ public class ShowFileActivity extends AppCompatActivity {
     }
 
     public void editButtonPressed(View view) {
-        if (FlowProxy.send_askToEditFile(getApplicationContext(), dto)) {
+        if (FlowProxy.getInstance().send_askToEditFile(getApplicationContext(), dto)) {
             Intent intent = new Intent(getApplicationContext(), CreateEditFileActivity.class);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_TITLE, dto.title);
             intent.putExtra(CreateEditFileActivity.ACTIVITY_MODE, CreateEditFileActivity.MODE.EDIT);

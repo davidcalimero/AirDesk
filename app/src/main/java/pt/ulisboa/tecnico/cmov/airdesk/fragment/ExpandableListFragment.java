@@ -86,6 +86,11 @@ public class ExpandableListFragment extends Fragment {
             wasChanged = true;
     }
 
+    protected void removeOwner(String owner){
+        adapter.removeTag(owner);
+        updateAdapter();
+    }
+
     protected void addWorkspace(String owner, String workspaceName){
         adapter.addGroup(owner, workspaceName);
         updateAdapter();

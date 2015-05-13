@@ -16,6 +16,7 @@ public class MessagePack implements Serializable {
     public static final String ADD_FILE = "Add File";
     public static final String REMOVE_FILE = "Remove File";
     public static final String EDIT_FILE = "Edit File";
+    public static final String FILE_CONTENT = "File Content";
 
     public enum TYPE {REQUEST, REPLY}
 

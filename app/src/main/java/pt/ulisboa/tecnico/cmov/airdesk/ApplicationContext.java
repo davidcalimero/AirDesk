@@ -11,7 +11,6 @@ import android.util.Log;
 
 import java.io.FileNotFoundException;
 
-import pt.ulisboa.tecnico.cmov.airdesk.dto.Dto;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FileManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.User;
 import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.RealWifiDirectService;

@@ -60,6 +60,11 @@ public class RealWifiDirectService extends WifiDirectService implements
     }
 
     @Override
+    public MessagePack sendMessageWithResponse(MessagePack message) throws ConnectionLostException {
+
+    }
+
+    @Override
     public void onGroupInfoAvailable(WifiP2pGroup wifiP2pGroup) {}
 
     @Override

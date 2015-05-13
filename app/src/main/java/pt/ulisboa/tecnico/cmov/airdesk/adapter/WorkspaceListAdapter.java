@@ -118,6 +118,13 @@ public class WorkspaceListAdapter extends AnimatedExpandableListView.AnimatedExp
         return convertView;
     }
 
+    public void removeTag(String tag){
+        for(Item item : items){
+            if(item.tag.equals(tag))
+                removeGroup(tag, item.group);
+        }
+    }
+
     public void addGroup(String tag, String title) {
         if(!items.contains(new Item(tag, title))) {
             items.add(new Item(tag, title));
