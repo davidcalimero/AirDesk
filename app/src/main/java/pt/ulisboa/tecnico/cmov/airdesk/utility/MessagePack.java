@@ -9,6 +9,7 @@ public class MessagePack implements Serializable {
     public static final String HELLO_WORLD = "Hello World";
 
     public static final String USER_REQUEST = "User Request";
+    public static final String USER_RECEIVE = "User Receive";
 
     public static final String UNINVITE_FROM_WORKSPACE = "Uninvite From Workspace";
     public static final String MOUNT_WORKSPACE = "Mount Workspace";
@@ -18,12 +19,9 @@ public class MessagePack implements Serializable {
     public static final String EDIT_FILE = "Edit File";
     public static final String FILE_CONTENT = "File Content";
 
-    public enum TYPE {REQUEST, REPLY}
-
     public String sender;
     public String receiver;
     public String request;
-    public TYPE type;
     public Dto dto;
 
     @Override

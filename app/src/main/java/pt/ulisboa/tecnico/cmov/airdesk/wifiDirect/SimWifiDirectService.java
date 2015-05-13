@@ -130,8 +130,17 @@ public class SimWifiDirectService extends WifiDirectService implements
                 MessagePack message = new MessagePack();
                 message.receiver = device.getVirtIp();
                 message.request = MessagePack.USER_REQUEST;
-                message.type = MessagePack.TYPE.REQUEST;
-                new OutgoingCommTask(null).execute(message);
+                new OutgoingCommTask(new ConnectionHandler<MessagePack>() {
+                    @Override
+                    public void onSuccess(MessagePack result) {
+                        Log.e("Connection", "Cenaz");
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                }).execute(message);
             }
         }
         /**/
@@ -179,16 +188,15 @@ public class SimWifiDirectService extends WifiDirectService implements
     }
 
     private MessagePack process(MessagePack message, String ip){
-        if((message.request).equals(MessagePack.USER_REQUEST))
+        if((message.request).equals(MessagePack.USER_REQUEST) || (message.request).equals(MessagePack.USER_RECEIVE))
             return processUser(message, ip);
         return processMessage(message);
     }
 
     private MessagePack processUser(MessagePack message, String ip){
-        if(message.type == MessagePack.TYPE.REQUEST){
+        if(message.request.equals(MessagePack.USER_REQUEST)){
             MessagePack pack = new MessagePack();
-            pack.request = MessagePack.USER_REQUEST;
-            pack.type = MessagePack.TYPE.REPLY;
+            pack.request = MessagePack.USER_RECEIVE;
             pack.dto = FlowProxy.getInstance().send_userID(getApplicationContext());
             return pack;
         }
@@ -275,11 +283,13 @@ public class SimWifiDirectService extends WifiDirectService implements
                     e.printStackTrace();
                 }
 
-                Log.e("Outgoing","Chegou aqui");
-                MessageTreatmentTask task = new MessageTreatmentTask(handler);
-                task.setDeviceIp(message.receiver);
-                Log.e("Outgoing", "A executar o MessageTreatment");
-                task.execute(cli);
+                if (handler != null){
+                    Log.e("Outgoing", "Chegou aqui");
+                    MessageTreatmentTask task = new MessageTreatmentTask(handler);
+                    task.setDeviceIp(message.receiver);
+                    Log.e("Outgoing", "A executar o MessageTreatment");
+                    task.execute(cli);
+                }
             }
         }
     }
