@@ -99,6 +99,35 @@ public class SimWifiDirectService extends WifiDirectService implements
             Log.e("MessageSend", "Don't know receiver");
     }
 
+    //Make the connection without worrying about blocking
+    public MessagePack sendMessageWithResponse(MessagePack message){
+        SimWifiP2pSocket conn;
+        ObjectInputStream ois;
+
+        try {
+            // Establishes the connection
+            conn = new SimWifiP2pSocket(message.receiver, 10001);
+
+            // Sends the message
+            conn.getOutputStream().write(Utils.objectToBytes(message));
+
+            // Waits for a pack from the other device
+            ois = new ObjectInputStream(conn.getInputStream());
+
+            // Get the received pack.
+            MessagePack receivedPack = (MessagePack) ois.readObject();
+
+            // Process pack?
+            process(receivedPack, message.receiver);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList, SimWifiP2pInfo simWifiP2pInfo) {
 
