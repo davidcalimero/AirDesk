@@ -154,9 +154,7 @@ public class FlowManager {
         //Notify the rest of the users
         if(getActiveUserID(context).equals(textFileDto.owner)) {
             //Update local data
-            Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace);
-            workspace.editFile(context, textFileDto.title, textFileDto.content);
-            workspace.getFiles().get(textFileDto.title).setAvailability(userDto.id, true);
+            ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).editFile(context, textFileDto.title, textFileDto.content);
 
             //Notify other users
             for (String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
