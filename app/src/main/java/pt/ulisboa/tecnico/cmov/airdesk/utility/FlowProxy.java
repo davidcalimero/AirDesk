@@ -225,9 +225,7 @@ public class FlowProxy {
             public void onSuccess(MessagePack message) {
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     try {
-                        UserDto userDto = new UserDto();
-                        userDto.id = FlowManager.getActiveUserID(context);
-                        FlowManager.receive_editFile(context, userDto, textFileDto);
+                        FlowManager.receive_editFile(context, textFileDto);
                         if(handler != null) handler.onSuccess(message != null ? message.data : null);
                     } catch (AlreadyExistsException | OutOfMemoryException e) {
                         if(handler != null) handler.onFailure();
@@ -281,10 +279,8 @@ public class FlowProxy {
 
     public void send_userStopEditing(final Context context, final TextFileDto textFileDto, final ConnectionHandler handler){
         if(textFileDto.owner.equals(FlowManager.getActiveUserID(context))) {
-            if(handler != null){
-                FlowManager.receive_userStopEditing(context, textFileDto);
-                handler.onSuccess(null);
-            }
+            FlowManager.receive_userStopEditing(context, textFileDto);
+            if(handler != null) handler.onSuccess(null);
             return;
         }
 

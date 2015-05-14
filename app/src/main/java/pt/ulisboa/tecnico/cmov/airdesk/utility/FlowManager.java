@@ -71,14 +71,9 @@ public class FlowManager {
     }
 
     public static void receive_userStopEditing(Context context, TextFileDto textFileDto){
-        for(Workspace workspace : ((ApplicationContext) context).getActiveUser().getWorkspaces().values()){
-            TextFile textFile = workspace.getFiles().get(textFileDto.title);
-            if(textFile != null){
-                textFile.setAvailability("", true);
-                return;
-            }
-        }
+        ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title).setAvailability("", true);
     }
+
 
     public static void receive_uninviteUserFromWorkspace(Context context, String userId, WorkspaceDto workspaceDto){
         ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceDto.name).removeUser(userId);
@@ -147,7 +142,7 @@ public class FlowManager {
         }
     }
 
-    public static void receive_editFile(Context context, UserDto userDto, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException{
+    public static void receive_editFile(Context context, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException{
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onFileContentChange(textFileDto);
 
@@ -164,8 +159,8 @@ public class FlowManager {
 
     public static boolean receive_askToEditFile(Context context, UserDto userDto, TextFileDto textFileDto){
         TextFile file = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title);
-            if(file.isAvailable()){
-                file.setAvailability(userDto.id, false);
+        if(file.isAvailable()){
+            file.setAvailability(userDto.id, false);
             return true;
         }
         return false;
