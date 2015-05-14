@@ -77,7 +77,7 @@ public abstract class WifiDirectService extends Service {
     protected MessagePack processMessage(MessagePack message) {
         Log.e("Message Process", "Message is " + message.request);
 
-        switch(message.request) {
+        switch(message.request){
             case MessagePack.USER_REQUEST:
                 if(message.type == MessagePack.Type.REQUEST){
                     MessagePack pack = new MessagePack();
@@ -143,7 +143,7 @@ public abstract class WifiDirectService extends Service {
                 return null;
 
             case MessagePack.FILE_CONTENT:
-                if (message.type == MessagePack.Type.REQUEST) {
+                if(message.type == MessagePack.Type.REQUEST){
                     MessagePack pack3 = new MessagePack();
                     pack3.request = MessagePack.FILE_CONTENT;
                     pack3.type = MessagePack.Type.REPLY;
@@ -165,7 +165,7 @@ public abstract class WifiDirectService extends Service {
                 return null;
 
             case MessagePack.SUBSCRIBE:
-                if (message.type == MessagePack.Type.REQUEST){
+                if(message.type == MessagePack.Type.REQUEST){
                     FlowManager.receive_subscribe(getApplicationContext(), (UserDto) message.data);
                     message.type = MessagePack.Type.REPLY;
                     return message;

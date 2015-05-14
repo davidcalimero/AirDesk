@@ -193,7 +193,7 @@ public class FlowManager {
         ((ApplicationContext) context).getActiveUser().addWorkspace(workspace);
         ((ApplicationContext) context).commit();
 
-        workspaceDto.files = new ArrayList<TextFileDto>();
+        workspaceDto.files = new ArrayList<>();
 
         //Notify owner
         FlowProxy.getInstance().send_mountWorkspace(context, workspaceDto.owner, workspaceDto, null);

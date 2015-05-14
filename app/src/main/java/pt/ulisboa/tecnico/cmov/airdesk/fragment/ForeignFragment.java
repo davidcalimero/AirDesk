@@ -3,8 +3,6 @@ package pt.ulisboa.tecnico.cmov.airdesk.fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,8 +37,6 @@ public class ForeignFragment extends ExpandableListFragment {
         setListener(new WorkspacesChangeListener() {
             @Override
             public void onUserLeft(UserDto userDto) {
-                Log.e("ForeignCenaz", "klkrcoisa");
-                Log.e("ForeignCenaz", "" + Looper.getMainLooper().equals(Looper.myLooper()));
                 removeOwner(userDto.id);
             }
 
