@@ -58,9 +58,26 @@ public class FlowManager {
                 FlowProxy.getInstance().send_mountWorkspace(context, userDto.id, workspaceDto, null);
     }
 
-    public static void receive_userLeft(UserDto userDto){
+    public static void receive_userLeft(Context context, UserDto userDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onUserLeft(userDto);
+
+        for(Workspace workspace : ((ApplicationContext) context).getActiveUser().getWorkspaces().values())
+            for(TextFile textFile : workspace.getFiles().values())
+                if(textFile.getUserEditing().equals(userDto.id)) {
+                    textFile.setAvailability("", true);
+                    return;
+                }
+    }
+
+    public static void receive_userStopEditing(Context context, TextFileDto textFileDto){
+        for(Workspace workspace : ((ApplicationContext) context).getActiveUser().getWorkspaces().values()){
+            TextFile textFile = workspace.getFiles().get(textFileDto.title);
+            if(textFile != null){
+                textFile.setAvailability("", true);
+                return;
+            }
+        }
     }
 
     public static void receive_uninviteUserFromWorkspace(Context context, String userId, WorkspaceDto workspaceDto){
@@ -130,7 +147,7 @@ public class FlowManager {
         }
     }
 
-    public static void receive_editFile(Context context, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException{
+    public static void receive_editFile(Context context, UserDto userDto, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException{
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onFileContentChange(textFileDto);
 
@@ -139,7 +156,7 @@ public class FlowManager {
             //Update local data
             Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace);
             workspace.editFile(context, textFileDto.title, textFileDto.content);
-            workspace.getFiles().get(textFileDto.title).setAvailability(true);
+            workspace.getFiles().get(textFileDto.title).setAvailability(userDto.id, true);
 
             //Notify other users
             for (String user : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getUsers())
@@ -147,10 +164,10 @@ public class FlowManager {
         }
     }
 
-    public static boolean receive_askToEditFile(Context context, TextFileDto textFileDto){
+    public static boolean receive_askToEditFile(Context context, UserDto userDto, TextFileDto textFileDto){
         TextFile file = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title);
             if(file.isAvailable()){
-                file.setAvailability(false);
+                file.setAvailability(userDto.id, false);
             return true;
         }
         return false;

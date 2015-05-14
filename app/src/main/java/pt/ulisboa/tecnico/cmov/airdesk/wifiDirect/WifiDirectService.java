@@ -117,12 +117,14 @@ public abstract class WifiDirectService extends Service {
 
             case MessagePack.EDIT_FILE:
                 if(message.type == MessagePack.Type.REQUEST){
+                    UserDto userDto = new UserDto();
+                    userDto.id = message.sender;
                     MessagePack pack2 = new MessagePack();
                     pack2.request = MessagePack.EDIT_FILE;
                     pack2.type = MessagePack.Type.REPLY;
                     pack2.data = null;
                     try {
-                        FlowManager.receive_editFile(getApplicationContext(), (TextFileDto) message.data);
+                        FlowManager.receive_editFile(getApplicationContext(), userDto, (TextFileDto) message.data);
                     } catch (AlreadyExistsException | OutOfMemoryException e) {
                         pack2.data = e;
                     }
@@ -146,16 +148,22 @@ public abstract class WifiDirectService extends Service {
 
             case MessagePack.ASK_TO_EDIT:
                 if(message.type == MessagePack.Type.REQUEST){
+                    UserDto userDto = new UserDto();
+                    userDto.id = message.sender;
                     MessagePack pack4 = new MessagePack();
                     pack4.request = MessagePack.USER_REQUEST;
                     pack4.type = MessagePack.Type.REPLY;
-                    pack4.data = FlowManager.receive_askToEditFile(getApplicationContext(), (TextFileDto) message.data);
+                    pack4.data = FlowManager.receive_askToEditFile(getApplicationContext(), userDto, (TextFileDto) message.data);
                     return pack4;
                 }
                 return null;
 
             case MessagePack.SUBSCRIBE:
                 FlowManager.receive_subscribe(getApplicationContext(), (UserDto) message.data);
+                return null;
+
+            case MessagePack.STOP_EDITING:
+                FlowManager.receive_userStopEditing(getApplicationContext(), (TextFileDto) message.data);
                 return null;
 
             default:
@@ -172,6 +180,6 @@ public abstract class WifiDirectService extends Service {
     }
 
     protected void removeDevice(String ip){
-        FlowProxy.getInstance().removeDevice(ip);
+        FlowProxy.getInstance().removeDevice(getApplicationContext(), ip);
     }
 }

@@ -57,7 +57,6 @@
     <string name="file_cant_be_edited_at_the_moment">File can\'t be edited at the moment</string>
     <string name="error_connection_lost_try_again_later">Error: Connection lost. Try again later</string>
     <string name="error_could_not_apply_changes">Error: Could not apply changes</string>
-    <string name="refresh_finished">Refresh Finished</string>
 
     <!-- AlertDialogs -->
     <string name="dialog_confirm_delete">Do you want to delete</string>
@@ -67,6 +66,7 @@
     <string name="dialog_please_wait">Please Wait</string>
     <string name="dialog_loading_user">Loading User…</string>
     <string name="dialog_loading_file">Loading File…</string>
+    <string name="dialog_loading_workspaces">Loading Workspaces…</string>
     <string name="dialog_applying_changes">Applying Changes…</string>
 
     <!-- Settings -->

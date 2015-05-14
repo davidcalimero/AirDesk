@@ -15,7 +15,9 @@ import java.io.FileNotFoundException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FileManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MyAsyncTask;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.TextFile;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.User;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.Workspace;
 import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.RealWifiDirectService;
 import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.SimWifiDirectService;
 import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.WifiDirectService;
@@ -81,6 +83,9 @@ public class ApplicationContext extends Application {
     private void loadUser(String email, String nickName) {
         try {
             activeUser = (User) FileManager.fileToObject(email, getApplicationContext());
+            for(Workspace workspace : activeUser.getWorkspaces().values())
+                for (TextFile textFile : workspace.getFiles().values())
+                    textFile.setAvailability("", true);
             Log.e("ApplicationContext", "user loaded: " + email + "," + nickName + ".");
         } catch (FileNotFoundException e) {
             activeUser = new User(email, nickName);

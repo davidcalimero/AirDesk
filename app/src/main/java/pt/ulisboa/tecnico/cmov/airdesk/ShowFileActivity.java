@@ -160,7 +160,9 @@ public class ShowFileActivity extends AppCompatActivity {
     }
 
     public void editButtonPressed(View view) {
-        FlowProxy.getInstance().send_askToEditFile(getApplicationContext(), dto, new ConnectionHandler<Boolean>() {
+        UserDto userDto = new UserDto();
+        userDto.id = FlowManager.getActiveUserID(getApplicationContext());
+        FlowProxy.getInstance().send_askToEditFile(getApplicationContext(), userDto, dto, new ConnectionHandler<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
                 if(result){

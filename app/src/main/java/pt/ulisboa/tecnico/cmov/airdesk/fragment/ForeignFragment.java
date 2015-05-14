@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -105,6 +106,13 @@ public class ForeignFragment extends ExpandableListFragment {
     }
 
     public void refreshView(View view){
+        final ProgressDialog dialog;
+        dialog = new ProgressDialog(getActivity());
+        dialog.setTitle(getString(R.string.dialog_please_wait));
+        dialog.setCancelable(false);
+        dialog.setIndeterminate(false);
+        dialog.setMessage(getString(R.string.dialog_loading_workspaces));
+        dialog.show();
         makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
         UserDto dto = new UserDto();
         dto.id = FlowManager.getActiveUserID(getActivity().getApplicationContext());
@@ -112,11 +120,12 @@ public class ForeignFragment extends ExpandableListFragment {
         FlowProxy.getInstance().send_subscribe(getActivity().getApplicationContext(), dto, new ConnectionHandler<Void>() {
             @Override
             public void onSuccess(Void result) {
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.refresh_finished), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
             }
             @Override
             public void onFailure() {
                 Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_connection_lost_try_again_later), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
             }
         });
     }

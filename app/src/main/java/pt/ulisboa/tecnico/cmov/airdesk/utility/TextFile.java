@@ -11,6 +11,7 @@ public class TextFile implements Serializable {
     private String title;
     private String filename;
     private boolean availability = true;
+    private String userEditing = "";
 
     public TextFile(Context context, String filename, String title, String content) {
         this.filename = filename;
@@ -45,7 +46,12 @@ public class TextFile implements Serializable {
         return availability;
     }
 
-    public void setAvailability(boolean isAvailable){
+    public void setAvailability(String userEditing, boolean isAvailable){
         availability = isAvailable;
+        this.userEditing = userEditing;
+    }
+
+    public String getUserEditing(){
+        return userEditing;
     }
 }

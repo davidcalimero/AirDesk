@@ -18,6 +18,7 @@ public class MessagePack implements Serializable {
 
     public static final String FILE_CONTENT = "File Content";
     public static final String ASK_TO_EDIT = "Ask to edit";
+    public static final String STOP_EDITING = "Stop editing";
 
     public enum Type {REQUEST, REPLY}
 

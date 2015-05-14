@@ -99,6 +99,10 @@ public class CreateEditFileActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if(mode.equals(MODE.EDIT)) {
+            Log.e("CreateEditFileActivity", "User stop editing");
+            FlowProxy.getInstance().send_userStopEditing(getApplicationContext(), dto, null);
+        }
         FlowManager.removeWorkspacesChangeListener(listener);
         super.onDestroy();
     }

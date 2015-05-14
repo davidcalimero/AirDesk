@@ -51,10 +51,10 @@ public class FlowProxy {
         });
     }
 
-    public void removeDevice(String ip){
+    public void removeDevice(Context context, String ip){
         UserDto userDto = new UserDto();
         userDto.id = ip_id.get(ip);
-        FlowManager.receive_userLeft(userDto);
+        FlowManager.receive_userLeft(context, userDto);
         ip_id.remove(ip);
         id_ip.remove(userDto.id);
         Log.e("FlowProxy", "User removed: " + userDto.id + "-" + ip);
@@ -225,7 +225,9 @@ public class FlowProxy {
             public void onSuccess(MessagePack message) {
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     try {
-                        FlowManager.receive_editFile(context, textFileDto);
+                        UserDto userDto = new UserDto();
+                        userDto.id = FlowManager.getActiveUserID(context);
+                        FlowManager.receive_editFile(context, userDto, textFileDto);
                         if(handler != null) handler.onSuccess(message != null ? message.data : null);
                     } catch (AlreadyExistsException | OutOfMemoryException e) {
                         if(handler != null) handler.onFailure();
@@ -239,9 +241,9 @@ public class FlowProxy {
         });
     }
 
-    public void send_askToEditFile(final Context context, final TextFileDto textFileDto, final ConnectionHandler handler) {
+    public void send_askToEditFile(final Context context, UserDto userDto, final TextFileDto textFileDto, final ConnectionHandler handler) {
         if(textFileDto.owner.equals(FlowManager.getActiveUserID(context))) {
-            if(handler != null) handler.onSuccess(FlowManager.receive_askToEditFile(context, textFileDto));
+            if(handler != null) handler.onSuccess(FlowManager.receive_askToEditFile(context, userDto, textFileDto));
             return;
         }
 
@@ -275,5 +277,21 @@ public class FlowProxy {
             messagePack.receiver = id;
             send(context, messagePack, handler);
         }
+    }
+
+    public void send_userStopEditing(final Context context, final TextFileDto textFileDto, final ConnectionHandler handler){
+        if(textFileDto.owner.equals(FlowManager.getActiveUserID(context))) {
+            if(handler != null){
+                FlowManager.receive_userStopEditing(context, textFileDto);
+                handler.onSuccess(null);
+            }
+            return;
+        }
+
+        MessagePack messagePack = new MessagePack();
+        messagePack.request = MessagePack.STOP_EDITING;
+        messagePack.data = textFileDto;
+        messagePack.receiver = textFileDto.owner;
+        send(context, messagePack, handler);
     }
 }
