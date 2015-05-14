@@ -115,7 +115,6 @@ public class FlowProxy {
             @Override
             protected Void doInBackground(Void param) {
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
-                    FlowManager.receive_mountWorkspace(workspaceDto);
                     publishProgress(null);
                     return null;
                 }
@@ -151,6 +150,10 @@ public class FlowProxy {
 
             @Override
             protected void onProgressUpdate(MessagePack message) {
+                if(FlowManager.getActiveUserID(context).equals(userId)) {
+                    FlowManager.receive_mountWorkspace(workspaceDto);
+                }
+
                 if(handler != null){
                     if(failure)
                         handler.onFailure();
@@ -169,7 +172,6 @@ public class FlowProxy {
             protected Void doInBackground(Void param) {
 
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
-                    FlowManager.receive_unmountWorkspace(workspaceDto);
                     publishProgress(null);
                     return null;
                 }
@@ -204,7 +206,11 @@ public class FlowProxy {
             }
 
             @Override
-            protected void onProgressUpdate(MessagePack message) {
+                protected void onProgressUpdate(MessagePack message) {
+                if(FlowManager.getActiveUserID(context).equals(userId)) {
+                    FlowManager.receive_unmountWorkspace(workspaceDto);
+                }
+
                 if(handler != null){
                     if(failure)
                         handler.onFailure();
@@ -222,16 +228,7 @@ public class FlowProxy {
             @Override
             protected Void doInBackground(Void param) {
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
-                    try {
-                        FlowManager.receive_addFile(context, textFileDto);
-                        publishProgress(null);
-                    } catch (AlreadyExistsException e) {
-                        failure = true;
-                        publishProgress(null);
-                    } catch (OutOfMemoryException e) {
-                        failure = true;
-                        publishProgress(null);
-                    }
+                    publishProgress(null);
                     return null;
                 }
 
@@ -266,6 +263,16 @@ public class FlowProxy {
 
             @Override
             protected void onProgressUpdate(Void message) {
+                if(FlowManager.getActiveUserID(context).equals(userId)) {
+                    try {
+                        FlowManager.receive_addFile(context, textFileDto);
+                    } catch (AlreadyExistsException e) {
+                        failure = true;
+                    } catch (OutOfMemoryException e) {
+                        failure = true;
+                    }
+                }
+
                 if(handler != null){
                     if(failure)
                         handler.onFailure();
@@ -284,7 +291,6 @@ public class FlowProxy {
             protected Void doInBackground(Void param) {
 
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
-                    FlowManager.receive_removeFile(context, textFileDto);
                     publishProgress(null);
                     return null;
                 }
@@ -320,6 +326,10 @@ public class FlowProxy {
 
             @Override
             protected void onProgressUpdate(Void message) {
+                if(FlowManager.getActiveUserID(context).equals(userId)) {
+                    FlowManager.receive_removeFile(context, textFileDto);
+                }
+
                 if(handler != null){
                     if(failure)
                         handler.onFailure();
@@ -338,18 +348,10 @@ public class FlowProxy {
             protected Void doInBackground(Void param) {
 
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
-                    try {
-                        FlowManager.receive_editFile(context, textFileDto);
-                        publishProgress(null);
-                    } catch (AlreadyExistsException e) {
-                        failure = true;
-                        publishProgress(null);
-                    } catch (OutOfMemoryException e) {
-                        failure = true;
-                        publishProgress(null);
-                    }
+                    publishProgress(null);
                     return null;
                 }
+
                 //Create message pack
                 MessagePack messagePack = new MessagePack();
                 messagePack.request = MessagePack.EDIT_FILE;
@@ -381,6 +383,16 @@ public class FlowProxy {
 
              @Override
              protected void onProgressUpdate(Void message) {
+                 if(FlowManager.getActiveUserID(context).equals(userId)) {
+                     try {
+                         FlowManager.receive_editFile(context, textFileDto);
+                     } catch (AlreadyExistsException e) {
+                         failure = true;
+                     } catch (OutOfMemoryException e) {
+                         failure = true;
+                     }
+                 }
+
                  if(handler != null){
                      if(failure)
                          handler.onFailure();
