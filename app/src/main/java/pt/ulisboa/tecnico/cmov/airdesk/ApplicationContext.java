@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.IBinder;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
 
+import pt.ulisboa.tecnico.cmov.airdesk.listener.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FileManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.MyAsyncTask;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.User;
 import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.RealWifiDirectService;
 import pt.ulisboa.tecnico.cmov.airdesk.wifiDirect.SimWifiDirectService;
@@ -52,9 +55,20 @@ public class ApplicationContext extends Application {
         return wifiDirectService;
     }
 
-    public void init(String email, String nickName){
-        loadUser(email, nickName);
-        startService();
+    public void init(final String email, final String nickName, final ConnectionHandler<Boolean> handler){
+        new MyAsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void param) {
+                loadUser(email, nickName);
+                startService();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void param) {
+                handler.onSuccess(true);
+            }
+        }.execute(null);
     }
 
     public void reset() {

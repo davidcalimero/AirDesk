@@ -15,10 +15,8 @@ import android.widget.Toast;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
-import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
-import pt.ulisboa.tecnico.cmov.airdesk.exception.OutOfMemoryException;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
-import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
@@ -69,7 +67,7 @@ public class CreateEditFileActivity extends AppCompatActivity {
 
         listener =  new WorkspacesChangeListener() {
             @Override
-            public void onUserLeaved(UserDto userDto) {
+            public void onUserLeft(UserDto userDto) {
                 if(dto.owner.equals(userDto.id))
                     finish();
             }

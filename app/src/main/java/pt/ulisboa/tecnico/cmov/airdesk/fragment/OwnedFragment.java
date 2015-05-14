@@ -10,8 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
-import java.util.ArrayList;
-
 import pt.ulisboa.tecnico.cmov.airdesk.CreateEditWorkspaceActivity;
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
@@ -35,7 +33,7 @@ public class OwnedFragment extends ExpandableListFragment {
 
         setListener(new WorkspacesChangeListener() {
             @Override
-            public void onUserLeaved(UserDto userDto) {}
+            public void onUserLeft(UserDto userDto) {}
 
             @Override
             public void onWorkspaceAdded(WorkspaceDto workspaceDto) {

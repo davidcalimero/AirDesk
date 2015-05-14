@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,9 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.Serializable;
-
-import pt.ulisboa.tecnico.cmov.airdesk.utility.ThreadHandler;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 
@@ -47,7 +46,7 @@ public class LogInActivity extends AppCompatActivity {
 
         //Logout if applicable
         if (getIntent().getBooleanExtra(LOGOUT, false)) {
-            sharedPreferences.edit().clear().commit();
+            sharedPreferences.edit().clear().apply();
             appState.reset();
         }
 
@@ -88,26 +87,33 @@ public class LogInActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(MainMenu.NICKNAME, nickname);
         editor.putString(MainMenu.EMAIL, email);
-        editor.commit();
+        editor.apply();
     }
 
     private void loadUser(final String nickname, final String email) {
-        ThreadHandler.startWorkerThread(getString(R.string.dialog_loading_user), new ThreadHandler(this) {
-            @Override
-            public Serializable start() {
-                //Load user
-                appState.init(email, nickname);
-                return null;
-            }
+        final ProgressDialog dialog;
+        dialog = new ProgressDialog(this);
+        dialog.setTitle(getString(R.string.dialog_please_wait));
+        dialog.setCancelable(false);
+        dialog.setIndeterminate(false);
+        dialog.setMessage(getString(R.string.dialog_loading_user));
+        dialog.show();
 
+        appState.init(email, nickname, new ConnectionHandler<Boolean>() {
             @Override
-            public void onFinish(Serializable result) {
+            public void onSuccess(Boolean result) {
                 //Change activity
                 Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                 intent.putExtra(MainMenu.NICKNAME, nickname);
                 intent.putExtra(MainMenu.EMAIL, email);
                 startActivity(intent);
                 finish();
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFailure() {
+                dialog.dismiss();
             }
         });
     }

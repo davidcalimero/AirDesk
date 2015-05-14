@@ -60,21 +60,40 @@ public class FlowManager {
 
     public static void receive_userLeft(UserDto userDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
-            l.onUserLeaved(userDto);
+            l.onUserLeft(userDto);
     }
 
     public static void receive_uninviteUserFromWorkspace(Context context, String userId, WorkspaceDto workspaceDto){
         ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceDto.name).removeUser(userId);
     }
 
-    public static void receive_mountWorkspace(WorkspaceDto workspaceDto){
+    public static void receive_mountWorkspace(Context context, WorkspaceDto workspaceDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onWorkspaceAdded(workspaceDto);
+
+        //Notify the rest of the users
+        if(getActiveUserID(context).equals(workspaceDto.owner)) {
+            for (String userId : ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceDto.name).getUsers())
+                FlowProxy.getInstance().send_mountWorkspace(context, userId, workspaceDto, null);
+        }
     }
 
-    public static void receive_unmountWorkspace(WorkspaceDto workspaceDto){
+    public static void receive_unmountWorkspace(Context context, WorkspaceDto workspaceDto){
         for (WorkspacesChangeListener l : getInstance().listeners)
             l.onWorkspaceRemoved(workspaceDto);
+
+        //Notify the rest of the users
+        if(getActiveUserID(context).equals(workspaceDto.owner)) {
+            //Update local data
+            User user = ((ApplicationContext) context).getActiveUser();
+            Workspace workspace = user.getWorkspaces().get(workspaceDto.name);
+            user.removeWorkspace(workspaceDto.name, context);
+            ((ApplicationContext) context).commit();
+
+            //Notify other users
+            for(String userId : workspace.getUsers())
+                FlowProxy.getInstance().send_unmountWorkspace(context, userId, workspaceDto, null);
+        }
     }
 
     public static void receive_addFile(Context context, TextFileDto textFileDto) throws AlreadyExistsException, OutOfMemoryException{
@@ -137,8 +156,9 @@ public class FlowManager {
         return false;
     }
 
-    public static String receive_getFileContent(Context context, TextFileDto textFileDto){
-        return ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title).getContent(context);
+    public static TextFileDto receive_getFileContent(Context context, TextFileDto textFileDto){
+        textFileDto.content = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title).getContent(context);
+        return textFileDto;
     }
 
     public static void receive_subscribe(Context context, UserDto userDto){
@@ -165,25 +185,6 @@ public class FlowManager {
 
         //Notify owner
         FlowProxy.getInstance().send_mountWorkspace(context, workspaceDto.owner, workspaceDto, null);
-
-        //Notify other users
-        for(String userId : users)
-            FlowProxy.getInstance().send_mountWorkspace(context, userId, workspaceDto, null);
-    }
-
-    public static void notifyRemoveWorkspace(Context context, WorkspaceDto workspaceDto) {
-        //Updates business layer
-        User user = ((ApplicationContext) context).getActiveUser();
-        Workspace workspace = user.getWorkspaces().get(workspaceDto.name);
-        user.removeWorkspace(workspaceDto.name, context);
-        ((ApplicationContext) context).commit();
-
-        //Notify owner
-        FlowProxy.getInstance().send_unmountWorkspace(context, workspaceDto.owner, workspaceDto, null);
-
-        //Notify other users
-        for(String userId : workspace.getUsers())
-            FlowProxy.getInstance().send_unmountWorkspace(context, userId, workspaceDto, null);
     }
 
     public static void notifyEditWorkspace(Context context, WorkspaceDto workspaceDto, boolean isPrivate, HashSet<String> users, HashSet<String> tags, long quota) {

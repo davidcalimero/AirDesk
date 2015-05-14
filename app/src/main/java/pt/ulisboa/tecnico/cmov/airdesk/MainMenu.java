@@ -31,7 +31,6 @@ public class MainMenu extends AppCompatActivity {
     public static final String NICKNAME = "nickname";
     public static final String EMAIL = "email";
 
-    private WorkspacePagerAdapter adapter;
     private String nickname;
     private String email;
 
@@ -44,7 +43,7 @@ public class MainMenu extends AppCompatActivity {
 
         //Initialize view
         ViewPager mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        adapter = new WorkspacePagerAdapter(getSupportFragmentManager(), getApplicationContext());
+        WorkspacePagerAdapter adapter = new WorkspacePagerAdapter(getSupportFragmentManager(), getApplicationContext());
         mViewPager.setAdapter(adapter);
         SlidingTabLayout mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);

@@ -16,12 +16,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.exception.AlreadyExistsException;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.Utils;
 
 public class CreateEditWorkspaceActivity extends AppCompatActivity {
@@ -195,9 +196,18 @@ public class CreateEditWorkspaceActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
                                 Log.e("", "" + dto);
-                                FlowManager.notifyRemoveWorkspace(getApplicationContext(), dto);
-                                Toast.makeText(getApplicationContext(), getString(R.string.workspace_removed_successfully), Toast.LENGTH_SHORT).show();
-                                finish();
+                                FlowProxy.getInstance().send_unmountWorkspace(getApplicationContext(), dto.owner, dto, new ConnectionHandler() {
+                                            @Override
+                                            public void onSuccess(Object result) {
+                                                Toast.makeText(getApplicationContext(), getString(R.string.workspace_removed_successfully), Toast.LENGTH_SHORT).show();
+                                                finish();
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                            }
+                                        });
+
                             }
                         })
                         .setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {

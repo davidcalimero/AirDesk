@@ -6,7 +6,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 
 public interface WorkspacesChangeListener {
 
-    void onUserLeaved(UserDto userDto);
+    void onUserLeft(UserDto userDto);
 
     void onWorkspaceAdded(WorkspaceDto workspaceDto);
 

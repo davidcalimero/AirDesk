@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import java.util.HashSet;
 
@@ -18,6 +19,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
@@ -33,13 +35,13 @@ public class ForeignFragment extends ExpandableListFragment {
 
         setListener(new WorkspacesChangeListener() {
             @Override
-            public void onUserLeaved(UserDto userDto) {
+            public void onUserLeft(UserDto userDto) {
                 removeOwner(userDto.id);
             }
 
             @Override
             public void onWorkspaceAdded(WorkspaceDto workspaceDto) {
-                if(!userId.equals(workspaceDto.owner)) {
+                if (!userId.equals(workspaceDto.owner)) {
                     addWorkspace(workspaceDto.owner, workspaceDto.name);
                     for (TextFileDto textFileDto : workspaceDto.files)
                         addFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
@@ -48,29 +50,29 @@ public class ForeignFragment extends ExpandableListFragment {
 
             @Override
             public void onWorkspaceRemoved(WorkspaceDto workspaceDto) {
-                if(!userId.equals(workspaceDto.owner))
+                if (!userId.equals(workspaceDto.owner))
                     removeWorkspace(workspaceDto.owner, workspaceDto.name);
             }
 
             @Override
             public void onFileAdded(TextFileDto textFileDto) {
-                if(!userId.equals(textFileDto.owner)) {
+                if (!userId.equals(textFileDto.owner)) {
                     addFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
                 }
             }
 
             @Override
             public void onFileRemoved(TextFileDto textFileDto) {
-                if(!userId.equals(textFileDto.owner)) {
+                if (!userId.equals(textFileDto.owner)) {
                     removeFile(textFileDto.owner, textFileDto.workspace, textFileDto.title);
                 }
             }
 
             @Override
-            public void onFileContentChange(TextFileDto textFileDto) {}
+            public void onFileContentChange(TextFileDto textFileDto) {
+            }
         });
 
-        //refreshView(view);
         return view;
     }
 
@@ -107,6 +109,15 @@ public class ForeignFragment extends ExpandableListFragment {
         UserDto dto = new UserDto();
         dto.id = FlowManager.getActiveUserID(getActivity().getApplicationContext());
         dto.subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
-        FlowProxy.getInstance().send_subscribe(getActivity().getApplicationContext(), dto, null);
+        FlowProxy.getInstance().send_subscribe(getActivity().getApplicationContext(), dto, new ConnectionHandler<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.refresh_finished), Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onFailure() {
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_connection_lost_try_again_later), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

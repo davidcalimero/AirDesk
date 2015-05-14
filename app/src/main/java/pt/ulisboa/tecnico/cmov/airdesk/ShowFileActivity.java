@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +17,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.dto.TextFileDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
-import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 
@@ -45,22 +46,32 @@ public class ShowFileActivity extends AppCompatActivity {
         setTitle(dto.title);
 
         //Get File content
-        FlowProxy.getInstance().send_getFileContent(getApplicationContext(), dto, new ConnectionHandler<String>() {
+        final ProgressDialog dialog;
+        dialog = new ProgressDialog(this);
+        dialog.setTitle(getString(R.string.dialog_please_wait));
+        dialog.setCancelable(false);
+        dialog.setIndeterminate(false);
+        dialog.setMessage(getString(R.string.dialog_loading_file));
+        dialog.show();
+        FlowProxy.getInstance().send_getFileContent(getApplicationContext(), dto, new ConnectionHandler<TextFileDto>() {
             @Override
-            public void onSuccess(String result) {
-                dto.content = result;
-                showText.setText(result);
+            public void onSuccess(TextFileDto result) {
+                dto.content = result.content;
+                showText.setText(result.content);
+                dialog.dismiss();
             }
 
             @Override
             public void onFailure() {
+                dialog.dismiss();
                 Toast.makeText(getApplicationContext(), getString(R.string.error_connection_lost_try_again_later), Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
 
         listener = new WorkspacesChangeListener() {
             @Override
-            public void onUserLeaved(UserDto userDto) {
+            public void onUserLeft(UserDto userDto) {
                 if(dto.owner.equals(userDto.id))
                     finish();
             }
@@ -139,8 +150,7 @@ public class ShowFileActivity extends AppCompatActivity {
                         })
                         .setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
+                            public void onClick(DialogInterface dialog, int which) {}
                         }).create().show();
                 break;
             default:

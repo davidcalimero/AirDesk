@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import pt.ulisboa.tecnico.cmov.airdesk.utility.ConnectionHandler;
+import pt.ulisboa.tecnico.cmov.airdesk.listener.ConnectionHandler;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.MessagePack;
 
 public class RealWifiDirectService extends WifiDirectService implements

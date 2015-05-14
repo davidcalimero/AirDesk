@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.listener.SwipeDismissListViewTouchListener;
@@ -25,7 +24,6 @@ public class ListActivity extends AppCompatActivity {
     private static final String TEXT = "text";
 
     private String title;
-    private String text;
     private HashSet<String> list;
     private ArrayAdapter<String> adapter;
 
@@ -41,7 +39,7 @@ public class ListActivity extends AppCompatActivity {
         Bundle bundle = savedInstanceState == null ? getIntent().getExtras() : savedInstanceState;
         list = (HashSet<String>) bundle.getSerializable(LIST);
         title = bundle.getString(TITLE);
-        text = bundle.getString(TEXT);
+        String text = bundle.getString(TEXT);
 
         //ListView inicialization
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);

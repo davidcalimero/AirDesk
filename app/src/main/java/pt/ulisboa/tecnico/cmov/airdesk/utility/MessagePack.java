@@ -8,8 +8,10 @@ public class MessagePack implements Serializable {
 
     public static final String SUBSCRIBE = "Subscribe";
     public static final String UNINVITE_FROM_WORKSPACE = "Uninvite From Workspace";
+
     public static final String MOUNT_WORKSPACE = "Mount Workspace";
     public static final String UNMOUNT_WORKSPACE = "Unmount Workspace";
+
     public static final String ADD_FILE = "Add File";
     public static final String REMOVE_FILE = "Remove File";
     public static final String EDIT_FILE = "Edit File";
