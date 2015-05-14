@@ -141,6 +141,16 @@ public class FlowManager {
         return ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title).getContent(context);
     }
 
+    public static void receive_subscribe(Context context, UserDto userDto){
+        for(WorkspaceDto workspaceDto : getWorkspaces(context)){
+            if(getWorkspaceUsers(context, workspaceDto.name).contains(getActiveUserID(context)) ||
+                    (!isWorkspacePrivate(context, workspaceDto.name) && Utils.haveElementsInCommon(getWorkspaceTags(context, workspaceDto.name), userDto.subscriptions))) {
+                ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceDto.name).addUser(userDto.id);
+                FlowProxy.getInstance().send_mountWorkspace(context, userDto.id, workspaceDto, null);
+            }
+        }
+    }
+
     //----------------------------------------------------------------------------------------------
     // METHODS TO NOTIFY USERS AND INTERFACE  ------------------------------------------------------
     //----------------------------------------------------------------------------------------------
@@ -196,52 +206,6 @@ public class FlowManager {
         for(String userId : users)
             if(!workspace.getUsers().contains(userId))
                 FlowProxy.getInstance().send_mountWorkspace(context, userId, workspaceDto, null);
-    }
-
-    //----------------------------------------------------------------------------------------------
-    // METHODS TO ASK OWNER  -----------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------
-
-    public static void updateForeignList(final Context context, HashSet<String> tags){
-        // N-Version TODO
-        // Get public workspaces from users
-        // Compare tags from Subscription and Public Profile
-        /** /
-        new MyAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void param) {
-                //Create message pack
-                final MessagePack[] messagePack = {new MessagePack()};
-                messagePack[0].request = MessagePack.HELLO_WORLD;
-                messagePack[0].receiver = "192.168.0.1";
-
-                ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack[0], new ConnectionHandler<MessagePack>() {
-                    @Override
-                    public void onSuccess(MessagePack result) {
-                        messagePack[0] = result;
-                        Log.e("Connection", "Success");
-                        Log.e("Connection", messagePack[0].request + "-");
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        //ConnectionLostException
-                    }
-                });
-
-                return null;
-            }
-        }.execute(null);
-        /**/
-
-
-        // S-Version
-        for(WorkspaceDto workspaceDto : getWorkspaces(context)){
-            if(getWorkspaceUsers(context, workspaceDto.name).contains(getActiveUserID(context)) ||
-                    (!isWorkspacePrivate(context, workspaceDto.name) && Utils.haveElementsInCommon(getWorkspaceTags(context, workspaceDto.name), tags))) {
-                FlowProxy.getInstance().send_mountWorkspace(context, getActiveUserID(context), workspaceDto, null);
-            }
-        }
     }
 
     //----------------------------------------------------------------------------------------------

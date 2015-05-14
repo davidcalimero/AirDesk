@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import pt.ulisboa.tecnico.cmov.airdesk.ListActivity;
@@ -21,6 +20,7 @@ import pt.ulisboa.tecnico.cmov.airdesk.dto.UserDto;
 import pt.ulisboa.tecnico.cmov.airdesk.dto.WorkspaceDto;
 import pt.ulisboa.tecnico.cmov.airdesk.listener.WorkspacesChangeListener;
 import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowManager;
+import pt.ulisboa.tecnico.cmov.airdesk.utility.FlowProxy;
 
 public class ForeignFragment extends ExpandableListFragment {
 
@@ -70,7 +70,7 @@ public class ForeignFragment extends ExpandableListFragment {
             public void onFileContentChange(TextFileDto textFileDto) {}
         });
 
-        refreshView(view);
+        //refreshView(view);
         return view;
     }
 
@@ -104,6 +104,9 @@ public class ForeignFragment extends ExpandableListFragment {
 
     public void refreshView(View view){
         makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
-        FlowManager.updateForeignList(getActivity().getApplicationContext(), FlowManager.getSubscriptions(getActivity().getApplicationContext()));
+        UserDto dto = new UserDto();
+        dto.id = FlowManager.getActiveUserID(getActivity().getApplicationContext());
+        dto.subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
+        FlowProxy.getInstance().send_subscribe(getActivity().getApplicationContext(), dto, null);
     }
 }

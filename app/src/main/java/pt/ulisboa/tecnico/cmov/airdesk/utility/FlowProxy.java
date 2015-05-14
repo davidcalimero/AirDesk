@@ -39,6 +39,9 @@ public class FlowProxy {
                 ip_id.put(ip, id);
                 id_ip.put(id, ip);
                 Log.e("FlowProxy", "User add: " + id + "-" + ip);
+
+                //SEND WORKSPACES IF ID OR SUBSCRIPTIONS MEETS
+                FlowManager.receive_userJoined(context, (UserDto) result.data);
             }
 
             @Override
@@ -482,6 +485,52 @@ public class FlowProxy {
                         publishProgress(null);
                     }
                 });
+                return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(String content) {
+                if(handler != null){
+                    if(failure)
+                        handler.onFailure();
+                    else
+                        handler.onSuccess(content);
+                }
+            }
+        }.execute(null);
+    }
+
+    public void send_subscribe(final Context context, final UserDto userDto, final ConnectionHandler handler){
+        new MyAsyncTask<Void, String, Void>() {
+            private boolean failure = false;
+
+            @Override
+            protected Void doInBackground(Void param) {
+
+                //Create message pack
+                MessagePack messagePack = new MessagePack();
+                messagePack.request = MessagePack.SUBSCRIBE;
+                messagePack.data = userDto;
+                messagePack.sender = id_ip.get(userDto.id);
+                messagePack.type = MessagePack.Type.REQUEST;
+
+                for(String ip : ip_id.keySet()) {
+                    messagePack.receiver = ip;
+
+                    //Send message
+                    ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack, new ConnectionHandler<MessagePack>() {
+                        @Override
+                        public void onSuccess(MessagePack result) {
+                            publishProgress(null);
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            failure = true;
+                            publishProgress(null);
+                        }
+                    });
+                }
                 return null;
             }
 

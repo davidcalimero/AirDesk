@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
@@ -163,6 +162,10 @@ public class SimWifiDirectService extends WifiDirectService implements
                 FlowManager.receive_mountWorkspace((WorkspaceDto) message.data);
                 return null;
 
+            case MessagePack.UNINVITE_FROM_WORKSPACE:
+                FlowManager.receive_uninviteUserFromWorkspace(getApplicationContext(), message.sender, (WorkspaceDto) message.data);
+                return null;
+
             case MessagePack.ADD_FILE:
                 if(message.type == MessagePack.Type.REQUEST){
                     MessagePack pack1 = new MessagePack();
@@ -219,6 +222,10 @@ public class SimWifiDirectService extends WifiDirectService implements
                     pack4.data = FlowManager.receive_askToEditFile(getApplicationContext(), (TextFileDto) message.data);
                     return pack4;
                 }
+                return null;
+
+            case MessagePack.SUBSCRIBE:
+                FlowManager.receive_subscribe(getApplicationContext(), (UserDto) message.data);
                 return null;
 
             default:
