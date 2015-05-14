@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.cmov.airdesk.fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +39,8 @@ public class ForeignFragment extends ExpandableListFragment {
         setListener(new WorkspacesChangeListener() {
             @Override
             public void onUserLeft(UserDto userDto) {
+                Log.e("ForeignCenaz", "klkrcoisa");
+                Log.e("ForeignCenaz", "" + Looper.getMainLooper().equals(Looper.myLooper()));
                 removeOwner(userDto.id);
             }
 
@@ -70,10 +74,10 @@ public class ForeignFragment extends ExpandableListFragment {
             }
 
             @Override
-            public void onFileContentChange(TextFileDto textFileDto) {
-            }
+            public void onFileContentChange(TextFileDto textFileDto) {}
         });
 
+        makeAdapter((ExpandableListView) view.findViewById(R.id.foreignListView), R.layout.list_group_foreign, R.layout.list_item);
         return view;
     }
 
@@ -117,9 +121,9 @@ public class ForeignFragment extends ExpandableListFragment {
         UserDto dto = new UserDto();
         dto.id = FlowManager.getActiveUserID(getActivity().getApplicationContext());
         dto.subscriptions = FlowManager.getSubscriptions(getActivity().getApplicationContext());
-        FlowProxy.getInstance().send_subscribe(getActivity().getApplicationContext(), dto, new ConnectionHandler<Void>() {
+        FlowProxy.getInstance().send_subscribe(getActivity().getApplicationContext(), dto, new ConnectionHandler<UserDto>() {
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(UserDto result) {
                 dialog.dismiss();
             }
             @Override

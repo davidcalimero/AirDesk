@@ -77,7 +77,7 @@ public abstract class WifiDirectService extends Service {
     protected MessagePack processMessage(MessagePack message) {
         Log.e("Message Process", "Message is " + message.request);
 
-        switch(message.request){
+        switch(message.request) {
             case MessagePack.USER_REQUEST:
                 if(message.type == MessagePack.Type.REQUEST){
                     MessagePack pack = new MessagePack();
@@ -93,11 +93,15 @@ public abstract class WifiDirectService extends Service {
                 return null;
 
             case MessagePack.UNMOUNT_WORKSPACE:
-                FlowManager.receive_mountWorkspace(getApplicationContext(),(WorkspaceDto) message.data);
+                FlowManager.receive_unmountWorkspace(getApplicationContext(), (WorkspaceDto) message.data);
                 return null;
 
             case MessagePack.UNINVITE_FROM_WORKSPACE:
-                FlowManager.receive_uninviteUserFromWorkspace(getApplicationContext(), message.sender, (WorkspaceDto) message.data);
+                if (message.type == MessagePack.Type.REQUEST) {
+                    FlowManager.receive_uninviteUserFromWorkspace(getApplicationContext(), message.sender, (WorkspaceDto) message.data);
+                    message.type = MessagePack.Type.REPLY;
+                    return message;
+                }
                 return null;
 
             case MessagePack.ADD_FILE:
@@ -131,11 +135,15 @@ public abstract class WifiDirectService extends Service {
                 return null;
 
             case MessagePack.REMOVE_FILE:
-                FlowManager.receive_removeFile(getApplicationContext(), (TextFileDto) message.data);
+                if(message.type == MessagePack.Type.REQUEST) {
+                    FlowManager.receive_removeFile(getApplicationContext(), (TextFileDto) message.data);
+                    message.type = MessagePack.Type.REPLY;
+                    return message;
+                }
                 return null;
 
             case MessagePack.FILE_CONTENT:
-                if(message.type == MessagePack.Type.REQUEST){
+                if (message.type == MessagePack.Type.REQUEST) {
                     MessagePack pack3 = new MessagePack();
                     pack3.request = MessagePack.FILE_CONTENT;
                     pack3.type = MessagePack.Type.REPLY;
@@ -157,7 +165,11 @@ public abstract class WifiDirectService extends Service {
                 return null;
 
             case MessagePack.SUBSCRIBE:
-                FlowManager.receive_subscribe(getApplicationContext(), (UserDto) message.data);
+                if (message.type == MessagePack.Type.REQUEST){
+                    FlowManager.receive_subscribe(getApplicationContext(), (UserDto) message.data);
+                    message.type = MessagePack.Type.REPLY;
+                    return message;
+                }
                 return null;
 
             case MessagePack.STOP_EDITING:

@@ -125,10 +125,10 @@ public class FlowProxy {
         messagePack.request = MessagePack.UNINVITE_FROM_WORKSPACE;
         messagePack.data = workspaceDto;
         messagePack.receiver = workspaceDto.owner;
-        send(context, messagePack, new ConnectionHandler<MessagePack>() {
+        send(context, messagePack, new ConnectionHandler<WorkspaceDto>() {
             @Override
-            public void onSuccess(MessagePack message) {
-                if(handler != null)  handler.onSuccess(message != null ? message.data : null);
+            public void onSuccess(WorkspaceDto dto) {
+                if(handler != null) handler.onSuccess(dto);
                 FlowManager.receive_unmountWorkspace(context, workspaceDto);
             }
 
@@ -151,6 +151,7 @@ public class FlowProxy {
                 if(FlowManager.getActiveUserID(context).equals(userId))
                     FlowManager.receive_mountWorkspace(context, workspaceDto);
             }
+
             @Override
             public void onFailure() {
                 if(handler != null) handler.onFailure();
@@ -170,6 +171,7 @@ public class FlowProxy {
                 if(FlowManager.getActiveUserID(context).equals(userId))
                     FlowManager.receive_unmountWorkspace(context, workspaceDto);
             }
+
             @Override
             public void onFailure() {
                 if(handler != null) handler.onFailure();
@@ -178,25 +180,28 @@ public class FlowProxy {
     }
 
     public void send_addFile(final Context context, final String userId, final TextFileDto textFileDto, final ConnectionHandler handler){
-        final MessagePack messagePack = new MessagePack();
+        MessagePack messagePack = new MessagePack();
         messagePack.request = MessagePack.ADD_FILE;
         messagePack.data = textFileDto;
         messagePack.receiver = userId;
-        send(context, messagePack, new ConnectionHandler<MessagePack>() {
+        send(context, messagePack, new ConnectionHandler<Exception>() {
             @Override
-            public void onSuccess(MessagePack message) {
+            public void onSuccess(Exception exception) {
                 if (FlowManager.getActiveUserID(context).equals(userId)) {
                     try {
                         FlowManager.receive_addFile(context, textFileDto);
-                        if(handler != null) handler.onSuccess(message != null ? message.data : null);
+                        if(handler != null) handler.onSuccess(exception);
                     } catch (AlreadyExistsException | OutOfMemoryException e) {
                         if(handler != null) handler.onFailure();
                     }
+                    return;
                 }
+                if(handler != null) handler.onSuccess(exception);
             }
+
             @Override
             public void onFailure() {
-                handler.onFailure();
+                if(handler != null) handler.onFailure();
             }
         });
     }
@@ -206,14 +211,15 @@ public class FlowProxy {
         messagePack.request = MessagePack.REMOVE_FILE;
         messagePack.data = textFileDto;
         messagePack.receiver = userId;
-        send(context, messagePack, new ConnectionHandler<MessagePack>() {
+        send(context, messagePack, new ConnectionHandler<TextFileDto>() {
             @Override
-            public void onSuccess(MessagePack message) {
-                if(handler != null) handler.onSuccess(message != null ? message.data : null);
+            public void onSuccess(TextFileDto message) {
+                if(handler != null) handler.onSuccess(message);
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     FlowManager.receive_removeFile(context, textFileDto);
                 }
             }
+
             @Override
             public void onFailure() {
                 if(handler != null) handler.onFailure();
@@ -226,17 +232,19 @@ public class FlowProxy {
         messagePack.request = MessagePack.EDIT_FILE;
         messagePack.data = textFileDto;
         messagePack.receiver = userId;
-        send(context, messagePack, new ConnectionHandler<MessagePack>() {
+        send(context, messagePack, new ConnectionHandler<Exception>() {
             @Override
-            public void onSuccess(MessagePack message) {
+            public void onSuccess(Exception exception) {
                 if(FlowManager.getActiveUserID(context).equals(userId)) {
                     try {
                         FlowManager.receive_editFile(context, textFileDto);
-                        if(handler != null) handler.onSuccess(message != null ? message.data : null);
+                        if(handler != null) handler.onSuccess(exception);
                     } catch (AlreadyExistsException | OutOfMemoryException e) {
                         if(handler != null) handler.onFailure();
                     }
+                    return;
                 }
+                if(handler != null) handler.onSuccess(exception);
             }
             @Override
             public void onFailure() {

@@ -138,9 +138,9 @@ public class CreateEditFileActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowProxy.getInstance().send_removeFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler<Void>() {
+                                FlowProxy.getInstance().send_removeFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler<TextFileDto>() {
                                     @Override
-                                    public void onSuccess(Void result) {
+                                    public void onSuccess(TextFileDto result) {
                                         Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
                                         finish();
                                     }
@@ -191,9 +191,9 @@ public class CreateEditFileActivity extends AppCompatActivity {
             });
 
         } else {
-            FlowProxy.getInstance().send_editFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler() {
+            FlowProxy.getInstance().send_editFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler<Exception>() {
                 @Override
-                public void onSuccess(Object result) {
+                public void onSuccess(Exception result) {
                     if(result != null) {
                         Toast.makeText(getApplicationContext(), getString(R.string.error_could_not_apply_changes), Toast.LENGTH_SHORT).show();
                         return;

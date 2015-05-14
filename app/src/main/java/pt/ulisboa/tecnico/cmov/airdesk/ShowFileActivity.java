@@ -98,6 +98,7 @@ public class ShowFileActivity extends AppCompatActivity {
             public void onFileContentChange(TextFileDto textFileDto) {
                 if(dto.owner.equals(textFileDto.owner) && dto.workspace.equals(textFileDto.workspace) && dto.title.equals(textFileDto.title))
                     showText.setText(textFileDto.content);
+                    dto.content = textFileDto.content;
             }
         };
         FlowManager.addWorkspacesChangeListener(listener);
@@ -134,9 +135,9 @@ public class ShowFileActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //Delete File
-                                FlowProxy.getInstance().send_removeFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler<Void>() {
+                                FlowProxy.getInstance().send_removeFile(getApplicationContext(), dto.owner, dto, new ConnectionHandler<TextFileDto>() {
                                     @Override
-                                    public void onSuccess(Void result) {
+                                    public void onSuccess(TextFileDto result) {
                                         Toast.makeText(getApplicationContext(), getString(R.string.file_removed_successfully), Toast.LENGTH_SHORT).show();
                                         finish();
                                     }

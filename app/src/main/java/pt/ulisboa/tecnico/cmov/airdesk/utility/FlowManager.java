@@ -173,7 +173,7 @@ public class FlowManager {
 
     public static void receive_subscribe(Context context, UserDto userDto){
         for(WorkspaceDto workspaceDto : getWorkspaces(context)){
-            if(getWorkspaceUsers(context, workspaceDto.name).contains(getActiveUserID(context)) ||
+            if(getWorkspaceUsers(context, workspaceDto.name).contains(userDto.id) ||
                     (!isWorkspacePrivate(context, workspaceDto.name) && Utils.haveElementsInCommon(getWorkspaceTags(context, workspaceDto.name), userDto.subscriptions))) {
                 ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceDto.name).addUser(userDto.id);
                 FlowProxy.getInstance().send_mountWorkspace(context, userDto.id, workspaceDto, null);
@@ -193,18 +193,14 @@ public class FlowManager {
         ((ApplicationContext) context).getActiveUser().addWorkspace(workspace);
         ((ApplicationContext) context).commit();
 
+        workspaceDto.files = new ArrayList<TextFileDto>();
+
         //Notify owner
         FlowProxy.getInstance().send_mountWorkspace(context, workspaceDto.owner, workspaceDto, null);
     }
 
     public static void notifyEditWorkspace(Context context, WorkspaceDto workspaceDto, boolean isPrivate, HashSet<String> users, HashSet<String> tags, long quota) {
-        //Updates business layer
         Workspace workspace = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(workspaceDto.name);
-        workspace.setTags(tags);
-        workspace.setUsers(users);
-        workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
-        workspace.setMaximumQuota(quota);
-        ((ApplicationContext) context).commit();
 
         //Update dto
         workspaceDto.files = getFiles(context, workspaceDto.name);
@@ -217,6 +213,13 @@ public class FlowManager {
         for(String userId : users)
             if(!workspace.getUsers().contains(userId))
                 FlowProxy.getInstance().send_mountWorkspace(context, userId, workspaceDto, null);
+
+        //Updates business layer
+        workspace.setTags(tags);
+        workspace.setUsers(users);
+        workspace.setPrivacy(isPrivate ? Workspace.PRIVACY.PRIVATE : Workspace.PRIVACY.PUBLIC);
+        workspace.setMaximumQuota(quota);
+        ((ApplicationContext) context).commit();
     }
 
     //----------------------------------------------------------------------------------------------
