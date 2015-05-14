@@ -114,6 +114,12 @@ public class FlowProxy {
 
     //SEND -----------------------------------------------------------------------------------------
 
+    public void send_userLeft(Context context){
+        for(WorkspaceDto workspaceDto : FlowManager.getWorkspaces(context))
+            for(String userId : FlowManager.getWorkspaceUsers(context, workspaceDto.name))
+                send_unmountWorkspace(context, userId, workspaceDto, null);
+    }
+
     public void send_userLeftWorkspace(final Context context, final WorkspaceDto workspaceDto, final ConnectionHandler handler){
         MessagePack messagePack = new MessagePack();
         messagePack.request = MessagePack.UNINVITE_FROM_WORKSPACE;

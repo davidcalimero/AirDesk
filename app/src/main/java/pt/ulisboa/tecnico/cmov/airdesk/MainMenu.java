@@ -79,6 +79,7 @@ public class MainMenu extends AppCompatActivity {
                 intent.putExtra(LogInActivity.LOGOUT, true);
                 startActivity(intent);
                 finish();
+                FlowProxy.getInstance().send_userLeft(getApplicationContext());
                 break;
             default:
                 return super.onOptionsItemSelected(item);
