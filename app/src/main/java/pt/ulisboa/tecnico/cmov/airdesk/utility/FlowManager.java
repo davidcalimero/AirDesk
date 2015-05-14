@@ -46,8 +46,10 @@ public class FlowManager {
 
     //RECEIVE --------------------------------------------------------------------------------------
 
-    public static String receive_userRequest(Context context){
-        return getActiveUserID(context);
+    public static UserDto receive_userRequest(Context context){
+        UserDto dto = new UserDto();
+        dto.id = getActiveUserID(context);
+        return dto;
     }
 
     public static void receive_userJoined(Context context, UserDto userDto){
@@ -200,10 +202,38 @@ public class FlowManager {
     // METHODS TO ASK OWNER  -----------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
 
-    public static void updateForeignList(Context context, HashSet<String> tags){
+    public static void updateForeignList(final Context context, HashSet<String> tags){
         // N-Version TODO
         // Get public workspaces from users
         // Compare tags from Subscription and Public Profile
+        /** /
+        new MyAsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void param) {
+                //Create message pack
+                final MessagePack[] messagePack = {new MessagePack()};
+                messagePack[0].request = MessagePack.HELLO_WORLD;
+                messagePack[0].receiver = "192.168.0.1";
+
+                ((ApplicationContext) context).getWifiDirectService().sendMessageWithResponse(messagePack[0], new ConnectionHandler<MessagePack>() {
+                    @Override
+                    public void onSuccess(MessagePack result) {
+                        messagePack[0] = result;
+                        Log.e("Connection", "Success");
+                        Log.e("Connection", messagePack[0].request + "-");
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        //ConnectionLostException
+                    }
+                });
+
+                return null;
+            }
+        }.execute(null);
+        /**/
+
 
         // S-Version
         for(WorkspaceDto workspaceDto : getWorkspaces(context)){
