@@ -22,6 +22,8 @@
     <string name="title">Title</string>
     <string name="enter_text">Enter Text</string>
     <string name="personID">Person\'s ID</string>
+    <string name="security_key">Security Key</string>
+    <string name="password">Password</string>
 
     <!-- Descriptions -->
     <string name="app_logo">App Logo</string>
@@ -38,6 +40,8 @@
     <string name="add">Add</string>
     <string name="confirm">Confirm</string>
     <string name="users">Users</string>
+    <string name="create_account">Create Account</string>
+    <string name="send_key">Send Key</string>
 
     <!-- Tabs -->
     <string name="owned">Owned</string>
@@ -57,6 +61,8 @@
     <string name="file_cant_be_edited_at_the_moment">File can\'t be edited at the moment</string>
     <string name="error_connection_lost_try_again_later">Error: Connection lost. Try again later</string>
     <string name="error_could_not_apply_changes">Error: Could not apply changes</string>
+    <string name="security_key_sent">Security Key Sent</string>
+    <string name="account_created_successfully">Account created successfully</string>
 
     <!-- AlertDialogs -->
     <string name="dialog_confirm_delete">Do you want to delete</string>
@@ -75,6 +81,7 @@
     <string name="change_quota">Change Quota</string>
     <string name="public_privacy">Public</string>
     <string name="private_privacy">Private</string>
+    <string name="title_activity_create_account">Create Account</string>
 
     <!-- Not Organized -->
 

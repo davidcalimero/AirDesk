@@ -111,15 +111,11 @@ public class SimWifiDirectService extends WifiDirectService implements
         }
 
         // REMOVE UNREACHABLE IPS FROM THE HASH
-        for(String ip : devices){
-            Log.e("OnGroup", "Device with IP: " + ip);
-            Log.e("OnGroup", "IPS Size: " + ips.size());
-            if(!ips.contains(ip) || ips.isEmpty()) {
-                Log.e("OnGroup", "Will remove IP");
+        for(String ip : devices)
+            if(!ips.contains(ip)) {
                 devices.remove(ip);
                 removeDevice(ip);
             }
-        }
 
         // KNOW IDs. WILL SEND A USER_REQUEST MESSAGEPACK
         /**/

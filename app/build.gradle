@@ -25,6 +25,12 @@ dependencies {
     compile(name:'Termite-WifiP2P-API-release', ext:'aar')
 }
 
+dependencies {
+    compile 'org.jooq:jooq:3.1.0'
+    compile 'com.google.guava:guava:14.0'
+    compile 'postgresql:postgresql:9.1-901-1.jdbc4'
+}
+
 repositories{
     flatDir{
         dirs 'libs'

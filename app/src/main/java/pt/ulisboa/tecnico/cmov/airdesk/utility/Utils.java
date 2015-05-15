@@ -5,10 +5,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.text.DecimalFormat;
 import java.util.Collection;
 
 public class Utils {
+
+    private static final String DRIVER_DB = "org.postgresql.Driver";
+    private static final String URL_DB = "db.ist.utl.pt:5432";
+    private static final String USERNAME_DB = "ist166392";
+    private static final String PASSWORD_DB = "inrq1320";
 
     //Returns true if list1 has at least one element contained in list2
     public static boolean haveElementsInCommon(Collection set1, Collection set2) {
@@ -56,11 +63,30 @@ public class Utils {
         try {
             ois = new ObjectInputStream(in);
             return ois.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Connection generateConnection() {
+        //Connects to database
+        Connection connection;
+        try {
+            Class.forName(DRIVER_DB);
+            connection = DriverManager.getConnection("jdbc:postgresql://" + URL_DB + "/", USERNAME_DB, PASSWORD_DB);
+        } catch (Exception e) {
+            System.out.println("Database connection failed!");
+            e.printStackTrace();
+            return null;
+        }
+
+        //Check connection success
+        if (connection == null) {
+            System.out.println("Failed to make database connection!");
+            return null;
+        }
+
+        return connection;
     }
 }
