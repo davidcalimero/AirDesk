@@ -10,7 +10,6 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -107,20 +106,25 @@ public class SimWifiDirectService extends WifiDirectService implements
 
         ArrayList<String> ips = new ArrayList<>();
         // GETS DEVICES' IPS
-        for(SimWifiP2pDevice device : simWifiP2pDeviceList.getDeviceList()){
-            ips.add(device.getVirtIp());
+        for(String deviceName : simWifiP2pInfo.getDevicesInNetwork()){
+            ips.add(simWifiP2pDeviceList.getByName(deviceName).getVirtIp());
         }
 
         // REMOVE UNREACHABLE IPS FROM THE HASH
         for(String ip : devices){
-            if(!ips.contains(ip))
+            Log.e("OnGroup", "Device with IP: " + ip);
+            Log.e("OnGroup", "IPS Size: " + ips.size());
+            if(!ips.contains(ip) || ips.isEmpty()) {
+                Log.e("OnGroup", "Will remove IP");
                 devices.remove(ip);
-            removeDevice(ip);
+                removeDevice(ip);
+            }
         }
 
         // KNOW IDs. WILL SEND A USER_REQUEST MESSAGEPACK
         /**/
-        for(SimWifiP2pDevice device : simWifiP2pDeviceList.getDeviceList()){
+        for(String deviceName : simWifiP2pInfo.getDevicesInNetwork()){
+            SimWifiP2pDevice device = simWifiP2pDeviceList.getByName(deviceName);
             if(!devices.contains(device.getVirtIp()) && !simWifiP2pInfo.getDeviceName().equals(device.deviceName)){
                 devices.add(device.getVirtIp());
                 addDevice(device.getVirtIp());

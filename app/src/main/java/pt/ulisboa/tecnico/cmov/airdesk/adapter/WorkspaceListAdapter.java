@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 import pt.ulisboa.tecnico.cmov.airdesk.R;
 import pt.ulisboa.tecnico.cmov.airdesk.widget.AnimatedExpandableListView;
@@ -119,9 +120,11 @@ public class WorkspaceListAdapter extends AnimatedExpandableListView.AnimatedExp
     }
 
     public void removeTag(String tag){
-        for(Item item : items){
-            if(item.tag.equals(tag))
-                removeGroup(tag, item.group);
+        ListIterator<Item> it = items.listIterator();
+        while(it.hasNext()){
+            Item i = it.next();
+            if(i.tag.equals(tag))
+                it.remove();
         }
     }
 

@@ -285,6 +285,8 @@ public class FlowProxy {
         messagePack.data = userDto;
         messagePack.sender = id_ip.get(userDto.id);
 
+        if(id_ip.isEmpty()) handler.onSuccess(messagePack.data);
+
         for(String id : id_ip.keySet()) {
             messagePack.receiver = id;
             send(context, messagePack, handler);
