@@ -142,13 +142,15 @@ public class CreateAccountActivity extends AppCompatActivity {
             protected Void doInBackground(Void param) {
                 try {
                    Connection databaseConnection = Utils.generateConnection();
-                    CallableStatement stmt = databaseConnection.prepareCall("{call cmov_active_account(?, ?)}");
-                    stmt.setString(1, email);
-                    stmt.setString(2, key);
-                    ResultSet result = stmt.executeQuery();
-                    result.next();
-                    value = result.getBoolean(1);
-                    databaseConnection.close();
+                    if(databaseConnection != null) {
+                        CallableStatement stmt = databaseConnection.prepareCall("{call cmov_active_account(?, ?)}");
+                        stmt.setString(1, email);
+                        stmt.setString(2, key);
+                        ResultSet result = stmt.executeQuery();
+                        result.next();
+                        value = result.getBoolean(1);
+                        databaseConnection.close();
+                    }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

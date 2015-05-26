@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
@@ -111,11 +112,14 @@ public class SimWifiDirectService extends WifiDirectService implements
         }
 
         // REMOVE UNREACHABLE IPS FROM THE HASH
-        for(String ip : devices)
-            if(!ips.contains(ip)) {
-                devices.remove(ip);
+        Iterator<String> it = devices.iterator();
+        while (it.hasNext()){
+            String ip = it.next();
+            if (!ips.contains(ip)) {
                 removeDevice(ip);
+                it.remove();
             }
+        }
 
         // KNOW IDs. WILL SEND A USER_REQUEST MESSAGEPACK
         /**/

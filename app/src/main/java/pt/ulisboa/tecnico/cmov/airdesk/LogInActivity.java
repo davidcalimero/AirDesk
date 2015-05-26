@@ -112,14 +112,15 @@ public class LogInActivity extends AppCompatActivity {
                 String nickname = null;
                 try {
                     Connection databaseConnection = Utils.generateConnection();
-                    CallableStatement stmt = databaseConnection.prepareCall("{call cmov_login(?, ?)}");
-                    stmt.setString(1, email);
-                    stmt.setString(2, password);
-                    ResultSet result = stmt.executeQuery();
-                    result.next();
-                    nickname = result.getString(1);
-                    Log.e("Teste", nickname);
-                    databaseConnection.close();
+                    if(databaseConnection != null) {
+                        CallableStatement stmt = databaseConnection.prepareCall("{call cmov_login(?, ?)}");
+                        stmt.setString(1, email);
+                        stmt.setString(2, password);
+                        ResultSet result = stmt.executeQuery();
+                        result.next();
+                        nickname = result.getString(1);
+                        databaseConnection.close();
+                    }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

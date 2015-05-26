@@ -71,7 +71,8 @@ public class FlowManager {
     }
 
     public static void receive_userStopEditing(Context context, TextFileDto textFileDto){
-        ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title).setAvailability("", true);
+        TextFile tf = ((ApplicationContext) context).getActiveUser().getWorkspaces().get(textFileDto.workspace).getFiles().get(textFileDto.title);
+        if(tf != null) tf.setAvailability("", true);
     }
 
 
